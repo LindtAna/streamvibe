@@ -1,0 +1,35 @@
+.container {
+    width: 100%;
+    max-width: calc(var(--container-width) + var(--container-padding-x) * 2);
+    margin-inline: auto;
+    padding-inline: var(--container-padding-x);
+  }
+
+.visually-hidden{
+    @include visually-hidden
+}
+// This is a utility class to hide elements visually but keep them accessible to screen readers
+
+.visible-tablet{
+    @include tablet-above{
+        display: none !important;
+    }
+}
+
+.hidden-tablet{
+    @include tablet{
+        display: none !important;
+    }
+}
+
+.visible-mobile{
+    @include mobile-above{
+        display: none !important;
+    }
+}
+
+.hidden-mobile{
+    @include mobile{
+        display: none !important;
+    }
+}

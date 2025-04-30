@@ -1,0 +1,59 @@
+:root{
+--colour-white: #FFFFFF;
+--colour-black: #000000;
+
+--colour-red-45: #E50000;
+--colour-red-50: #FF0000;
+--colour-red-55: #FF1919;
+--colour-red-60: #FF3333;
+--colour-red-80: #FF9999;
+--colour-red-90: #FFCCCC;
+--colour-red-95: #FFE5E5;
+--colour-red-99: #FFFAFA;
+
+--colour-black-06: #0F0F0F;
+--colour-black-08: #141414;
+--colour-black-10: #1A1A1A;
+--colour-black-12: #1F1F1F;
+--colour-black-15: #262626;
+--colour-black-20: #333333;
+--colour-black-25: #404040;
+--colour-black-30: #4C4C4C;
+
+
+--colour-grey-60: #999999;
+--colour-grey-65: #A6A6A6;
+--colour-grey-70: #B3B3B3;
+--colour-grey-75: #BFBFBF;
+--colour-grey-90: #E4E4E7;
+--colour-grey-95: #F1F1F3;
+--colour-grey-97: #F7F7F8;
+--colour-grey-99: #FCFCFD;
+
+--border: var(--border-width-s) solid var(--colour-black-15);
+
+--border-width-xl: 6px;
+--border-width-l: 4px;
+--border-width-m: 3px;
+--border-width-s: 1px;
+
+--border-radius-l: 12px;
+--border-radius-m: 10px;
+--border-radius-s: 8px;
+--border-radius-xs: 6px;
+--border-radius-xxs: 5px;
+--border-radius-xxxs: 4px;
+
+--font-family-basic:'Manrope', sans-serif;
+
+--container-width: #{fluid-to-laptop(
+    $container-desktop-width,
+    $container-laptop-width
+  )};
+  --container-padding-x: 16px;
+
+  --section-padding-y: #{fluid(75, 40)};
+
+  --transition-duration: 0.2s;
+  --transition-duration-longer: 0.4s;
+}
