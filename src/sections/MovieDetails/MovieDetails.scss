@@ -1,0 +1,104 @@
+.movie-details {
+    --movieDetailsPaddingTop: #{fluid(100, 60)};
+    display: grid;
+    gap: 20px;
+    padding-top: var(--movieDetailsPaddingTop);
+    padding-bottom: var(--section-padding-y);
+
+    @include tablet-above {
+        grid-template-columns: 1fr 32.5%;
+    }
+
+    @include tablet {
+        .movie-details {
+            &__panel{
+                &--description-tablet-order {
+                    order: -2;
+                }
+                &--order-seasons{
+                    order: -3;
+                }
+            }
+
+            &__info {
+                order: -1;
+            }
+        }
+    }
+
+    &__main {
+        display: grid;
+        row-gap: fluid-to-laptop(30, 20);
+
+        @include tablet {
+            display: contents;
+        }
+    }
+
+    &__panel {
+        display: grid;
+        row-gap: fluid(30, 16);
+        padding: fluid(50, 24);
+        background-color: var(--colour-black-10);
+        border: var(--border);
+        border-radius: var(--border-radius-l);
+
+        @include laptop {
+            border-radius: var(--border-radius-m);
+        }
+
+        &-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            column-gap: 10px;
+        }
+
+        &--large-gap-y {
+            row-gap: fluid(40, 24);
+        }
+    }
+
+    &__groups {
+        display: grid;
+        row-gap: fluid(30, 20);
+    }
+
+    &__group {
+        display: grid;
+        row-gap: fluid-to-laptop(14, 10);
+
+        &__group--big-gap-y{
+            row-gap: fluid(40, 20);
+        }
+    }
+
+    &__description,
+    &__title {
+        font-weight: 500;
+
+    }
+
+    &__title {
+        @include fluid-text(18, 14);
+
+        display: flex;
+        align-items: center;
+        column-gap: 4px;
+        color: inherit;
+    }
+
+    &__description {
+        color: var(--colour-white);
+    }
+
+    &__info {
+        @include tablet-above {
+            position: sticky;
+            top: calc(var(--movieDetailsPaddingTop) + 20px);
+            align-self: start;
+        }
+    }
+
+
+}
