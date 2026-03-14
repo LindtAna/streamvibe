@@ -1,4 +1,7 @@
-package model
+// Note: Go uses snake_case for file names
+// Note_2: only double quotes ("") for string literals...
+
+package models
 
 import (
 	"go.mongodb.org/mongo-driver/v2/bson"
