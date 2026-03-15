@@ -37,7 +37,7 @@ func GenerateAllTokens(email, firstName, lastName, role, userId string) (string,
 		},
 	}
 
-	token := jwt.NewWithClaims(jwt.SigningMethodES256, claims)
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	signedToken, err := token.SignedString([]byte(SECRET_KEY_TOKEN))
 
 	if err != nil {
@@ -53,11 +53,11 @@ func GenerateAllTokens(email, firstName, lastName, role, userId string) (string,
 		RegisteredClaims: jwt.RegisteredClaims{
 			Issuer:    "streamvibe",
 			IssuedAt:  jwt.NewNumericDate(time.Now()),
-			ExpiresAt: jwt.NewNumericDate(time.Now().Add(24 * time.Hour)),
+			ExpiresAt: jwt.NewNumericDate(time.Now().Add(24 * 7 * time.Hour)),
 		},
 	}
 
-	refreshToken := jwt.NewWithClaims(jwt.SigningMethodES256, refreshClaims)
+	refreshToken := jwt.NewWithClaims(jwt.SigningMethodHS256, refreshClaims)
 	signedRefreshToken, err := refreshToken.SignedString([]byte(SECRET_KEY_REFRESH_TOKEN))
 
 	if err != nil {
