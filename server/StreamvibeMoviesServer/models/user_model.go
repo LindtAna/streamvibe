@@ -11,7 +11,7 @@ type User struct {
 	UserID          string        `bson:"user_id" json:"user_id"`
 	FirstName       string        `bson:"first_name" json:"first_name" validate:"required,min=1,max=100"`
 	LastName        string        `bson:"last_name" json:"last_name" validate:"required,min=1,max=100"`
-	Email           string        `json:"email" bson:"email" validate:"required,email"`
+	Email           string        `bson:"email" json:"email" validate:"required,email"`
 	Password        string        `bson:"password" json:"password" validate:"required,min=7"`
 	Role            string        `bson:"role" json:"role" validate:"oneof=ADMIN USER"`
 	CreatedAt       time.Time     `bson:"created_at" json:"created_at"`
@@ -19,4 +19,18 @@ type User struct {
 	Token           string        `bson:"token" json:"token"`
 	RefreshToken    string        `bson:"refresh_token" json:"refresh_token"`
 	FavouriteGenres []Genre       `bson:"favourite_genres" json:"favourite_genres" validate:"required,dive"`
+}
+
+type UserLogin struct {
+	Email    string `bson:"email" json:"email" validate:"required,email"`
+	Password string `bson:"password" json:"password" validate:"required,min=7"`
+}
+
+type UserResponse struct {
+	UserId          string  `json:"user_id"`
+	FirstName       string  `json:"first_name"`
+	LastName        string  `json:"last_name"`
+	Email           string  `json:"email"`
+	Role            string  `json:"role"`
+	FavouriteGenres []Genre `json:"favourite_genres"`
 }
