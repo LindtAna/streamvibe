@@ -5,21 +5,18 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	controller "github.com/LindtAna/streamvibe/server/StreamvibeMoviesServer/controllers"
+	"github.com/LindtAna/streamvibe/server/StreamvibeMoviesServer/routes"
 )
 
 func main() {
 	router := gin.Default()
 
 	router.GET("/hi", func(c *gin.Context) {
-		c.String(200, "hi, endpoint!")
+		c.String(200, "hi, streamvibe")
 	})
 
-	router.GET("/movies", controller.GetMovies())
-	router.GET("/movie/:imdb_id", controller.GetMovie())
-	router.POST("/addmovie", controller.AddMovie())
-	router.POST("/register", controller.RegisterUser())
-	router.POST("/login", controller.LoginUser())
+	routes.SetupUnprotectedRoutes(router)
+	routes.SetupProtectedRoutes(router)
 
 	if err := router.Run(":8080"); err != nil {
 		fmt.Println("Failed to start server", err)
