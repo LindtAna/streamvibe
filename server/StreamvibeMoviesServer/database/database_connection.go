@@ -37,15 +37,13 @@ func DBConnect() *mongo.Client {
 	return client
 }
 
-var Client *mongo.Client = DBConnect()
-
-func OpenCollection(collectionName string) *mongo.Collection {
+func OpenCollection(collectionName string, client *mongo.Client) *mongo.Collection {
 
 	databaseName := os.Getenv("DATABASE_NAME")
 
 	fmt.Println("DATABASE_NAME:", databaseName)
 
-	collection := Client.Database(databaseName).Collection(collectionName)
+	collection := client.Database(databaseName).Collection(collectionName)
 
 	return collection
 

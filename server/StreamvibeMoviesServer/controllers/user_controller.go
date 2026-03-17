@@ -25,7 +25,7 @@ func HashPassword(password string) (string, error) {
 
 }
 
-func RegisterUser() gin.HandlerFunc {
+func RegisterUser(client *mongo.Client) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var user models.User
 
@@ -51,7 +51,7 @@ func RegisterUser() gin.HandlerFunc {
 		var ctx, cancel = context.WithTimeout(context.Background(), 100*time.Second)
 		defer cancel()
 
-		var userCollection *mongo.Collection = database.OpenCollection("users")
+		var userCollection *mongo.Collection = database.OpenCollection("users", client)
 
 		count, err := userCollection.CountDocuments(ctx, bson.D{{Key: "email", Value: user.Email}})
 
@@ -82,7 +82,7 @@ func RegisterUser() gin.HandlerFunc {
 	}
 }
 
-func LoginUser() gin.HandlerFunc {
+func LoginUser(client *mongo.Client) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var userLogin models.UserLogin
 
@@ -94,9 +94,9 @@ func LoginUser() gin.HandlerFunc {
 		var ctx, cancel = context.WithTimeout(context.Background(), 100*time.Second)
 		defer cancel()
 
-		var userCollection *mongo.Collection = database.OpenCollection("users")
-
 		var foundUser models.User
+		var userCollection *mongo.Collection = database.OpenCollection("users", client)
+
 		err := userCollection.FindOne(ctx, bson.D{{Key: "email", Value: userLogin.Email}}).Decode(&foundUser)
 		if err != nil {
 			c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid email or password"})
@@ -116,7 +116,7 @@ func LoginUser() gin.HandlerFunc {
 			return
 		}
 
-		err = utils.UpdateAllTokes(foundUser.UserID, token, refreshToken)
+		err = utils.UpdateAllTokes(foundUser.UserID, token, refreshToken, client)
 
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update tokens"})
