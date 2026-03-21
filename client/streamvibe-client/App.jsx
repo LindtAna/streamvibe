@@ -1,13 +1,11 @@
 import { useState } from 'react'
-import MovieCard from './src/components/Movie'
+import Movie from './src/components/Movie/Movie'
 
 
 function App() {
-  const [count, setCount] = useState(0)
-
   return (
     <>
-   <MovieCard />
+   <Movie />
     </>
   )
 }

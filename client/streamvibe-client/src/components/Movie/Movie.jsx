@@ -1,10 +1,17 @@
 import './Movie.scss'
 import React from 'react'
+// import { Helmet } from 'react-helmet-async'
+import MovieBanner from '../MovieBanner'
+import MovieDetails from '../MovieDetails'
 
-const MovieCard = () => {
+const Movie = () => {
   return (
-    <div>MovieCard</div>
+     <>
+     {/* <Helmet><title>StreamVibe | Avengers : Endgame</title></Helmet> */}
+      <MovieBanner />
+      <MovieDetails />
+    </>
   )
 }
 
-export default MovieCard
+export default Movie
