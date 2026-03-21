@@ -1,5 +1,6 @@
 import './Button.scss'
 import Icon from '../Icon'
+import classNames from 'classnames'
 
 const Button = ({
   className,

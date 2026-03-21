@@ -4,20 +4,22 @@ import playIcon from '../../assets/icons/play.svg'
 import plusIcon from '../../assets/icons/plus.svg'
 import likeIcon from '../../assets/icons/like.svg'
 import volumeIcon from '../../assets/icons/volume.svg'
+import classNames from 'classnames'
+import imgMovie from '../../assets/test-images/interstellar.jpg'
 
 const MovieBannerCard = ({
   title,
   titleId,
   TitleTag = 'h2',
-  description,
-  imgSrc,
+  // description,
+  // imgMovie,
   isSmallPaddingY = false,
 }) => {
   return (
     <div className="movie-banner-card">
       <img
         className="movie-banner-card__image"
-        src={imgSrc}
+        src={imgMovie}
         alt={title}
       />
       <div
@@ -27,13 +29,15 @@ const MovieBannerCard = ({
       >
         <div className="movie-banner-card__body">
           <TitleTag className="movie-banner-card__title h3" id={titleId}>
-            {title}
+            {/* {title} */}
+            Avengers : Endgame
           </TitleTag>
-          {description && (
+          {/* {description && ( */}
             <div className="movie-banner-card__description hidden-mobile">
-              <p>{description}</p>
+              {/* <p>{description}</p> */}
+              Whatever It Takes! Part of the journey is the end.
             </div>
-          )}
+          {/* )} */}
         </div>
         <footer className="movie-banner-card__footer">
           <Button

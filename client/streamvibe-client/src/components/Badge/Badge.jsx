@@ -1,5 +1,6 @@
 import './Badge.scss'
 import Icon from '../Icon'
+import classNames from 'classnames'
 
 const Badge = ({
   className,

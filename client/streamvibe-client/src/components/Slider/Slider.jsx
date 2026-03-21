@@ -1,9 +1,10 @@
 import { useEffect, useId, useRef } from 'react'
-// import 'swiper/css'
+import 'swiper/css'
 import './Slider.scss'
 import SliderNavigation from '../SliderNavigation'
-// import Swiper from 'swiper'
-// import { Navigation, Pagination, Scrollbar } from 'swiper/modules'
+import Swiper from 'swiper'
+import { Navigation, Pagination, Scrollbar } from 'swiper/modules'
+import classNames from 'classnames'
 
 const defaultSliderParams = {
   slidesPerView: 5,

@@ -1,4 +1,5 @@
 import './Icon.scss'
+import classNames from 'classnames'
 
 const Icon = ({
   className,

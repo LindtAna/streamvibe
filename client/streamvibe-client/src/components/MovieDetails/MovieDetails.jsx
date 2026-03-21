@@ -1,4 +1,3 @@
-import { useEffect, useRef } from 'react'
 import './MovieDetails.scss'
 import Slider from '../Slider'
 import SliderNavigation from '../SliderNavigation'
@@ -21,7 +20,21 @@ import Actor2 from '../../assets/test-images/actor2.jpg'
 
 const castItems = [
   { imgSrc: Actor1, imgAlt: 'Actor Test' },
-  { imgSrc: Actor2, imgAlt: 'Actress Test' }
+  { imgSrc: Actor2, imgAlt: 'Actress Test' },
+  { imgSrc: Actor1, imgAlt: 'Actor Test' },
+  { imgSrc: Actor2, imgAlt: 'Actress Test' },
+  { imgSrc: Actor1, imgAlt: 'Actor Test' },
+  { imgSrc: Actor2, imgAlt: 'Actress Test' },
+  { imgSrc: Actor1, imgAlt: 'Actor Test' },
+  { imgSrc: Actor2, imgAlt: 'Actress Test' },
+  { imgSrc: Actor1, imgAlt: 'Actor Test' },
+  { imgSrc: Actor2, imgAlt: 'Actress Test' },
+  { imgSrc: Actor1, imgAlt: 'Actor Test' },
+  { imgSrc: Actor2, imgAlt: 'Actress Test' },
+  { imgSrc: Actor1, imgAlt: 'Actor Test' },
+  { imgSrc: Actor2, imgAlt: 'Actress Test' },
+  { imgSrc: Actor1, imgAlt: 'Actor Test' },
+  { imgSrc: Actor2, imgAlt: 'Actress Test' },
 ]
 
 const reviewItems = [
@@ -38,7 +51,21 @@ const reviewItems = [
     description:
       'Nicht mehr die Avengers aus den Hit- und Marvel Comics. Mit Emotiönchen versehen, weil mitfühlen so gut zum Zeitgeist passt.',
     ratingValue: 3,
-  }
+  },
+    {
+    name: 'Dennis Donohue',
+    subtitle: 'From USA',
+    description:
+      'Whereas Infinity War was a pulsating caffiene rush from beginning to end that could leave one shaking from the adrenaline dump, Endgame was an emotional walk home after a long night out.',
+    ratingValue: 5,
+  },
+  {
+    name: 'Klaus Martin',
+    subtitle: 'From Germany',
+    description:
+      'Nicht mehr die Avengers aus den Hit- und Marvel Comics. Mit Emotiönchen versehen, weil mitfühlen so gut zum Zeitgeist passt.',
+    ratingValue: 3,
+  },
 ]
 
 

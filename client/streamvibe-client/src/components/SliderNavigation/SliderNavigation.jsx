@@ -2,6 +2,7 @@ import './SliderNavigation.scss'
 import Button from '../Button'
 import arrowLeft from '../../assets/icons/arrow-left.svg'
 import arrowRight from '../../assets/icons/arrow-right.svg'
+import classNames from 'classnames'
 
 // prevBtnRef, nextBtnRef, paginationRef передаются из Slider
 // чтобы Swiper мог найти DOM-элементы навигации.
