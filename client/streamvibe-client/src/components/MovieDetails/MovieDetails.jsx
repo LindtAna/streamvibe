@@ -1,4 +1,3 @@
-import './MovieDetails.scss'
 import Slider from '../Slider'
 import SliderNavigation from '../SliderNavigation'
 import PersonCard from '../PersonCard'
@@ -7,6 +6,10 @@ import Button from '../Button'
 import Icon from '../Icon'
 import Tags from '../Tags'
 import Ratings from '../Ratings'
+
+import { api } from '../../services/api'
+import './MovieDetails.scss'
+import { useState, useEffect } from 'react'
 
 import CalenderIcon from '../../assets/icons/calender.svg'
 import TranslateIcon from '../../assets/icons/translate.svg'
@@ -52,7 +55,7 @@ const reviewItems = [
       'Nicht mehr die Avengers aus den Hit- und Marvel Comics. Mit Emotiönchen versehen, weil mitfühlen so gut zum Zeitgeist passt.',
     ratingValue: 3,
   },
-    {
+  {
     name: 'Dennis Donohue',
     subtitle: 'From USA',
     description:
@@ -69,9 +72,57 @@ const reviewItems = [
 ]
 
 
-const MovieDetails = ({ seasons }) => {
+const MovieDetails = ({ imdbId, seasons }) => {
+  const [movie, setMovie] = useState(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
+
   const titleId = 'movie-details-title'
   const castSliderNavigationId = 'movie-cast-slider-navigation'
+
+  useEffect(() => {
+    const fetchMovie = async () => {
+      try {
+        setLoading(true)
+        // Wenn eine bestimmte IMDb-ID angegeben wird, wird diese verwendet
+        // Andernfalls werden alle Filme geladen und der erste ausgewählt
+        if (imdbId) {
+          const movies = await api.getMovies()
+          const foundMovie = movies.find(m => m.imdb_id === imdbId)
+          setMovie(foundMovie || movies[0])
+        } else {
+          const movies = await api.getMovies()
+          setMovie(movies[0])
+        }
+      } catch (err) {
+        setError(err.message)
+        console.error('Failed to fetch movie:', err)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchMovie()
+  }, [imdbId])
+
+  if (loading) {
+    return <div className="container">Loading movie details...</div>
+  }
+
+  if (error) {
+    return <div className="container">Error: {error}</div>
+  }
+
+  if (!movie) {
+    return <div className="container">No movie found</div>
+  }
+
+  // IMDb-Bewertung (falls vorhanden) extrahieren
+  const imdbRating = movie.ranking?.ranking_value || 0
+  const streamVibeRating = movie.ranking?.ranking_value || 0
+
+
+  const genreNames = movie.genre?.map(g => g.genre_name) || []
 
   return (
     <section className="movie-details container" aria-labelledby={titleId}>
@@ -96,9 +147,10 @@ const MovieDetails = ({ seasons }) => {
             <h3 className="movie-details__title">Description</h3>
             <div className="movie-details__description">
               <p>
-                The surviving members of the Avengers and their allies attempt to
+                {/* The surviving members of the Avengers and their allies attempt to
                 reverse Thanos's actions in Infinity War which erased half of all
-                life in the universe.
+                life in the universe. */}
+                {movie.admin_review || 'No description available.'}
               </p>
             </div>
           </div>
@@ -219,7 +271,7 @@ const MovieDetails = ({ seasons }) => {
                 <Icon iconName="genres" src={GenresIcon} />
                 <span>Genres</span>
               </h3>
-              <Tags items={['Action', 'Superhero Movie']} />
+               <Tags items={genreNames} />
             </div>
 
             {/* Director */}

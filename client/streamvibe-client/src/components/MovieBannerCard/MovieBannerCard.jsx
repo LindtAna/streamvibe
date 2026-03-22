@@ -5,48 +5,63 @@ import plusIcon from '../../assets/icons/plus.svg'
 import likeIcon from '../../assets/icons/like.svg'
 import volumeIcon from '../../assets/icons/volume.svg'
 import classNames from 'classnames'
-import imgMovie from '../../assets/test-images/interstellar.jpg'
 
 const MovieBannerCard = ({
-  title,
+  movie,
   titleId,
   TitleTag = 'h2',
-  // description,
-  // imgMovie,
-  isSmallPaddingY = false,
 }) => {
+
+  if (!movie) {
+    return null
+  }
+
+  const handlePlayClick = () => {
+    if (movie.youtube_id) {
+      window.open(`https://www.youtube.com/watch?v=${movie.youtube_id}`, '_blank')
+    }
+  }
+
   return (
-    <div className="movie-banner-card">
-      <img
-        className="movie-banner-card__image"
-        src={imgMovie}
-        alt={title}
-      />
+    <div className="movie-banner-card container">
+      {/* Blurred background poster */}
       <div
-        className={classNames('movie-banner-card__inner', {
-          'movie-banner-card__inner--small-padding-y': isSmallPaddingY,
-        })}
-      >
-        <div className="movie-banner-card__body">
-          <TitleTag className="movie-banner-card__title h3" id={titleId}>
-            {/* {title} */}
-            Avengers : Endgame
-          </TitleTag>
-          {/* {description && ( */}
-            <div className="movie-banner-card__description hidden-mobile">
-              {/* <p>{description}</p> */}
-              Whatever It Takes! Part of the journey is the end.
-            </div>
-          {/* )} */}
+        className="movie-banner-card__background"
+        style={{ backgroundImage: `url(${movie.poster_path})` }}
+        aria-hidden="true"
+      />
+
+      {/* Gradient overlay */}
+      <div className="movie-banner-card__overlay" aria-hidden="true" />
+
+      {/* Content container */}
+      <div className="movie-banner-card__content container">
+        {/* Left side - poster */}
+        <div className="movie-banner-card__left">
+          <img
+            className="movie-banner-card__poster"
+            src={movie.poster_path}
+            alt={movie.title}
+            loading="eager"
+          />
         </div>
-        <footer className="movie-banner-card__footer">
+
+        {/* Right side - Movie info */}
+        <div className="movie-banner-card__right">
+          <TitleTag className="movie-banner-card__title h1" id={titleId}>
+            {movie.title}
+          </TitleTag>
+
+
           <Button
             className="movie-banner-card__play-button"
             iconName="play"
             iconSrc={playIcon}
             label="Play Now"
             hasFillIcon
+            onClick={handlePlayClick}
           />
+
           <div className="movie-banner-card__actions">
             <Button
               mode="black-06"
@@ -70,7 +85,7 @@ const MovieBannerCard = ({
               isLabelHidden
             />
           </div>
-        </footer>
+        </div>
       </div>
     </div>
   )

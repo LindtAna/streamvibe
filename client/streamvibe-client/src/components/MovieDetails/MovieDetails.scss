@@ -1,5 +1,5 @@
 .movie-details {
-    --movieDetailsPaddingTop: #{fluid(100, 60)};
+    --movieDetailsPaddingTop: #{fluid(30, 10)};
     display: grid;
     gap: 20px;
     padding-top: var(--movieDetailsPaddingTop);
