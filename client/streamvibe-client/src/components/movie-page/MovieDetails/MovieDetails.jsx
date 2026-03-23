@@ -7,18 +7,18 @@ import Icon from '../Icon'
 import Tags from '../Tags'
 import Ratings from '../Ratings'
 
-import { api } from '../../services/api'
+import { api } from '../../../services/api'
 import './MovieDetails.scss'
 import { useState, useEffect } from 'react'
 
-import CalenderIcon from '../../assets/icons/calender.svg'
-import TranslateIcon from '../../assets/icons/translate.svg'
-import PlusIcon from '../../assets/icons/plus.svg'
-import StarIcon from '../../assets/icons/star.svg'
-import GenresIcon from '../../assets/icons/genres.svg'
+import CalenderIcon from '../../../assets/icons/calender.svg'
+import TranslateIcon from '../../../assets/icons/translate.svg'
+import PlusIcon from '../../../assets/icons/plus.svg'
+import StarIcon from '../../../assets/icons/star.svg'
+import GenresIcon from '../../../assets/icons/genres.svg'
 
-import Actor1 from '../../assets/test-images/actor1.jpg'
-import Actor2 from '../../assets/test-images/actor2.jpg'
+import Actor1 from '../../../assets/test-images/actor1.jpg'
+import Actor2 from '../../../assets/test-images/actor2.jpg'
 
 
 const castItems = [

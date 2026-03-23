@@ -1,9 +1,9 @@
 import './MovieBannerCard.scss'
 import Button from '../Button'
-import playIcon from '../../assets/icons/play.svg'
-import plusIcon from '../../assets/icons/plus.svg'
-import likeIcon from '../../assets/icons/like.svg'
-import volumeIcon from '../../assets/icons/volume.svg'
+import playIcon from '../../../assets/icons/play.svg'
+import plusIcon from '../../../assets/icons/plus.svg'
+import likeIcon from '../../../assets/icons/like.svg'
+import volumeIcon from '../../../assets/icons/volume.svg'
 import classNames from 'classnames'
 
 const MovieBannerCard = ({

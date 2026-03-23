@@ -1,6 +1,6 @@
 import './RatingView.scss'
-import starsUnfilledImgSrc from '../../assets/icons/stars_unfilled.svg'
-import starsFilledImgSrc from '../../assets/icons/stars_filled.svg'
+import starsUnfilledImgSrc from '../../../assets/icons/stars_unfilled.svg'
+import starsFilledImgSrc from '../../../assets/icons/stars_filled.svg'
 
 const RatingView = ({ value = 5, label }) => {
   const ariaLabel = `Rating: ${value} stars`
