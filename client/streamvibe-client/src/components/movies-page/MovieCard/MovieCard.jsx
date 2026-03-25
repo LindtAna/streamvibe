@@ -34,12 +34,6 @@ const MovieCard = ({
           </Badge>
         )}
 
-        {season && (
-          <Badge iconName="catalog" iconSrc={CatalogIcon} hasFillIcon>
-            {season}
-          </Badge>
-        )}
-
         {rating && (
           <Badge className="movie-card__rating-badge">
             <RatingView {...rating} />

@@ -29,7 +29,7 @@ const Icon = ({
         fill={hasFill ? 'currentColor' : 'none'}
         stroke={hasFill ? 'none' : 'currentColor'}
       >
-        <use href={`/assets/images/icons.svg#${name}`} />
+        <use href={`/assets/icons.svg#${name}`} />
       </svg>
     </span>
   )

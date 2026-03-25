@@ -35,7 +35,8 @@
 
     &__icon{
         &.icon{
-            --iconSize: #{fluid-to-laptop(24, 20)};
+            --iconSize: #{fluid-to-laptop(24, 4)};
         }
+
     }
 }

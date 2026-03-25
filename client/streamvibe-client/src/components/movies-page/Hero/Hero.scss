@@ -1,0 +1,74 @@
+.hero {
+  position: relative;
+  text-align: center;
+
+  &__banner {
+    position: relative;
+    flex-grow: 1;
+
+    --heroGradientColourStart: var(--colour-black-08);
+    --heroGradientColourEnd: rgb(20 20 20 / 0);
+    --heroGradientHeight: 67.5%;
+
+    --heroGraidentTop: linear-gradient(to bottom,
+        var(--heroGradientColourStart) 0%,
+        var(--heroGradientColourEnd) 100%) 50% 0/100% var(--heroGradientHeight);
+
+    --heroGraidentBottom: linear-gradient(to top,
+        var(--heroGradientColourStart) 0%,
+        var(--heroGradientColourEnd) 100%) 50% 101%/100% var(--heroGradientHeight);
+
+    padding-top: fluid(20, 10);
+
+    background:
+      var(--heroGraidentTop),
+      var(--heroGraidentBottom),
+      url('../../../assets/banner.png') 0 50%/auto 100%;
+    background-repeat: repeat-x;
+
+    animation: slide-left 30s linear infinite;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  &__content {
+    position: absolute;
+    top: 0;             
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    pointer-events: none; 
+  }
+
+  &__content > * {
+    pointer-events: auto; 
+  }
+
+  
+  &__play-button-image {
+    @include square(fluid(250, 150));
+    background: transparent;
+    border: none;
+  }
+
+  &__title {
+    margin-bottom: fluid-to-laptop(14, 10);
+  }
+
+  &__description {
+    
+    max-width: 700px;
+    margin-bottom: fluid(50, 30);
+  }
+}
+
+@keyframes slide-left {
+  from { background-position-x: 0; }
+  to   { background-position-x: -100%; }
+}

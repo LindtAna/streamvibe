@@ -13,7 +13,7 @@
 
     &__group {
         display: grid;
-        row-gap: fluid(100, 75);
+        row-gap: fluid(40, 15);
 
         @include mobile-above {
             position: relative;
