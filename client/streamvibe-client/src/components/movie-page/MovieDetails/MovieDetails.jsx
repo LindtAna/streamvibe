@@ -195,7 +195,7 @@ const MovieDetails = ({ imdbId, seasons }) => {
               mode="black-08"
               iconSrc={PlusIcon}
               iconName="plus"
-              label="Add Your Review"
+              label="Bewertung hinzufügen"
               href="/"
             />
           </header>

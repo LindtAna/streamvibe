@@ -3,15 +3,18 @@
         display: grid;
         grid-template-columns: repeat(2, 1fr);
         gap: fluid-to-laptop(20, 16);
+        margin-block: 0;
+        padding-inline: 0;
     }
 
     &__item{
         display: grid;
         row-gap: 4px;
-        padding: fluid(16, 12);
+        padding: fluid(8, 6);
         background-color: var(--colour-black-08);
         border: var(--border);
         border-radius:var(--border-radius-s);
+        justify-content: center;
 
         @include mobile{
             row-gap: 2px;
@@ -20,5 +23,7 @@
 
     &__title {
         @include fluid-text(20, 14);
+        padding: 0;
+        margin: 5px;
       }
 }

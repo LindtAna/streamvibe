@@ -52,7 +52,8 @@
     $container-desktop-width,
     $container-laptop-width
   )};
-  --container-padding-x: 16px;
+  // --container-padding-x: 16px;
+  --container-padding-x: #{fluid(105, 24)};
 
   --section-padding-y: #{fluid(75, 40)};
 

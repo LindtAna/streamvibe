@@ -81,11 +81,9 @@ const Slider = ({
     return () => {
       swiperInstanceRef.current?.destroy(true, true)
     }
-  }, []) // eslint-disable-line react-hooks/exhaustive-deps
-  // Намеренно пустые deps — Swiper инициализируется один раз после mount.
-  // Если нужна реинициализация при смене sliderParams — добавьте их в deps
-  // и вызывайте destroy + reinit.
+  }, []) 
 
+  
   return (
     <div
       className={classNames('slider', {

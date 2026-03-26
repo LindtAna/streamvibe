@@ -4,10 +4,6 @@ import arrowLeft from '../../../assets/icons/arrow-left.svg'
 import arrowRight from '../../../assets/icons/arrow-right.svg'
 import classNames from 'classnames'
 
-// prevBtnRef, nextBtnRef, paginationRef передаются из Slider
-// чтобы Swiper мог найти DOM-элементы навигации.
-// Для внешней навигации (navigationTargetElementId) рефы не нужны —
-// Swiper сам ищет элементы по data-js-* атрибутам в DOM.
 
 const SliderNavigation = ({
   className,
@@ -20,7 +16,7 @@ const SliderNavigation = ({
   isHiddenMobile,
   buttonMode = 'black-10',
   justifyContent,
-  // Рефы для Swiper (передаются из <Slider>)
+
   prevBtnRef,
   nextBtnRef,
   paginationRef,
@@ -34,9 +30,6 @@ const SliderNavigation = ({
         'hidden-mobile': isHiddenMobile,
       })}
       id={id}
-      // data-атрибут нужен если используется внешняя навигация через JS-модуль
-      // (например на страницах без React). В React-Slider он не нужен, но
-      // оставляем для совместимости с navigationTargetElementId.
       data-js-slider-navigation=""
     >
       <Button

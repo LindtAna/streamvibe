@@ -28,7 +28,7 @@
     grid-template-columns: 1fr auto 1fr;
     align-items: center;
     column-gap: 16px;
-    padding-inline-start: none;
+    padding-inline: 10px;
 
     @include tablet {
       display: flex;
@@ -104,7 +104,7 @@
 
       @include tablet {
         flex-direction: column;
-        row-gap: 36px;
+        row-gap: 26px;
         margin-block: auto;
 
       }
@@ -117,7 +117,6 @@
 
       @include tablet {
         font-size: 28px;
-        padding: 30px 20px;
       }
 
       @include hover {
@@ -142,16 +141,11 @@
     @include tablet {
       justify-content: end;
       order: -1; 
-      margin-bottom: 25px ;
     }
 
     @include mobile {
       column-gap: 35px;
     }
-  }
-
-  &__button{
-    @include square(50px);
   }
 
   &__burger-button {
