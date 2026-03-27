@@ -7,7 +7,7 @@ import Icon from '../Icon'
 import Tags from '../Tags'
 import Ratings from '../Ratings'
 
-import { api } from '../../../services/api'
+// import { api } from '../../../services/api'
 import './MovieDetails.scss'
 import { useState, useEffect } from 'react'
 

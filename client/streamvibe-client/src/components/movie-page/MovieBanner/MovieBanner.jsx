@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import MovieBannerCard from '../MovieBannerCard'
-import { api } from '../../../services/api'
+// import { api } from '../../../services/api'
 
 
 const MovieBanner = ({ imdbId }) => {

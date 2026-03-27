@@ -1,3 +1,4 @@
+import { useMemo } from 'react'
 import './Collections.scss'
 import Tabs from '../Tabs'
 import Section from '../Section'
@@ -6,20 +7,37 @@ import Slider from '../../movie-page/Slider'
 import CategoryCard from '../CategoryCard'
 import MovieCard from '../MovieCard'
 import getIdFromTitle from '../getIdFromTitle'
-import collectionGroups from '../collectionGroups'
 
-const CollectionSection = ({ title, titleId, sliderNavigationId, sliderParams, categoryItems, movieItems }) => {
+
+const groupMoviesByGenre = (movies) => {
+  const genreMap = {}
+  
+  movies.forEach(movie => {
+    movie.genre?.forEach(g => {
+      if (!genreMap[g.genre_name]) {
+        genreMap[g.genre_name] = []
+      }
+      genreMap[g.genre_name].push(movie)
+    })
+  })
+  
+  return genreMap
+}
+
+const CollectionSection = ({ 
+  title, 
+  titleId, 
+  sliderNavigationId, 
+  sliderParams, 
+  categoryItems, 
+  movieItems 
+}) => {
   return (
     <Section
       className="collections__section"
       title={title}
       titleId={titleId}
-      actions={
-        <SliderNavigation
-          id={sliderNavigationId}
-          mode="tile"
-        />
-      }
+      actions={<SliderNavigation id={sliderNavigationId} mode="tile" />}
       isActionsHiddenOnMobile
     >
       <Slider
@@ -32,28 +50,67 @@ const CollectionSection = ({ title, titleId, sliderNavigationId, sliderParams, c
               <CategoryCard key={index} {...item} />
             ))
           : movieItems.map((item, index) => (
-              <MovieCard key={index} {...item} />
+              <MovieCard 
+                key={index}
+                title={item.title}
+                imgSrc={item.poster_path}
+                rating={{ 
+                  value: item.ranking?.ranking_value || 0, 
+                  label: item.ranking?.ranking_name || 'N/A' 
+                }}
+                href={`/movie/${item.imdb_id}`}
+              />
             ))}
       </Slider>
     </Section>
   )
 }
 
-//Collections 
+const Collections = ({ movies = [] }) => {
+  const categorySliderParams = {
+    slidesPerView: 4,
+    slidesPerGroup: 10,
+    spaceBetween: 30,
+    breakpoints: {
+      0: { slidesPerView: 1.6, slidesPerGroup: 1, spaceBetween: 20 },
+      481: { slidesPerView: 2, slidesPerGroup: 2, spaceBetween: 20 },
+      768: { slidesPerView: 3, slidesPerGroup: 3, spaceBetween: 20 },
+      1024: { spaceBetween: 20 },
+      1441: { spaceBetween: 30 },
+    },
+  }
 
-const Collections = () => {
+  const collectionGroups = useMemo(() => {
+    if (!movies.length) return []
+
+    const genreGroups = groupMoviesByGenre(movies)
+    
+    return [{
+      title: 'Movies',
+      isActive: true,
+      items: [
+        {
+          title: 'All Movies',
+          movieItems: movies.slice(0, 12),
+          sliderParams: categorySliderParams,
+        },
+        ...Object.entries(genreGroups).map(([genreName, genreMovies]) => ({
+          title: genreName,
+          movieItems: genreMovies.slice(0, 12),
+          sliderParams: categorySliderParams,
+        }))
+      ],
+    }]
+  }, [movies])
+
   const tabItems = collectionGroups.map((group) => ({
     title: group.title,
     isActive: group.isActive ?? false,
     children: (
       <div className="collections__group">
-        {/* Плашка с названием группы*/}
         <p className="collections__title hidden-mobile">{group.title}</p>
-
         {group.items.map((collectionItem, index) => {
           const { title, categoryItems, movieItems, sliderParams } = collectionItem
-
-          // Уникальные id для aria и для Swiper navigationTargetElementId
           const titleFormatted = `${getIdFromTitle(group.title)}-${getIdFromTitle(title)}`
           const titleId = `${titleFormatted}-title`
           const sliderNavigationId = `${titleFormatted}-slider-navigation`
