@@ -57,10 +57,11 @@ const MovieBannerCard = ({
             className="movie-banner-card__play-button"
             iconName="play"
             iconSrc={playIcon}
-            label="Play Now"
+            label="Trailer abspielen"
             hasFillIcon
             onClick={handlePlayClick}
           />
+          
 
           <div className="movie-banner-card__actions">
             <Button

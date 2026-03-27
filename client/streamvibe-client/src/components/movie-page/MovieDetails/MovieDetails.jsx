@@ -144,7 +144,7 @@ const MovieDetails = ({ imdbId, seasons }) => {
         {/* Description */}
         <div className="movie-details__panel movie-details__panel--description-tablet-order">
           <div className="movie-details__group">
-            <h3 className="movie-details__title">Description</h3>
+            <h3 className="movie-details__title">Handlung</h3>
             <div className="movie-details__description">
               <p>
                 {/* The surviving members of the Avengers and their allies attempt to
@@ -159,7 +159,7 @@ const MovieDetails = ({ imdbId, seasons }) => {
         {/* Cast */}
         <div className="movie-details__panel">
           <header className="movie-details__panel-header">
-            <h3 className="movie-details__title">Cast</h3>
+            <h3 className="movie-details__title">Schauspieler</h3>
             <SliderNavigation
               id={castSliderNavigationId}
               hasPagination={false}
@@ -190,7 +190,7 @@ const MovieDetails = ({ imdbId, seasons }) => {
         {/* Reviews */}
         <div className="movie-details__panel movie-details__panel--large-gap-y">
           <header className="movie-details__panel-header">
-            <h3 className="movie-details__title">Reviews</h3>
+            <h3 className="movie-details__title">Bewertungen</h3>
             <Button
               mode="black-08"
               iconSrc={PlusIcon}
@@ -235,7 +235,7 @@ const MovieDetails = ({ imdbId, seasons }) => {
             <div className="movie-details__group">
               <h3 className="movie-details__title">
                 <Icon iconName="calender" src={CalenderIcon} />
-                <span>Released Year</span>
+                <span>Veröffentlicht</span>
               </h3>
               <div className="movie-details__description">
                 <time className="h6" dateTime="2019">2019</time>
@@ -246,9 +246,9 @@ const MovieDetails = ({ imdbId, seasons }) => {
             <div className="movie-details__group">
               <h3 className="movie-details__title">
                 <Icon iconName="translate" src={TranslateIcon} />
-                <span>Available Languages</span>
+                <span>Originalsprache</span>
               </h3>
-              <Tags items={['English', 'German', 'Japanese', 'Russian', 'French']} />
+              <Tags items={['English']} />
             </div>
 
             {/* Ratings */}
@@ -276,7 +276,7 @@ const MovieDetails = ({ imdbId, seasons }) => {
 
             {/* Director */}
             <div className="movie-details__group">
-              <h3 className="movie-details__title">Director</h3>
+              <h3 className="movie-details__title">Regie</h3>
               <PersonCard
                 name="Anthony Russo"
                 subtitle="From USA"
