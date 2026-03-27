@@ -4,6 +4,7 @@ import Logo from '../Logo'
 import classNames from 'classnames'
 import Button from '../../movie-page/Button'
 import BurgerButton from '../BurgerButton'
+import { useNavigate } from 'react-router-dom'
 
 import LoginIcon from '../../../assets/icons/login.svg'
 import SearchIcon from '../../../assets/icons/search.svg'
@@ -28,6 +29,7 @@ const Header = ({ url, isFixed }) => {
   const [isOpen, setIsOpen] = useState(false)
   const dialogRef = useRef(null)
   const burgerRef = useRef(null)
+  const navigate = useNavigate()
 
 
   useEffect(() => {
@@ -71,6 +73,8 @@ const Header = ({ url, isFixed }) => {
   const toggle = useCallback(() => {
     setIsOpen((prev) => !prev)
   }, [])
+
+  
 
   return (
     <header
