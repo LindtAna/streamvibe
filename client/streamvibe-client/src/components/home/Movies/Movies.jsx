@@ -1,6 +1,5 @@
 import Collections from '../Collections'
 
-
 const MoviesPage = () => {
   return (
     <>

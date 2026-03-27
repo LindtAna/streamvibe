@@ -8,8 +8,8 @@ function App() {
   return (
     <>
     <Header />
-   <Movie />
-   {/* <Movies /> */}
+   {/* <Movie /> */}
+   <Movies />
    {/* <SupportPage /> */}
     </>
   )
