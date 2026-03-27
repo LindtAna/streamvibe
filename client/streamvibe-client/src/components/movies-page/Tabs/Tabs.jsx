@@ -3,11 +3,6 @@ import classNames from 'classnames'
 import './Tabs.scss'
 import getIdFromTitle from '../getIdFromTitle'
 
-// TabsNavigation встроена прямо в Tabs, т.к. в React не нужна
-// отдельная инициализация через data-атрибуты.
-// Анимированный индикатор активной кнопки реализован через CSS-переменные —
-// точно так же, как это делал JS-модуль TabsCollection.
-
 const getTabIds = (title) => {
   const formatted = getIdFromTitle(title)
   return {
@@ -20,12 +15,11 @@ const Tabs = ({
   className,
   title,
   items = [],
-  // Если передан — навигация рендерится во внешнем элементе с этим id.
-  // В React-версии не используем внешнюю навигацию: всегда рендерим внутри.
   navigationTargetElementId = null,
-  // Табы работают только на мобильных (как аккордеон-замена)
   inEnableOnlyOnMobile = false,
 }) => {
+  if (!items.length) return null
+
   const initialIndex = items.findIndex((item) => item.isActive)
   const [activeIndex, setActiveIndex] = useState(
     initialIndex >= 0 ? initialIndex : 0
@@ -34,7 +28,6 @@ const Tabs = ({
   const navRef = useRef(null)
   const buttonRefs = useRef([])
 
-  // ── CSS-переменные для анимированного индикатора ──────────────────────────
   const updateIndicator = useCallback((index) => {
     const nav = navRef.current
     const btn = buttonRefs.current[index]
@@ -55,7 +48,6 @@ const Tabs = ({
     updateIndicator(activeIndex)
   }, [activeIndex, updateIndicator])
 
-  // Обновляем индикатор при ресайзе (как ResizeObserver в JS-модуле)
   useEffect(() => {
     const nav = navRef.current
     if (!nav) return
@@ -64,7 +56,6 @@ const Tabs = ({
     return () => observer.disconnect()
   }, [activeIndex, updateIndicator])
 
-  // ── Клавиатурная навигация (как в TabsCollection.js) ─────────────────────
   const handleKeyDown = useCallback(
     (e) => {
       const limit = items.length - 1
@@ -75,7 +66,6 @@ const Tabs = ({
         End: () => setActiveIndex(limit),
       }
 
-      // macOS: Meta+Arrow
       if (e.metaKey && e.code === 'ArrowLeft') {
         e.preventDefault()
         setActiveIndex(0)
@@ -95,13 +85,13 @@ const Tabs = ({
     [items.length]
   )
 
-  // Фокус на кнопку после смены клавиатурой
   useEffect(() => {
     buttonRefs.current[activeIndex]?.focus()
   }, [activeIndex])
 
-  const navId = navigationTargetElementId || `${getIdFromTitle(title || 'tabs')}-navigation`
-  const titleId = `${getIdFromTitle(title || 'tabs')}-title`
+  const baseId = getIdFromTitle(title || 'tabs')
+  const navId = navigationTargetElementId || `${baseId}-navigation`
+  const titleId = `${baseId}-title`
 
   return (
     <div
@@ -127,21 +117,24 @@ const Tabs = ({
           const isActive = index === activeIndex
 
           return (
-            <div
-              key={index}
-              className={classNames('tabs-navigation__button', {
-                'is-active': isActive,
-              })}
+            <button
+              key={buttonId}
+              type="button"
               id={buttonId}
               role="tab"
-              aria-controls={contentId}
               aria-selected={isActive}
+              aria-controls={contentId}
               tabIndex={isActive ? 0 : -1}
-              ref={(el) => (buttonRefs.current[index] = el)}
+              className={classNames('tabs-navigation__button visually-hidden', {
+                'is-active': isActive,
+              })}
+              ref={(el) => {
+                buttonRefs.current[index] = el
+              }}
               onClick={() => setActiveIndex(index)}
             >
               {item.title}
-            </div>
+            </button>
           )
         })}
       </div>
@@ -154,7 +147,7 @@ const Tabs = ({
 
           return (
             <div
-              key={index}
+              key={contentId}
               className={classNames('tabs__content', { 'is-active': isActive })}
               id={contentId}
               role="tabpanel"
