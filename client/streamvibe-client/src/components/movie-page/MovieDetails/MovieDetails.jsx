@@ -7,7 +7,7 @@ import Icon from '../Icon'
 import Tags from '../Tags'
 import Ratings from '../Ratings'
 
-// import { api } from '../../../services/api'
+import { apiService } from '../../../api/api'
 import './MovieDetails.scss'
 import { useState, useEffect } from 'react'
 
@@ -84,14 +84,14 @@ const MovieDetails = ({ imdbId, seasons }) => {
     const fetchMovie = async () => {
       try {
         setLoading(true)
-        // Wenn eine bestimmte IMDb-ID angegeben wird, wird diese verwendet
-        // Andernfalls werden alle Filme geladen und der erste ausgewählt
+
+         const movies = await apiService.getMovies()
+  
         if (imdbId) {
-          const movies = await api.getMovies()
+
           const foundMovie = movies.find(m => m.imdb_id === imdbId)
           setMovie(foundMovie || movies[0])
         } else {
-          const movies = await api.getMovies()
           setMovie(movies[0])
         }
       } catch (err) {
