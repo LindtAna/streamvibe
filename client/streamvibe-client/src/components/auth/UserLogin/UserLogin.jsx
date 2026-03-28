@@ -16,7 +16,7 @@ const phonePrefixOptions = [
   { value: '+385' },
 ]
 
-const UserLogin = () => {
+const UserLogin = ({ onClose }) => {
   const titleId = 'user-login-title'
 
   const [formData, setFormData] = useState({
@@ -39,6 +39,10 @@ const UserLogin = () => {
     e.preventDefault()
   
     console.log('Form submitted:', formData)
+
+     if (onClose) {
+      onClose()
+    }
   }
 
   return (

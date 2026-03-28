@@ -3,7 +3,7 @@ import Header from './src/components/header/Header'
 import Movie from './src/components/movie-page/Movie/Movie'
 import Movies from './src/components/movies-page/Movies'
 import SupportPage from './src/components/support-page/SupportPage/SupportPage'
-import UserLogin from './src/components/home/UserLogin'
+import UserLogin from './src/components/auth/UserLogin'
 import HomePage from './src/components/home/HomePage'
 
 function App() {
