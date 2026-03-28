@@ -6,42 +6,42 @@ import Collections from '../Collections'
 const Movies = () => {
   const [movies, setMovies] = useState([])
   const [loading, setLoading] = useState(false)
-  const [message, setMessage] = useState('')
+  const [error, setError] = useState('')
 
   useEffect(() => {
+    const controller = new AbortController()
+
     const fetchMovies = async () => {
-      setLoading(true)
-      setMessage('')
       try {
-        const response = await axiosClient.get('/movies')
+        const response = await axiosClient.get('/movies', {
+          signal: controller.signal,
+        })
         setMovies(response.data)
-        if (response.data.length === 0) {
-          setMessage('Zurzeit sind keine Filmdaten vorhanden.')
+      } catch (err) {
+        if (err.name !== 'CanceledError') {
+          console.error('Fehler beim Laden der Filme:', err)
+          setError('Fehler beim Laden der Filme.')
         }
-      } catch (error) {
-        console.error('Fehler beim Laden der Filme:', error)
-        setMessage('Fehler beim Laden der Filme.')
       } finally {
         setLoading(false)
       }
     }
 
     fetchMovies()
+
+    return () => controller.abort()
   }, [])
 
-  if (loading) {
-    return <p>Loading...</p>
-  }
+   const isEmpty = !loading && !error && movies.length === 0
 
-  if (message) {
-    return (
-      <div className="container">
-        <h2 className="h3">{message}</h2>
-      </div>
-    )
-  }
-
-  return <Collections movies={movies} />
+  return (
+    <div className="container">
+      {loading && <p>Loading...</p>}
+      {error && <h2 className="h3">{error}</h2>}
+      {isEmpty && <h2 className="h3">Zurzeit sind keine Filmdaten vorhanden.</h2>}
+      {!loading && !error && !isEmpty && <Collections movies={movies} />}
+    </div>
+  )
 }
 
 export default Movies
