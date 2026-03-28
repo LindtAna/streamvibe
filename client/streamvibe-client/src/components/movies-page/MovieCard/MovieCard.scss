@@ -17,7 +17,13 @@
   
     &__image {
       width: 100%;
+      height: fluid(420, 240);
+      object-fit: cover;
       border-radius: inherit;
+      
+      @include laptop {
+        height: fluid-to-laptop(380, 220);
+      }
     }
 
     &__body{

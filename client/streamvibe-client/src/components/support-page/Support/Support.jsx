@@ -44,7 +44,7 @@ const Support = () => {
     <section className="support container" aria-labelledby={titleId}>
       <div className="support__body">
         <div className="support__info">
-          <h1 className="support__title h2" id={titleId}>
+          <h1 className="support__title h3" id={titleId}>
             Willkommen auf unserer<br/>Support-Seite!
           </h1>
           <div className="support__description">
