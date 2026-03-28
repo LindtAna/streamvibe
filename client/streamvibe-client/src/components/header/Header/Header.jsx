@@ -31,24 +31,24 @@ const Header = ({ url, isFixed }) => {
   const burgerRef = useRef(null)
   const navigate = useNavigate()
 
-
+  // scroll-lock + dialog.open
   useEffect(() => {
+    const dialog = dialogRef.current
+
     document.documentElement.classList.toggle('is-lock', isOpen)
+
+     if (dialog) {
+      dialog.open = isOpen
+    }
 
     return () => {
       document.documentElement.classList.remove('is-lock')
     }
   }, [isOpen])
 
+// Escape menu schliessen 
 
-  useEffect(() => {
-    const dialog = dialogRef.current
-    if (!dialog) return
-    dialog.open = isOpen
-  }, [isOpen])
-
-
-  useEffect(() => {
+    useEffect(() => {
     if (!isOpen) return
 
     const handleKeyDown = (e) => {
@@ -59,6 +59,7 @@ const Header = ({ url, isFixed }) => {
     return () => document.removeEventListener('keydown', handleKeyDown)
   }, [isOpen])
 
+
   const handleDialogClick = useCallback((e) => {
     if (e.target === dialogRef.current) close()
   }, [])
@@ -66,7 +67,6 @@ const Header = ({ url, isFixed }) => {
   const open = useCallback(() => setIsOpen(true), [])
   const close = useCallback(() => {
     setIsOpen(false)
-   
     burgerRef.current?.focus()
   }, [])
 
@@ -97,7 +97,7 @@ const Header = ({ url, isFixed }) => {
                       'is-active': href === url,
                     })}
                     href={href}
-                    onClick={isOpen ? close : undefined}
+                    onClick={close}
                   >
                     {label}
                   </a>
@@ -114,7 +114,7 @@ const Header = ({ url, isFixed }) => {
               mode="transparent"
               iconSrc={SearchIcon}
               iconName="search"
-              onClick={isOpen ? close : undefined}
+              onClick={close}
             />
             <Button
               className="header__button"
@@ -123,7 +123,7 @@ const Header = ({ url, isFixed }) => {
               mode="transparent"
               iconSrc={LoginIcon}
               iconName="login"
-              onClick={isOpen ? close : undefined}
+              onClick={close}
             />
           </div>
         </dialog>
