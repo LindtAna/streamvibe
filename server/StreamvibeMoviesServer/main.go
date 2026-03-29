@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"time"
 
 	"github.com/LindtAna/streamvibe/server/StreamvibeMoviesServer/database"
 	"github.com/LindtAna/streamvibe/server/StreamvibeMoviesServer/routes"
@@ -20,7 +21,9 @@ func main() {
 		AllowOrigins:     []string{"http://localhost:5173"},
 		AllowMethods:     []string{"GET", "POST", "PUT", "PATCH", "DELETE"},
 		AllowHeaders:     []string{"Origin", "Content-Type", "Authorization"},
+		ExposeHeaders:    []string{"Content-Length"},
 		AllowCredentials: true,
+		MaxAge:           12 * time.Hour,
 	}))
 
 	router.GET("/hi", func(c *gin.Context) {
