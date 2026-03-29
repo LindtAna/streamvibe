@@ -186,8 +186,7 @@
   }
  
   &__login-content {
-    max-width: 600px;
-    width: 100%;
+    width: #{fluid(500, 400)};
     max-height: 90vh;
     overflow-y: auto;
     background-color: var(--colour-black-08);

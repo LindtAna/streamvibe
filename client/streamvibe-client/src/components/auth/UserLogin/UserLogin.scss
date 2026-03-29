@@ -1,49 +1,87 @@
 .user-login {
 
-   
+    &__title {
+        text-align: center;
+        color: var(--colour-red-55);
+    }
 
-    &__form{
+    &__description {
+        margin-bottom: 8px;
+        font-size: fluid-to-laptop(14, 12);
+        text-align: center;
+    }
 
-    width:50vb;
-        display: flex;
+    &__form { 
         flex-direction: column;
-        gap:fluid(20, 8) fluid-to-laptop(20, 8);
-        padding: fluid(20, 8);
+        gap: fluid(35, 15) fluid-to-laptop(20, 15);
+        padding: fluid(20, 10);
         background-color: var(--colour-black-06);
         border: var(--border);
         border-radius: var(--border-radius-l);
 
-        @include laptop{
+        @include laptop {
             border-radius: var(--border-radius-m);
         }
 
-        @include mobile-s-above{
-            grid-template-columns: repeat(2, 1fr); grid-template-columns: repeat(2, 1fr); 
+        @include mobile-s-above {
+            grid-template-columns: repeat(2, 1fr);
 
         }
 
-        &-cell{
-            &--wide{
+        .field {
+            --field-row-gap: #{fluid-to-laptop(15, 8)};
+        }
+
+        .field__control {
+            --field-control-height: #{fluid-to-laptop(45, 38)};
+        }
+
+        .field__body {
+            --field-body-margin-bottom: #{fluid(20, 15)};
+        }
+
+
+
+        &-cell {
+            &--wide {
                 grid-column: -1/1;
             }
 
-            &--actions{
+            &--actions {
                 display: flex;
                 justify-content: space-between;
                 align-items: center;
-                gap: 10px;
+                gap: 20px;
 
-                @include mobile-s{
+                @include mobile-s {
                     flex-direction: column;
                     align-items: stretch;
-        
+
                 }
             }
         }
 
-        &-agreement{
-            font-size: 14px;
+     &-submit-button--login{
+            width: 100%;
+        }
+        &-agreement {
+            font-size: fluid-to-laptop(11, 9);
+            color: var(--colour-black-30);
         }
     }
 
+
+
+
+    &__form-switch {
+        text-align: center;
+        font-size: 14px;
+        color: var(--colour-white);
+        padding: fluid(20, 10);
+    }
+
+    &__link {
+        cursor: pointer;
+        text-decoration: underline;
+    }
 }

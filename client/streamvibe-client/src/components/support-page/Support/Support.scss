@@ -1,7 +1,7 @@
 .support {
     display: grid;
     padding-block: var(--section-padding-y);
-    gap: 50px fluid-to-laptop(80, 50);
+    gap: fluid-to-laptop(40, 20);
 
     @include mobile-above {
         grid-template-columns: 33.5% 1fr;
@@ -9,7 +9,7 @@
 
     &__body{
         display: grid;
-        row-gap: fluid(50, 30);
+        row-gap: fluid(40, 30);
     }
 
     &__info{
@@ -30,7 +30,7 @@
 
     &__form{
         display: grid;
-        gap:fluid(50, 20) fluid-to-laptop(50, 20);
+        gap:fluid(50, 20) fluid-to-laptop(20, 20);
         padding: fluid(50, 24);
         background-color: var(--colour-black-06);
         border: var(--border);

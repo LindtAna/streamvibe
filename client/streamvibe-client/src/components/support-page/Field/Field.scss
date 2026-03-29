@@ -2,7 +2,7 @@
     display: flex;
     flex-direction: column;
     align-items: start;
-    row-gap: fluid-to-laptop(16, 12);
+    row-gap: var(--field-row-gap, fluid-to-laptop(16, 12));
 
 
     &__label {
@@ -19,11 +19,12 @@
         display: flex;
         column-gap: fluid-to-laptop(16, 12);
         width: 100%;
+        margin-bottom: var(--field-body-margin-bottom);
     }
 
     &__control {
         width: 100%;
-        height: fluid-to-laptop(67, 53);
+        height: var(--field-control-height, fluid-to-laptop(67, 53));
         padding-inline: fluid-to-laptop(20, 16);
         color: var(--colour-white);
         background-color: var(--colour-black-08);
