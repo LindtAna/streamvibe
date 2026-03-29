@@ -21,7 +21,7 @@
         background-size: var(--selectButtonArrowIconSize);
         background-repeat: no-repeat;
 
-        @include mobile-above{
+        @include mobile-above {
             @include visually-hidden;
         }
 
@@ -58,7 +58,7 @@
         padding-inline: var(--selectButtonPaddingX);
         transition-duration: var(--transition-duration);
 
-        @include mobile{
+        @include mobile {
             @include visually-hidden;
         }
 
@@ -102,6 +102,14 @@
             transform-origin: 100% 0;
         }
 
+        &.is-on-bottom {
+            top: calc(100% + 4px);
+        }
+
+        &.is-on-top {
+            bottom: calc(100% + 4px);
+        }
+
         &:not(.is-expanded) {
             @include hide;
 
@@ -109,7 +117,7 @@
         }
     }
 
-    &__option{
+    &__option {
         display: flex;
         justify-content: space-between;
         align-items: center;
@@ -118,21 +126,23 @@
         border: var(--border);
         border-radius: inherit;
 
-        @include hover{
+        @include hover {
             color: var(--colour-white);
             border-color: var(--colour-white);
         }
 
-        &.is-selected{
+        &.is-selected {
             color: var(--colour-white);
 
-            &::after{
+            &::after {
                 content: '❌';
             }
         }
 
-        &.is-current{
+        &.is-current {
             border-color: var(--colour-white);
         }
     }
+
+
 }

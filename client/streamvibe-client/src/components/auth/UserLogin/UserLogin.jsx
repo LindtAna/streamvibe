@@ -4,16 +4,18 @@ import Field from '../../support-page/Field'
 import Checkbox from '../../support-page/Checkbox'
 import Button from '../../movie-page/Button'
 import Select from '../../support-page/Select'
+import axiosClient from '../../../api/axiosConfig';
+import { useNavigate, Link } from 'react-router-dom';
+import Tags from '../../movie-page/Tags'
 
-
-const phonePrefixOptions = [
-  { value: '+49', isSelected: true },
-  { value: '+44' },
-  { value: '+33' },
-  { value: '+39' },
-  { value: '+31' },
-  { value: '+81' },
-  { value: '+385' },
+const prefixOptions = [
+  { value: 'Comedy', isSelected: true },
+  { value: 'Drama' },
+  { value: 'Action' },
+  { value: 'Horror' },
+  { value: 'Romantik' },
+  { value: 'Sci-Fi' },
+  { value: 'Fantasy' },
 ]
 
 const UserLogin = ({ onClose }) => {
@@ -21,29 +23,68 @@ const UserLogin = ({ onClose }) => {
 
   const [state, setState] = useState("login");
 
- const [formData, setFormData] = useState({
-    username: '',
+  const [formData, setFormData] = useState({
+    user_name: '',
     email: '',
     password: '',
     confirmPassword: '',
-    phone: '',
     agreement: false,
   })
+
+  const [favouriteGenres, setFavouriteGenres] = useState([])
+
+  const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
   const handleChange = (field) => (e) => {
     const value = e.target.type === 'checkbox' ? e.target.checked : e.target.value
     setFormData((prev) => ({ ...prev, [field]: value }))
   }
 
-  const handleSubmit = (e) => {
-    e.preventDefault()
-
-    console.log('Form submitted:', formData)
-
-    if (onClose) {
-      onClose()
-    }
+  const handleGenreSelect = (genre) => {
+    setFavouriteGenres((prev) => {
+      if (prev.includes(genre)) return prev // не дублируем
+      return [...prev, genre]
+    })
   }
+
+  const handleRemoveGenre = (genre) => {
+    setFavouriteGenres((prev) => prev.filter((g) => g !== genre))
+  }
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError(null);
+
+    if (formData.password !== formData.confirmPassword) {
+      setError('Passwords do not match.');
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      const payload = {
+        user_name: formData.user_name,
+        email: formData.email,
+        password: formData.password,
+        role: defaultRole,
+        favourite_genres: favouriteGenres
+      };
+      const response = await axiosClient.post('/register', payload);
+      if (response.data.error) {
+        setError(response.data.error);
+        return;
+      }
+      // Registration successful, redirect to login
+      navigate('/login', { replace: true });
+    } catch (err) {
+      setError('Registration failed. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <form className="user-login__form" onSubmit={handleSubmit} noValidate>
@@ -51,15 +92,15 @@ const UserLogin = ({ onClose }) => {
         {state === "login" ? "Anmelden" : "Account erstellen"}
       </h1>
       <h2 className="user-login__description h6">
-  {state === "login" ? (
-    "Bitte melde dich an"
-  ) : (
-    <>
-      Die Registrierung ist einfach und kostenlos.<br />
-      Fülle dazu das Formular aus um zu beginnen.
-    </>
-  )}
-</h2>
+        {state === "login" ? (
+          "Bitte melde dich an"
+        ) : (
+          <>
+            Die Registrierung ist einfach und kostenlos.<br />
+            Fülle dazu das Formular aus um zu beginnen.
+          </>
+        )}
+      </h2>
 
 
       {/* LOGIN FORM */}
@@ -85,7 +126,7 @@ const UserLogin = ({ onClose }) => {
             onChange={handleChange('password')}
           />
 
- 
+
           <div className="user-login__form-switch">
             Noch kein Account?{' '}
             <span
@@ -96,13 +137,13 @@ const UserLogin = ({ onClose }) => {
             </span>
           </div>
 
-        <div className="user-login__form-cell user-login__form-cell--actions">
+          <div className="user-login__form-cell user-login__form-cell--actions">
             <Button
               className="user-login__form-submit-button user-login__form-submit-button--login"
               label="Einloggen"
               type="submit"
             />
-  </div>
+          </div>
         </>
       )}
 
@@ -114,8 +155,8 @@ const UserLogin = ({ onClose }) => {
             label="Benutzername"
             placeholder="Erika Musterfrau"
             isRequired
-            value={formData.username}
-            onChange={handleChange('username')}
+            value={formData.user_name}
+            onChange={handleChange('user_name')}
           />
 
           <Field
@@ -144,28 +185,34 @@ const UserLogin = ({ onClose }) => {
             type="password"
             placeholder="********"
             isRequired
-             value={formData.confirmPassword}
+            value={formData.confirmPassword}
             onChange={handleChange('confirmPassword')}
           />
 
 
-          <Field
-            className="user-login__form-cell"
-            label="Handy / Mobile"
-            placeholder="(0123) 987-65-43"
-            inputMode="tel"
-            value={formData.phone}
-            onChange={handleChange('phone')}
-            renderBefore={(buttonClassName) => (
-              <Select
-                label="Phone number prefix"
-                buttonClassName={buttonClassName}
-                options={phonePrefixOptions}
-              />
-            )}
-          />
-           
-            <div className="user-login__form-switch">
+          <div className="user-login__form-cell">
+            <Select
+              label="Favourite Genres"
+              isLabelHidden={false}
+              options={prefixOptions}
+              onChange={handleGenreSelect}
+            />
+
+            <div
+              className="user-login__tags"
+              onClick={(e) => {
+                const tagEl = e.target.closest('[data-tag]')
+                if (!tagEl) return
+
+                const tag = tagEl.dataset.tag
+                handleRemoveGenre(tag)
+              }}
+            >
+              <Tags items={favouriteGenres} />
+            </div>
+          </div>
+
+          <div className="user-login__form-switch">
             Hast Du bereits einen Account?{' '}
             <span
               className="user-login__link"
@@ -189,10 +236,10 @@ const UserLogin = ({ onClose }) => {
               type="submit"
             />
           </div>
-             </>
-        )}
-        </form>
+        </>
+      )}
+    </form>
   )
 }
 
-      export default UserLogin
+export default UserLogin

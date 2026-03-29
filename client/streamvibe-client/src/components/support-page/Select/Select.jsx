@@ -1,4 +1,4 @@
-import {useState, useEffect, useRef, useCallback, useId} from 'react'
+import { useState, useEffect, useRef, useCallback, useId } from 'react'
 import classNames from 'classnames'
 import './Select.scss'
 import getIdFromTitle from '../../movies-page/getIdFromTitle'
@@ -15,9 +15,7 @@ const Select = ({
   isLabelHidden = true,
   // Array<{ value: string, isSelected?: boolean }>
   options = [],
-  // CSS-класс пробрасывается в кнопку и нативный select (нужно для Field)
   buttonClassName,
-  // Колбэк при смене значения
   onChange,
 }) => {
   const reactId = useId()
@@ -38,19 +36,36 @@ const Select = ({
     options.findIndex((o) => o.value === (defaultSelected?.value ?? ''))
   )
   const [dropdownSide, setDropdownSide] = useState('left') // 'left' | 'right'
+  const [dropdownVertical, setDropdownVertical] = useState('bottom') // 'top' | 'bottom'
 
   const rootRef = useRef(null)
   const buttonRef = useRef(null)
   const dropdownRef = useRef(null)
 
-  // Позиционирование dropdown (слева/справа)
+  // dropdown positioning
   const fixDropdownPosition = useCallback(() => {
     const btn = buttonRef.current
     if (!btn) return
+
     const viewportWidth = document.documentElement.clientWidth
-    const { width, x } = btn.getBoundingClientRect()
-    const btnCenterX = x + width / 2
+    const viewportHeight = document.documentElement.clientHeight
+
+    const rect = btn.getBoundingClientRect()
+
+    // LEFT / RIGHT 
+    const btnCenterX = rect.x + rect.width / 2
     setDropdownSide(btnCenterX < viewportWidth / 2 ? 'left' : 'right')
+
+    // TOP / BOTTOM 
+    const spaceBelow = viewportHeight - rect.bottom
+    const spaceAbove = rect.top
+
+
+    if (spaceBelow < 200 && spaceAbove > spaceBelow) {
+      setDropdownVertical('top')
+    } else {
+      setDropdownVertical('bottom')
+    }
   }, [])
 
   useEffect(() => {
@@ -118,7 +133,7 @@ const Select = ({
     [isExpanded, currentIndex, options.length, selectOption]
   )
 
-  // Синхронизация нативного select → состояние
+
   const handleNativeChange = (e) => {
     const index = options.findIndex((o) => o.value === e.target.value)
     if (index >= 0) selectOption(index)
@@ -177,6 +192,8 @@ const Select = ({
             'is-expanded': isExpanded,
             'is-on-the-left-side': dropdownSide === 'left',
             'is-on-the-right-side': dropdownSide === 'right',
+            'is-on-top': dropdownVertical === 'top',
+            'is-on-bottom': dropdownVertical === 'bottom',
           })}
           id={ids.dropdown}
           role="listbox"
