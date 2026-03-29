@@ -109,7 +109,7 @@ func LoginUser(client *mongo.Client) gin.HandlerFunc {
 			return
 		}
 
-		token, refreshToken, err := utils.GenerateAllTokens(foundUser.Email, foundUser.FirstName, foundUser.LastName, foundUser.Role, foundUser.UserID)
+		token, refreshToken, err := utils.GenerateAllTokens(foundUser.Email, foundUser.UserName, foundUser.Role, foundUser.UserID)
 
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to generate tokens"})
@@ -125,8 +125,7 @@ func LoginUser(client *mongo.Client) gin.HandlerFunc {
 
 		c.JSON(http.StatusOK, models.UserResponse{
 			UserId:          foundUser.UserID,
-			FirstName:       foundUser.FirstName,
-			LastName:        foundUser.LastName,
+			UserName:        foundUser.UserName,
 			Email:           foundUser.Email,
 			Role:            foundUser.Role,
 			Token:           token,

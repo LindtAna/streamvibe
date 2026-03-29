@@ -9,8 +9,7 @@ import (
 type User struct {
 	ID              bson.ObjectID `bson:"_id,omitempty" json:"_id,omitempty"`
 	UserID          string        `bson:"user_id" json:"user_id"`
-	FirstName       string        `bson:"first_name" json:"first_name" validate:"required,min=1,max=100"`
-	LastName        string        `bson:"last_name" json:"last_name" validate:"required,min=1,max=100"`
+	UserName        string        `bson:"user_name" json:"user_name" validate:"required,min=1,max=100"`
 	Email           string        `bson:"email" json:"email" validate:"required,email"`
 	Password        string        `bson:"password" json:"password" validate:"required,min=7"`
 	Role            string        `bson:"role" json:"role" validate:"oneof=ADMIN USER"`
@@ -28,8 +27,7 @@ type UserLogin struct {
 
 type UserResponse struct {
 	UserId          string  `json:"user_id"`
-	FirstName       string  `json:"first_name"`
-	LastName        string  `json:"last_name"`
+	UserName        string  `json:"user_name"`
 	Email           string  `json:"email"`
 	Role            string  `json:"role"`
 	Token           string  `json:"token"`

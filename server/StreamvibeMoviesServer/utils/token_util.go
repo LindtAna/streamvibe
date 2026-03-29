@@ -15,24 +15,22 @@ import (
 )
 
 type SignedDetails struct {
-	UserId    string
-	FirstName string
-	LastName  string
-	Email     string
-	Role      string
+	UserId   string
+	UserName string
+	Email    string
+	Role     string
 	jwt.RegisteredClaims
 }
 
 var SECRET_KEY_TOKEN string = os.Getenv("SECRET_KEY")
 var SECRET_KEY_REFRESH_TOKEN string = os.Getenv("SECRET_KEY_REFRESH_TOKEN")
 
-func GenerateAllTokens(email, firstName, lastName, role, userId string) (string, string, error) {
+func GenerateAllTokens(email, userName, role, userId string) (string, string, error) {
 	claims := &SignedDetails{
-		Email:     email,
-		FirstName: firstName,
-		LastName:  lastName,
-		Role:      role,
-		UserId:    userId,
+		Email:    email,
+		UserName: userName,
+		Role:     role,
+		UserId:   userId,
 		RegisteredClaims: jwt.RegisteredClaims{
 			Issuer:    "streamvibe",
 			IssuedAt:  jwt.NewNumericDate(time.Now()),
@@ -48,11 +46,10 @@ func GenerateAllTokens(email, firstName, lastName, role, userId string) (string,
 	}
 
 	refreshClaims := &SignedDetails{
-		Email:     email,
-		FirstName: firstName,
-		LastName:  lastName,
-		Role:      role,
-		UserId:    userId,
+		Email:    email,
+		UserName: userName,
+		Role:     role,
+		UserId:   userId,
 		RegisteredClaims: jwt.RegisteredClaims{
 			Issuer:    "streamvibe",
 			IssuedAt:  jwt.NewNumericDate(time.Now()),
