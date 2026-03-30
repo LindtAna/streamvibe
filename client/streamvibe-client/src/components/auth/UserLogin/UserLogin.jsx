@@ -1,22 +1,14 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import './UserLogin.scss'
 import Field from '../../support-page/Field'
 import Checkbox from '../../support-page/Checkbox'
 import Button from '../../movie-page/Button'
 import Select from '../../support-page/Select'
 import axiosClient from '../../../api/axiosConfig';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate} from 'react-router-dom';
 import Tags from '../../movie-page/Tags'
 
-const prefixOptions = [
-  { value: 'Comedy', isSelected: true },
-  { value: 'Drama' },
-  { value: 'Action' },
-  { value: 'Horror' },
-  { value: 'Romantik' },
-  { value: 'Sci-Fi' },
-  { value: 'Fantasy' },
-]
+
 
 const UserLogin = ({ onClose }) => {
   const titleId = 'user-login-title'
@@ -31,60 +23,202 @@ const UserLogin = ({ onClose }) => {
     agreement: false,
   })
 
+  const prefixOptions = [
+  { value: 'Comedy', isSelected: true },
+  { value: 'Drama' },
+  { value: 'Action' },
+  { value: 'Horror' },
+  { value: 'Romantik' },
+  { value: 'Sci-Fi' },
+  { value: 'Fantasy' },
+]
+
   const [favouriteGenres, setFavouriteGenres] = useState([])
 
   const [error, setError] = useState(null);
+  const [success, setSuccess] = useState(null);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  const handleChange = (field) => (e) => {
-    const value = e.target.type === 'checkbox' ? e.target.checked : e.target.value
-    setFormData((prev) => ({ ...prev, [field]: value }))
+  useEffect(() => {
+  if (success) {
+    const timer = setTimeout(() => setSuccess(null), 1500)
+    return () => clearTimeout(timer)
   }
+}, [success])
+
+  const handleChange = (field) => (e) => {
+  const { type, checked, value } = e.target
+  setFormData(prev => ({
+    ...prev,
+    [field]: type === 'checkbox' ? checked : value
+  }))
+}
 
   const handleGenreSelect = (genre) => {
-    setFavouriteGenres((prev) => {
-      if (prev.includes(genre)) return prev // не дублируем
-      return [...prev, genre]
-    })
+    setFavouriteGenres(prev =>
+  prev.includes(genre) ? prev : [...prev, genre]
+)
   }
 
   const handleRemoveGenre = (genre) => {
     setFavouriteGenres((prev) => prev.filter((g) => g !== genre))
   }
 
+  const resetForm = () => {
+    setFormData({
+      user_name: '',
+      email: '',
+      password: '',
+      confirmPassword: '',
+      agreement: false,
+    })
+    setFavouriteGenres([])
+    setError(null)
+    setSuccess(null)
+  }
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError(null);
+    setError(null)
+    setSuccess(null)
 
-    if (formData.password !== formData.confirmPassword) {
-      setError('Passwords do not match.');
-      return;
+    if (state === 'login') {
+      handleLogin();
+    } else {
+      handleRegister();
+    }
+  }
+
+  const handleLogin = async () => {
+    if (!formData.email || !formData.password) {
+      setError('Bitte fülle alle Pflichtfelder aus.')
+      return
     }
 
     setLoading(true);
-
     try {
       const payload = {
-        user_name: formData.user_name,
         email: formData.email,
         password: formData.password,
-        role: defaultRole,
-        favourite_genres: favouriteGenres
-      };
-      const response = await axiosClient.post('/register', payload);
+      }
+      const response = await axiosClient.post('/login', payload)
+
       if (response.data.error) {
         setError(response.data.error);
         return;
       }
-      // Registration successful, redirect to login
-      navigate('/login', { replace: true });
+
+      localStorage.setItem('token', response.data.token)
+      localStorage.setItem('user', JSON.stringify(response.data))
+
+      setSuccess('Login erfolgreich! Weiterleitung...')
+
+      setTimeout(() => {
+        resetForm()
+        if (onClose) onClose()
+        navigate('/', { replace: true })
+      }, 1500)
     } catch (err) {
-      setError('Registration failed. Please try again.');
+      setError('Login fehlgeschlagen. Bitte überprüfe deine Anmeldedaten.')
+      console.error('Login error:', err)
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  const handleRegister = async () => {
+    if (!formData.user_name || !formData.email || !formData.password || !formData.confirmPassword) {
+      setError('Bitte fülle alle Pflichtfelder aus.')
+      return
+    }
+
+    if (formData.password !== formData.confirmPassword) {
+      setError('Passwörter stimmen nicht überein.')
+      return
+    }
+
+    if (formData.password.length < 7) {
+      setError('Passwort muss mindestens 7 Zeichen lang sein.')
+      return;
+    }
+
+    if (!formData.agreement) {
+      setError('Bitte akzeptiere die Nutzungsbedingungen.')
+      return;
+    }
+
+    // if (favouriteGenres.length === 0) {
+    //   setError('Bitte wähle mindestens ein Genre aus.');
+    //   return;
+    // }
+
+    setLoading(true)
+
+    try {
+      // die aktuelle Liste der Genres vom Server abrufen
+      let genresFormatted = [];
+
+      try {
+        const genresResponse = await axiosClient.get('/genres');
+        const allGenres = genresResponse.data;
+
+        // Abgleich der ausgewählten Genres mit den Serverdaten
+        genresFormatted = favouriteGenres
+          .map(genreName => allGenres.find(g => g.genre_name === genreName))
+          .filter(Boolean);
+
+        // falls es nicht möglich war, Genres vom Server abzurufen, werden temporäre IDs verwendet.
+        if (genresFormatted.length === 0) {
+          genresFormatted = favouriteGenres.map((genreName, index) => ({
+            genre_id: index + 1,
+            genre_name: genreName
+          }));
+        }
+      } catch (genreErr) {
+        // Falls es nicht möglich war, Genres vom Server abzurufen, verwenden wir temporäre IDs.
+        console.warn('Could not fetch genres from server, using temporary IDs');
+        genresFormatted = favouriteGenres.map((genreName, index) => ({
+          genre_id: index + 1,
+          genre_name: genreName
+        }));
+      }
+
+      const payload = {
+        user_name: formData.user_name,
+        email: formData.email,
+        password: formData.password,
+        role: 'USER',
+        favourite_genres: genresFormatted
+      };
+
+      const response = await axiosClient.post('/register', payload)
+
+      if (response.data.error) {
+        setError(response.data.error);
+        return;
+      }
+
+
+      resetForm()
+      setSuccess('Registrierung erfolgreich! Bitte melde dich jetzt an.')
+      setState('login')
+
+    } catch (err) {
+      console.error('Registration error:', err);
+
+      if (err.response?.data?.error) {
+        setError(err.response.data.error);
+      } else if (err.response?.status === 409) {
+        setError('Ein Benutzer mit dieser E-Mail existiert bereits.');
+      } else {
+        setError('Registrierung fehlgeschlagen. Bitte versuche es erneut.');
+      }
     } finally {
       setLoading(false);
     }
   };
+ 
 
   return (
     <form className="user-login__form" onSubmit={handleSubmit} noValidate>
@@ -102,6 +236,17 @@ const UserLogin = ({ onClose }) => {
         )}
       </h2>
 
+      {error && (
+        <div className="user-login__message user-login__message--error">
+          {error}
+        </div>
+      )}
+
+      {success && (
+        <div className="user-login__message user-login__message--success">
+          {success}
+        </div>
+      )}
 
       {/* LOGIN FORM */}
       {state === 'login' && (
@@ -131,7 +276,10 @@ const UserLogin = ({ onClose }) => {
             Noch kein Account?{' '}
             <span
               className="user-login__link"
-              onClick={() => setState('register')}
+              onClick={() => {
+                setState('register')
+                resetForm()
+              }}
             >
               Hier klicken
             </span>
@@ -140,7 +288,7 @@ const UserLogin = ({ onClose }) => {
           <div className="user-login__form-cell user-login__form-cell--actions">
             <Button
               className="user-login__form-submit-button user-login__form-submit-button--login"
-              label="Einloggen"
+              label={"Einloggen"}
               type="submit"
             />
           </div>
@@ -192,7 +340,7 @@ const UserLogin = ({ onClose }) => {
 
           <div className="user-login__form-cell">
             <Select
-              label="Favourite Genres"
+              label="Lieblingsgenres"
               isLabelHidden={false}
               options={prefixOptions}
               onChange={handleGenreSelect}
@@ -216,7 +364,10 @@ const UserLogin = ({ onClose }) => {
             Hast Du bereits einen Account?{' '}
             <span
               className="user-login__link"
-              onClick={() => setState('login')}
+              onClick={() => {
+                setState('login')
+                resetForm()
+              }}
             >
               Hier klicken
             </span>

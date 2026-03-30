@@ -23,10 +23,6 @@
             border-radius: var(--border-radius-m);
         }
 
-        @include mobile-s-above {
-            grid-template-columns: repeat(2, 1fr);
-
-        }
 
         .field {
             --field-row-gap: #{fluid-to-laptop(5, 3)};
@@ -75,12 +71,33 @@
         font-size: 14px;
         color: var(--colour-white);
         padding: fluid(20, 10);
+
+         @include laptop {
+            margin-top: 15px;
+        }
     }
 
     &__link {
         cursor: pointer;
         text-decoration: underline;
     }
+
+ &__message {
+    padding: 10px;
+    background-color: var(--colour-black-12);
+    border-radius: var(--border-radius-xs);
+    margin-bottom: 10px;
+    text-align: center;
+
+    &--error {
+      color: var(--colour-red-50);
+    }
+
+    &--success {
+      color: var(--colour-green); 
+    }
+  }
+
 }
 
 .select__label{
@@ -91,6 +108,7 @@
 
     @include laptop {
             margin-right: 15px;
+            margin-bottom: 25px;
         }
 }
 
@@ -110,10 +128,6 @@
 
         @include hover {
             border-color: var(--colour-grey-97);
-        }
-
-        &:user-invalid {
-            border-color: var(--colour-red-50);
         }
 
         &:disabled {
