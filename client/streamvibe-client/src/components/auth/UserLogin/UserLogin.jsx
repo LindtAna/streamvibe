@@ -7,13 +7,15 @@ import Select from '../../support-page/Select'
 import axiosClient from '../../../api/axiosConfig';
 import { useNavigate} from 'react-router-dom';
 import Tags from '../../movie-page/Tags'
+import useAuth from '../../../hooks/useAuth'
 
 
 
 const UserLogin = ({ onClose }) => {
   const titleId = 'user-login-title'
 
-  const [state, setState] = useState("login");
+  const {setAuth} = useAuth()
+  const [mode, setMode] = useState("login")
 
   const [formData, setFormData] = useState({
     user_name: '',
@@ -47,6 +49,8 @@ const UserLogin = ({ onClose }) => {
   }
 }, [success])
 
+
+///CHECKBOX////////////
   const handleChange = (field) => (e) => {
   const { type, checked, value } = e.target
   setFormData(prev => ({
@@ -55,6 +59,7 @@ const UserLogin = ({ onClose }) => {
   }))
 }
 
+///GENRES////////////
   const handleGenreSelect = (genre) => {
     setFavouriteGenres(prev =>
   prev.includes(genre) ? prev : [...prev, genre]
@@ -65,6 +70,8 @@ const UserLogin = ({ onClose }) => {
     setFavouriteGenres((prev) => prev.filter((g) => g !== genre))
   }
 
+
+  ///CLEAR FORM////////////
   const resetForm = () => {
     setFormData({
       user_name: '',
@@ -83,14 +90,16 @@ const UserLogin = ({ onClose }) => {
     setError(null)
     setSuccess(null)
 
-    if (state === 'login') {
+    if (mode === 'login') {
       handleLogin();
     } else {
       handleRegister();
     }
   }
 
+///LOGIN////////////
   const handleLogin = async () => {
+
     if (!formData.email || !formData.password) {
       setError('Bitte fülle alle Pflichtfelder aus.')
       return
@@ -109,7 +118,8 @@ const UserLogin = ({ onClose }) => {
         return;
       }
 
-      localStorage.setItem('token', response.data.token)
+      setAuth(response.data)
+      // localStorage.setItem('token', response.data.token)
       localStorage.setItem('user', JSON.stringify(response.data))
 
       setSuccess('Login erfolgreich! Weiterleitung...')
@@ -119,6 +129,8 @@ const UserLogin = ({ onClose }) => {
         if (onClose) onClose()
         navigate('/', { replace: true })
       }, 1500)
+
+
     } catch (err) {
       setError('Login fehlgeschlagen. Bitte überprüfe deine Anmeldedaten.')
       console.error('Login error:', err)
@@ -127,6 +139,8 @@ const UserLogin = ({ onClose }) => {
     }
   }
 
+
+  ///REGISTRATION////////////
   const handleRegister = async () => {
     if (!formData.user_name || !formData.email || !formData.password || !formData.confirmPassword) {
       setError('Bitte fülle alle Pflichtfelder aus.')
@@ -202,7 +216,7 @@ const UserLogin = ({ onClose }) => {
 
       resetForm()
       setSuccess('Registrierung erfolgreich! Bitte melde dich jetzt an.')
-      setState('login')
+      setMode('login')
 
     } catch (err) {
       console.error('Registration error:', err);
@@ -223,10 +237,10 @@ const UserLogin = ({ onClose }) => {
   return (
     <form className="user-login__form" onSubmit={handleSubmit} noValidate>
       <h1 className="user-login__title h5" id={titleId}>
-        {state === "login" ? "Anmelden" : "Account erstellen"}
+        {mode === "login" ? "Anmelden" : "Account erstellen"}
       </h1>
       <h2 className="user-login__description h6">
-        {state === "login" ? (
+        {mode === "login" ? (
           "Bitte melde dich an"
         ) : (
           <>
@@ -249,7 +263,7 @@ const UserLogin = ({ onClose }) => {
       )}
 
       {/* LOGIN FORM */}
-      {state === 'login' && (
+      {mode === 'login' && (
         <>
           <Field
             className="user-login__form-cell"
@@ -277,7 +291,7 @@ const UserLogin = ({ onClose }) => {
             <span
               className="user-login__link"
               onClick={() => {
-                setState('register')
+                setMode('register')
                 resetForm()
               }}
             >
@@ -288,7 +302,7 @@ const UserLogin = ({ onClose }) => {
           <div className="user-login__form-cell user-login__form-cell--actions">
             <Button
               className="user-login__form-submit-button user-login__form-submit-button--login"
-              label={"Einloggen"}
+              label="Einloggen"
               type="submit"
             />
           </div>
@@ -296,7 +310,7 @@ const UserLogin = ({ onClose }) => {
       )}
 
       {/* REGISTER FORM */}
-      {state === 'register' && (
+      {mode === 'register' && (
         <>
           <Field
             className="user-login__form-cell"
@@ -365,7 +379,7 @@ const UserLogin = ({ onClose }) => {
             <span
               className="user-login__link"
               onClick={() => {
-                setState('login')
+                setMode('login')
                 resetForm()
               }}
             >

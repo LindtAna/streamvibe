@@ -6,9 +6,12 @@ import Button from '../../movie-page/Button'
 import BurgerButton from '../BurgerButton'
 import { useNavigate } from 'react-router-dom'
 import UserLogin from '../../auth/UserLogin/UserLogin'
+import useAuth from '../../../hooks/useAuth'
 
 import LoginIcon from '../../../assets/icons/login.svg'
 import SearchIcon from '../../../assets/icons/search.svg'
+
+
 
 const menuItems = [
   { label: 'Home', href: '/' },
@@ -26,6 +29,7 @@ const Header = ({ url, isFixed }) => {
   const [isOpen, setIsOpen] = useState(false)
   const [isLoginOpen, setIsLoginOpen] = useState(false)
 
+const {auth} = useAuth()
   const dialogRef = useRef(null)
   const loginDialogRef = useRef(null)
   const burgerRef = useRef(null)

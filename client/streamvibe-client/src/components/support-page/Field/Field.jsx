@@ -11,12 +11,12 @@ const Field = ({
   placeholder,
   isRequired,
   inputMode,
-  // renderBefore — слот для Select (код страны перед полем ввода)
+  // renderBefore — Slot für Select (Ländercode vor dem Eingabefeld)
   renderBefore,
-  // Остальные props пробрасываются в input/textarea
+  // Die restlichen Eigenschaften werden an das Eingabefeld/Textfeld übergeben.
   ...rest
 }) => {
-  const fieldId = id ?? getIdFromTitle(label)
+  const fieldId = id ?? getIdFromTitle(label ?? 'field')
   const Component = type === 'textarea' ? 'textarea' : 'input'
 
   return (
@@ -34,7 +34,7 @@ const Field = ({
         <Component
           className="field__control"
           id={fieldId}
-          type={type}
+          {...(Component === 'input' ? { type } : {})}
           placeholder={placeholder}
           required={isRequired}
           inputMode={inputMode}
