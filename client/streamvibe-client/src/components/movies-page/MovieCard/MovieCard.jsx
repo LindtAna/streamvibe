@@ -1,6 +1,7 @@
 import './MovieCard.scss'
 import Badge from '../../movie-page/Badge'
 import RatingView from '../../movie-page/RatingView'
+import { Link } from 'react-router-dom'
 
 import CatalogIcon from '../../../assets/icons/catalog.svg'
 import EyeIcon from '../../../assets/icons/eye.svg'
@@ -17,7 +18,7 @@ const MovieCard = ({
   href = '/movie',
 }) => {
   return (
-    <a className="movie-card" href={href} title={title}>
+    <Link className="movie-card" to={href} title={title}>
       <h3 className="visually-hidden">{title}</h3>
 
       <img
@@ -58,7 +59,7 @@ const MovieCard = ({
           </Badge>
         )}
       </div>
-    </a>
+    </Link>
   )
 }
 

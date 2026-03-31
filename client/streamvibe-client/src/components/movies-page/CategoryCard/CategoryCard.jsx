@@ -1,12 +1,13 @@
 import './CategoryCard.scss'
 import Badge from '../../movie-page/Badge'
 import Icon from '../../movie-page/Icon'
+import { Link } from 'react-router-dom'
 
 import arrowRightSrc from '../../../assets/icons/arrow-right.svg'
 
 const CategoryCard = ({ title, images = [], badge, href = '/movies' }) => {
   return (
-    <a className="category-card" href={href}>
+    <Link className="category-card" to={href}>
       <div className="category-card__images">
         {images.map((imgSrc, index) => (
           <img
@@ -33,7 +34,7 @@ const CategoryCard = ({ title, images = [], badge, href = '/movies' }) => {
           src={arrowRightSrc}
         />
       </div>
-    </a>
+    </Link>
   )
 }
 

@@ -4,7 +4,7 @@ import Logo from '../Logo'
 import classNames from 'classnames'
 import Button from '../../movie-page/Button'
 import BurgerButton from '../BurgerButton'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, Link } from 'react-router-dom'
 import UserLogin from '../../auth/UserLogin/UserLogin'
 import useAuth from '../../../hooks/useAuth'
 
@@ -79,15 +79,15 @@ const Header = ({ url, isFixed }) => {
     if (!isLogoutVisible) return
 
     const handleClickOutside = (e) => {
-  if (!logoutContainerRef.current) return
+      if (!logoutContainerRef.current) return
 
-  if (logoutContainerRef.current.contains(e.target)) return
+      if (logoutContainerRef.current.contains(e.target)) return
 
-  setIsLogoutVisible(false)
-}
+      setIsLogoutVisible(false)
+    }
 
     document.addEventListener('pointerdown', handleClickOutside)
-return () => document.removeEventListener('pointerdown', handleClickOutside)
+    return () => document.removeEventListener('pointerdown', handleClickOutside)
   }, [isLogoutVisible])
 
 
@@ -125,7 +125,7 @@ return () => document.removeEventListener('pointerdown', handleClickOutside)
 
 
   const handleLoginButtonClick = useCallback((e) => {
-     e.stopPropagation()
+    e.stopPropagation()
     if (auth) {
       setIsLogoutVisible((prev) => !prev)
     } else {
@@ -158,15 +158,15 @@ return () => document.removeEventListener('pointerdown', handleClickOutside)
             <ul className="header__menu-list">
               {menuItems.map(({ label, href }, index) => (
                 <li className="header__menu-item" key={index}>
-                  <a
+                  <Link
                     className={classNames('header__menu-link', {
                       'is-active': href === url,
                     })}
-                    href={href}
-                    onClick={close}
+                    to={href}
+                    onClick={close} 
                   >
                     {label}
-                  </a>
+                  </Link>
                 </li>
               ))}
             </ul>
@@ -194,14 +194,14 @@ return () => document.removeEventListener('pointerdown', handleClickOutside)
               extraAttrs={{ ref: loginButtonRef }}
             />
 
- 
-          {auth && isLogoutVisible && (
+
+            {auth && isLogoutVisible && (
               <Button
                 className="header__button header__logout-button"
                 label="Abmelden"
                 onClick={handleLogout}
               />
-          )}
+            )}
           </div>
         </dialog>
 

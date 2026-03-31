@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom'
 import './Logo.scss'
 import classNames from 'classnames'
 import logoImgSrc from '../../../assets/logo.svg'
@@ -6,9 +7,9 @@ const Logo = ({ className, loading = 'lazy' }) => {
   const title = 'Home'
 
   return (
-    <a
+    <Link
       className={classNames(className, 'logo')}
-      href="/"
+      to="/"
       title={title}
       aria-label={title}
     >
@@ -20,7 +21,7 @@ const Logo = ({ className, loading = 'lazy' }) => {
         height={60}
         loading={loading}
       />
-    </a>
+    </Link>
   )
 }
 
