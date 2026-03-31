@@ -91,7 +91,7 @@
     @include tablet {
       display: flex;
       justify-content: center;
-      border-radius: 0;  
+      border-radius: 0;
     }
 
     &-list {
@@ -100,7 +100,7 @@
       column-gap: 6px;
       list-style: none;
       padding: 0;
-  
+
 
       @include tablet {
         flex-direction: column;
@@ -140,20 +140,24 @@
 
     @include tablet {
       justify-content: end;
-      order: -1; 
+      order: -1;
     }
-    
+
 
     @include mobile {
       column-gap: 35px;
     }
   }
-
+  
+  &__logout-button{
+   transition-duration: var(--transition-duration-longer);
+  }
+  
   &__burger-button {
     position: relative;
   }
 
-   &__login-dialog {
+  &__login-dialog {
     position: fixed;
     inset: 0;
     display: none;
@@ -166,25 +170,26 @@
     border: none;
     transition-duration: var(--transition-duration);
     transition-behavior: allow-discrete;
- 
+
     @mixin login-starting-styles {
       opacity: 0;
       scale: 0.9;
     }
- 
+
     &[open] {
       display: flex;
+
       @starting-style {
         @include login-starting-styles;
       }
     }
- 
+
     &:not([open]) {
       display: none;
-    pointer-events: none;
+      pointer-events: none;
     }
   }
- 
+
   &__login-content {
     width: #{fluid(500, 400)};
     max-height: 90vh;
@@ -192,7 +197,7 @@
     background-color: var(--colour-black-08);
     border: var(--border);
     border-radius: var(--border-radius-l);
-    
+
     @include laptop {
       border-radius: var(--border-radius-m);
     }

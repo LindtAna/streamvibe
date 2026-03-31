@@ -11,8 +11,6 @@ import useAuth from '../../../hooks/useAuth'
 import LoginIcon from '../../../assets/icons/login.svg'
 import SearchIcon from '../../../assets/icons/search.svg'
 
-
-
 const menuItems = [
   { label: 'Home', href: '/' },
   { label: 'Filme', href: '/movies' },
@@ -20,7 +18,6 @@ const menuItems = [
   { label: 'Merkliste', href: '/saved' },
   { label: 'Support', href: '/support' },
 ]
-
 // isOpen steuert dialog[open] und die is-active-Klasse des Burger-Menüs
 // Schließen per Escape (ein einziger Handler für beide Modalfenster)
 // Schließen beim Klick auf den Backdrop
@@ -28,25 +25,25 @@ const menuItems = [
 const Header = ({ url, isFixed }) => {
   const [isOpen, setIsOpen] = useState(false)
   const [isLoginOpen, setIsLoginOpen] = useState(false)
+  const [isLogoutVisible, setIsLogoutVisible] = useState(false)
 
-const {auth} = useAuth()
+  const { auth, setAuth } = useAuth()
   const dialogRef = useRef(null)
   const loginDialogRef = useRef(null)
   const burgerRef = useRef(null)
   const loginButtonRef = useRef(null)
+  const logoutContainerRef = useRef(null)
 
   const navigate = useNavigate()
 
   const isAnyModalOpen = isOpen || isLoginOpen
 
-  // EIN useEffect für Scroll-Lock
+  //   // EIN useEffect für Scroll-Lock
   useEffect(() => {
     const menuDialog = dialogRef.current
     const loginDialog = loginDialogRef.current
-
     // Scroll wird blockiert, wenn irgendein Modal geöffnet ist
     document.documentElement.classList.toggle('is-lock', isAnyModalOpen)
-
     // Den open-Attributwert für jedes Dialog-Element separat setzen
     if (menuDialog) menuDialog.open = isOpen
     if (loginDialog) loginDialog.open = isLoginOpen
@@ -56,14 +53,15 @@ const {auth} = useAuth()
     }
   }, [isAnyModalOpen, isOpen, isLoginOpen])
 
-  // EIN useEffect für Escape
+  // EIN useEffect für Escape handler
   useEffect(() => {
-    if (!isAnyModalOpen) return
+    if (!isAnyModalOpen && !isLogoutVisible) return
 
     const handleKeyDown = (e) => {
       if (e.key === 'Escape') {
-        // Priorität: zuerst das Login-Modal schließen (falls geöffnet)
-        if (isLoginOpen) {
+        if (isLogoutVisible) {
+          setIsLogoutVisible(false)
+        } else if (isLoginOpen) {
           closeLogin()
         } else if (isOpen) {
           close()
@@ -73,7 +71,25 @@ const {auth} = useAuth()
 
     document.addEventListener('keydown', handleKeyDown)
     return () => document.removeEventListener('keydown', handleKeyDown)
-  }, [isAnyModalOpen, isLoginOpen, isOpen])
+  }, [isAnyModalOpen, isLoginOpen, isOpen, isLogoutVisible])
+
+
+  // logout wird ausgeblendet, wenn man außerhalb des Buttons klickt
+  useEffect(() => {
+    if (!isLogoutVisible) return
+
+    const handleClickOutside = (e) => {
+  if (!logoutContainerRef.current) return
+
+  if (logoutContainerRef.current.contains(e.target)) return
+
+  setIsLogoutVisible(false)
+}
+
+    document.addEventListener('pointerdown', handleClickOutside)
+return () => document.removeEventListener('pointerdown', handleClickOutside)
+  }, [isLogoutVisible])
+
 
   const handleDialogClick = useCallback((e) => {
     if (e.target === dialogRef.current) close()
@@ -86,8 +102,10 @@ const {auth} = useAuth()
   const open = useCallback(() => setIsOpen(true), [])
   const close = useCallback(() => {
     setIsOpen(false)
+    setIsLogoutVisible(false)
     burgerRef.current?.focus()
   }, [])
+
 
   const toggle = useCallback(() => {
     setIsOpen((prev) => !prev)
@@ -104,6 +122,26 @@ const {auth} = useAuth()
     setIsLoginOpen(false)
     loginButtonRef.current?.focus()
   }, [])
+
+
+  const handleLoginButtonClick = useCallback((e) => {
+     e.stopPropagation()
+    if (auth) {
+      setIsLogoutVisible((prev) => !prev)
+    } else {
+      openLogin()
+    }
+  }, [auth, openLogin])
+
+  //// Logout
+  const handleLogout = useCallback(() => {
+    setAuth(null)
+    localStorage.removeItem('user')
+    localStorage.removeItem('token')
+    setIsLogoutVisible(false)
+    setIsOpen(false)
+    navigate('/')
+  }, [setAuth, navigate])
 
   return (
     <header className={classNames('header', { 'is-fixed': isFixed })}>
@@ -135,7 +173,7 @@ const {auth} = useAuth()
           </nav>
 
           {/* Aktionsbuttons (Search + User Login) */}
-          <div className="header__actions">
+          <div className="header__actions" ref={logoutContainerRef}>
             <Button
               className="header__button"
               label="Search"
@@ -152,9 +190,18 @@ const {auth} = useAuth()
               mode="transparent"
               iconSrc={LoginIcon}
               iconName="login"
-              onClick={openLogin}              
+              onClick={handleLoginButtonClick}
               extraAttrs={{ ref: loginButtonRef }}
             />
+
+ 
+          {auth && isLogoutVisible && (
+              <Button
+                className="header__button header__logout-button"
+                label="Abmelden"
+                onClick={handleLogout}
+              />
+          )}
           </div>
         </dialog>
 

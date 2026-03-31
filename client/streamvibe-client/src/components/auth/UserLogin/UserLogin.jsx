@@ -25,7 +25,7 @@ const UserLogin = ({ onClose }) => {
     agreement: false,
   })
 
-  const prefixOptions = [
+  const genresOptions = [
   { value: 'Comedy', isSelected: true },
   { value: 'Drama' },
   { value: 'Action' },
@@ -120,7 +120,7 @@ const UserLogin = ({ onClose }) => {
 
       setAuth(response.data)
       // localStorage.setItem('token', response.data.token)
-      localStorage.setItem('user', JSON.stringify(response.data))
+      // localStorage.setItem('user', JSON.stringify(response.data))
 
       setSuccess('Login erfolgreich! Weiterleitung...')
 
@@ -356,7 +356,7 @@ const UserLogin = ({ onClose }) => {
             <Select
               label="Lieblingsgenres"
               isLabelHidden={false}
-              options={prefixOptions}
+              options={genresOptions}
               onChange={handleGenreSelect}
             />
 
