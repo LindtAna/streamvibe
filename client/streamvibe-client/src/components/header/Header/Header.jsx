@@ -194,10 +194,9 @@ const Header = ({ url, isFixed }) => {
               extraAttrs={{ ref: loginButtonRef }}
             />
 
-
             {auth && isLogoutVisible && (
               <Button
-                className="header__button header__logout-button"
+                className="header__button button--red-06"
                 label="Abmelden"
                 onClick={handleLogout}
               />

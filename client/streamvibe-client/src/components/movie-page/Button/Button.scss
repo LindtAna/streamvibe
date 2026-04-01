@@ -69,4 +69,11 @@
         background-color: var(--colour-black-06);
         border: var(--border);
     }
+
+    &--red-06 {
+        background-color: transparent;
+        border: var(--border);;
+        border-color: var(--colour-red-60);
+        transition-duration: var(--transition-duration-longer);
+    }
 }

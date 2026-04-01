@@ -5,7 +5,7 @@ import Checkbox from '../../support-page/Checkbox'
 import Button from '../../movie-page/Button'
 import Select from '../../support-page/Select'
 import axiosClient from '../../../api/axiosConfig';
-import { useNavigate} from 'react-router-dom';
+import { useLocation, useNavigate} from 'react-router-dom';
 import Tags from '../../movie-page/Tags'
 import useAuth from '../../../hooks/useAuth'
 
@@ -37,10 +37,13 @@ const UserLogin = ({ onClose }) => {
 
   const [favouriteGenres, setFavouriteGenres] = useState([])
 
-  const [error, setError] = useState(null);
-  const [success, setSuccess] = useState(null);
-  const [loading, setLoading] = useState(false);
-  const navigate = useNavigate();
+  const [error, setError] = useState(null)
+  const [success, setSuccess] = useState(null)
+  const [loading, setLoading] = useState(false)
+  const navigate = useNavigate()
+  const location = useLocation()
+
+  const from = location.state?.from?.pathname || "/"
 
   useEffect(() => {
   if (success) {
@@ -127,8 +130,8 @@ const UserLogin = ({ onClose }) => {
       setTimeout(() => {
         resetForm()
         if (onClose) onClose()
-        navigate('/', { replace: true })
-      }, 1500)
+        navigate(from, { replace: true })
+      }, 1000)
 
 
     } catch (err) {
