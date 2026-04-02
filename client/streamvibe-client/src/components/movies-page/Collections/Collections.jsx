@@ -12,7 +12,7 @@ import useAxiosPrivate from '../../../hooks/useAxiosPrivate'
 
 const groupMoviesByGenre = (movies) => {
   const genreMap = {}
-  
+
   movies.forEach(movie => {
     movie.genre?.forEach(g => {
       if (!genreMap[g.genre_name]) {
@@ -21,18 +21,40 @@ const groupMoviesByGenre = (movies) => {
       genreMap[g.genre_name].push(movie)
     })
   })
-  
+
   return genreMap
 }
 
-const CollectionSection = ({ 
-  title, 
-  titleId, 
-  sliderNavigationId, 
-  sliderParams, 
-  categoryItems, 
-  movieItems 
+const CollectionSection = ({
+  title,
+  titleId,
+  sliderNavigationId,
+  sliderParams,
+  categoryItems,
+  movieItems
 }) => {
+  // Dynamische Anpassung von Slider abhängig von der Anzahl der Elemente
+  const itemCount = categoryItems?.length || movieItems?.length || 0
+
+  
+  const adjustedSliderParams = useMemo(() => {
+    const params = { ...sliderParams }
+
+    const maxSlidesPerView = Math.max(
+      params.slidesPerView || 0,
+      ...(Object.values(params.breakpoints || {})
+        .map(breakpoint => breakpoint.slidesPerView || 0))
+    )
+
+    // Bei wenigen Elementen loop deaktivieren
+    if (itemCount <= maxSlidesPerView) {
+      params.loop = false
+    }
+
+    return params
+  }, [sliderParams, itemCount])
+
+
   return (
     <Section
       className="collections__section"
@@ -42,26 +64,26 @@ const CollectionSection = ({
       isActionsHiddenOnMobile
     >
       <Slider
-        sliderParams={sliderParams}
+        sliderParams={adjustedSliderParams}
         navigationTargetElementId={sliderNavigationId}
         isBeyondTheViewPortOnMobileS
       >
         {categoryItems
           ? categoryItems.map((item, index) => (
-              <CategoryCard key={index} {...item} />
-            ))
+            <CategoryCard key={index} {...item} />
+          ))
           : movieItems.map((item, index) => (
-              <MovieCard 
-                key={index}
-                title={item.title}
-                imgSrc={item.poster_path}
-                rating={{ 
-                  value: item.ranking?.ranking_value || 0, 
-                  label: item.ranking?.ranking_name || 'N/A' 
-                }}
-                href={`/movie/${item.imdb_id}`}
-              />
-            ))}
+            <MovieCard
+              key={index}
+              title={item.title}
+              imgSrc={item.poster_path}
+              rating={{
+                value: item.ranking?.ranking_value || 0,
+                label: item.ranking?.ranking_name || 'N/A'
+              }}
+              href={`/movie/${item.imdb_id}`}
+            />
+          ))}
       </Slider>
     </Section>
   )
@@ -72,19 +94,22 @@ const Collections = ({ movies = [], showRecommendations = false }) => {
   const axiosPrivate = useAxiosPrivate()
   const [recommendedMovies, setRecommendedMovies] = useState([])
   const [loadingRecommendations, setLoadingRecommendations] = useState(false)
+  const [recommendationsLoaded, setRecommendationsLoaded] = useState(false)
 
   const categorySliderParams = {
     slidesPerView: 4,
-    slidesPerGroup: 10,
+    slidesPerGroup: 4,
     spaceBetween: 30,
+    loop: true, // aktiviert, wird aber dynamisch deaktiviert
     breakpoints: {
       0: { slidesPerView: 1.6, slidesPerGroup: 1, spaceBetween: 20 },
       481: { slidesPerView: 2, slidesPerGroup: 2, spaceBetween: 20 },
       768: { slidesPerView: 3, slidesPerGroup: 3, spaceBetween: 20 },
-      1024: { spaceBetween: 20 },
-      1441: { spaceBetween: 30 },
-    },
+      1024: { slidesPerView: 4, slidesPerGroup: 4, spaceBetween: 20 },
+      1441: { slidesPerView: 4, slidesPerGroup: 4, spaceBetween: 30 },
+    }
   }
+
 
   // Filmempfehlungen für den angemeldeten Benutzer geladen
   useEffect(() => {
@@ -96,21 +121,42 @@ const Collections = ({ movies = [], showRecommendations = false }) => {
           setRecommendedMovies(response.data || [])
         } catch (error) {
           console.error('Fehler beim Laden der Empfehlungen:', error)
-          setRecommendedMovies([])
+          if (error.response?.status === 500) {
+            setRecommendedMovies([])
+          }
         } finally {
           setLoadingRecommendations(false)
+          setRecommendationsLoaded(true)
         }
       }
       fetchRecommendations()
+    } else {
+      setRecommendedMovies([])
+      setRecommendationsLoaded(false)
     }
-  }, [auth, showRecommendations, axiosPrivate])
+  }, [auth, showRecommendations])
+
 
   const collectionGroups = useMemo(() => {
     if (!movies.length) return []
 
     const genreGroups = groupMoviesByGenre(movies)
-    
-    const items = [
+    const items = []
+
+    // Filmempfehlungen am Anfang, falls sie geladen sind.
+    if (auth &&
+      showRecommendations &&
+      recommendationsLoaded &&
+      recommendedMovies.length > 0
+    ) {
+      items.push({
+        title: 'Filmempfehlungen',
+        movieItems: recommendedMovies,
+        sliderParams: categorySliderParams,
+      })
+    }
+
+    items.push(
       {
         title: 'Alle Filme',
         movieItems: movies.slice(0, 12),
@@ -121,23 +167,24 @@ const Collections = ({ movies = [], showRecommendations = false }) => {
         movieItems: genreMovies.slice(0, 12),
         sliderParams: categorySliderParams,
       }))
-    ]
-
-    // Filmempfehlungen für angemeldete Benutzer auf der /movies oben in der Liste
-    if (auth && showRecommendations && recommendedMovies.length > 0) {
-      items.unshift({
-        title: 'Filmempfehlungen',
-        movieItems: recommendedMovies,
-        sliderParams: categorySliderParams,
-      })
-    }
+    )
 
     return [{
-      title: 'Movies',
+      title: 'Filme',
       isActive: true,
       items,
     }]
-  }, [movies, auth, showRecommendations, recommendedMovies])
+  }, [movies, auth, showRecommendations, recommendedMovies, recommendationsLoaded])
+
+  if (showRecommendations &&
+    loadingRecommendations &&
+    !recommendationsLoaded) {
+    return (
+      <div className="container">
+        <h5>Filmempfehlungen werden geladen...</h5>
+      </div>
+    )
+  }
 
   const tabItems = collectionGroups.map((group) => ({
     title: group.title,

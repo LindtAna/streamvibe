@@ -259,6 +259,7 @@ func GetRecommendedMovies(client *mongo.Client) gin.HandlerFunc {
 
 		if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": "User Id not found in context"})
+			return
 		}
 
 		favourite_genres, err := GetUsersFavouriteGenres(userId, c, client)
@@ -267,6 +268,13 @@ func GetRecommendedMovies(client *mongo.Client) gin.HandlerFunc {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return
 		}
+
+		// // Wenn der Benutzer keine Fav.genres hat, wird ein leeres Array zurückgegeben
+		if len(favourite_genres) == 0 {
+			c.JSON(http.StatusOK, []models.Movie{})
+			return
+		}
+
 		err = godotenv.Load(".env")
 		if err != nil {
 			log.Println("Warning: .env file not found")
@@ -310,6 +318,11 @@ func GetRecommendedMovies(client *mongo.Client) gin.HandlerFunc {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return
 		}
+		// Всегда возвращаем массив, даже если он пустой
+		if recommendedMovies == nil {
+			recommendedMovies = []models.Movie{}
+		}
+
 		c.JSON(http.StatusOK, recommendedMovies)
 	}
 }
@@ -333,17 +346,18 @@ func GetUsersFavouriteGenres(userId string, c *gin.Context, client *mongo.Client
 	err := userCollection.FindOne(ctx, filter, opts).Decode(&result)
 
 	if err != nil {
+
 		if err == mongo.ErrNoDocuments {
 			return []string{}, nil
 		}
+		return nil, err
 	}
 
 	favGenresArray, ok := result["favourite_genres"].(bson.A) //bson.A = slice([]interface{}), which stores array elements from MongoDB
 
 	if !ok {
-		return []string{}, errors.New("unable to retrieve favourite genres for user")
+		return []string{}, nil
 	}
-
 	var genreNames []string
 
 	for _, item := range favGenresArray {

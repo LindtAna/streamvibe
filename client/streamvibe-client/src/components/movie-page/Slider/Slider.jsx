@@ -39,21 +39,17 @@ const Slider = ({
   const scrollbarRef = useRef(null)
   const swiperInstanceRef = useRef(null)
 
-  // Генерируем уникальный id для внутренней навигации
-  // (когда navigationTargetElementId не передан)
-  const internalNavId = useId()
-
-  const childrenArray = Array.isArray(children) ? children : [children]
+ const childrenArray = Array.isArray(children) ? children : [children]
 
   useEffect(() => {
     if (!swiperRef.current) return
 
-    // Если навигация внешняя — ищем элементы по id
     let prevEl = prevBtnRef.current
     let nextEl = nextBtnRef.current
     let paginationEl = paginationRef.current
     let scrollbarEl = scrollbarRef.current
 
+     // externe Navigation
     if (navigationTargetElementId) {
       const navRoot = document.getElementById(navigationTargetElementId)
       if (navRoot) {
@@ -63,7 +59,10 @@ const Slider = ({
       }
     }
 
-    swiperInstanceRef.current = new Swiper(swiperRef.current, {
+
+    const slidesCount = childrenArray.length
+
+   swiperInstanceRef.current = new Swiper(swiperRef.current, {
       ...sliderParams,
       modules: [Navigation, Pagination, Scrollbar],
       navigation: { prevEl, nextEl },
@@ -76,12 +75,20 @@ const Slider = ({
         el: scrollbarEl,
         dragClass: 'slider__scrollbar-drag',
       },
+      on: {
+        init() {
+          if (slidesCount <= (sliderParams.slidesPerView || 1)) {
+            if (prevEl) prevEl.style.display = 'none'
+            if (nextEl) nextEl.style.display = 'none'
+          }
+        }
+      }
     })
 
-    return () => {
+  return () => {
       swiperInstanceRef.current?.destroy(true, true)
     }
-  }, []) 
+  }, [childrenArray.length, navigationTargetElementId])
 
   
   return (
@@ -101,7 +108,7 @@ const Slider = ({
         </ul>
       </div>
 
-      {/* Внутренняя навигация (когда нет внешней) */}
+      {/* Interne Navigation (wenn keine externe Navigation vorhanden ist)*/}
       {!navigationTargetElementId && (
         <SliderNavigation
           className="slider__navigation"
