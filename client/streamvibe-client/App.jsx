@@ -7,7 +7,6 @@ import UserLogin from './src/components/auth/UserLogin'
 import HomePage from './src/components/home/HomePage'
 import { AuthProvider } from './src/context/AuthProvider'
 import Layout from './src/components/Layout'
-import Recommended from './src/recommended/Recommended'
 import RequiredAuth from './src/components/RequiredAuth'
 // import AddReview from './src/components/movie-page/AddReview'
 
@@ -18,24 +17,23 @@ function App() {
         <Header />
         <main>
           <Routes>
+            
             {/* Layout */}
             <Route path="/" element={<Layout />}>
               <Route path="/" element={<HomePage />} />
-              <Route path="/movies" element={<Movies />} />
+              <Route path="/movies" element={<Movies showRecommendations={true} />} />
               <Route path="/movie/:imdbId" element={<Movie />} />
               <Route path="/support" element={<SupportPage />} />
               <Route path="/login" element={<UserLogin />} />
 
               {/* Protected */}
               <Route path="/" element={<RequiredAuth />}>
-                <Route path="/recommendedmovies" element={<Recommended />} />
-
                 {/* <Route path="/saved" element={<Saved />} />
                 <Route path="/add-review" element={<AddReview />} /> */}
-
               </Route>
 
             </Route>
+
             {/* fallback */}
             <Route path="*" element={<Navigate to="/" replace />} />
 

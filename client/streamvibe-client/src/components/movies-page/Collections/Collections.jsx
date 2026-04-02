@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { useMemo, useState, useEffect } from 'react'
 import './Collections.scss'
 import Tabs from '../Tabs'
 import Section from '../Section'
@@ -7,7 +7,8 @@ import Slider from '../../movie-page/Slider'
 import CategoryCard from '../CategoryCard'
 import MovieCard from '../MovieCard'
 import getIdFromTitle from '../getIdFromTitle'
-
+import useAuth from '../../../hooks/useAuth'
+import useAxiosPrivate from '../../../hooks/useAxiosPrivate'
 
 const groupMoviesByGenre = (movies) => {
   const genreMap = {}
@@ -66,7 +67,12 @@ const CollectionSection = ({
   )
 }
 
-const Collections = ({ movies = [] }) => {
+const Collections = ({ movies = [], showRecommendations = false }) => {
+  const { auth } = useAuth()
+  const axiosPrivate = useAxiosPrivate()
+  const [recommendedMovies, setRecommendedMovies] = useState([])
+  const [loadingRecommendations, setLoadingRecommendations] = useState(false)
+
   const categorySliderParams = {
     slidesPerView: 4,
     slidesPerGroup: 10,
@@ -80,28 +86,58 @@ const Collections = ({ movies = [] }) => {
     },
   }
 
+  // Filmempfehlungen für den angemeldeten Benutzer geladen
+  useEffect(() => {
+    if (auth && showRecommendations) {
+      const fetchRecommendations = async () => {
+        setLoadingRecommendations(true)
+        try {
+          const response = await axiosPrivate.get('/recommendedmovies')
+          setRecommendedMovies(response.data || [])
+        } catch (error) {
+          console.error('Fehler beim Laden der Empfehlungen:', error)
+          setRecommendedMovies([])
+        } finally {
+          setLoadingRecommendations(false)
+        }
+      }
+      fetchRecommendations()
+    }
+  }, [auth, showRecommendations, axiosPrivate])
+
   const collectionGroups = useMemo(() => {
     if (!movies.length) return []
 
     const genreGroups = groupMoviesByGenre(movies)
     
+    const items = [
+      {
+        title: 'Alle Filme',
+        movieItems: movies.slice(0, 12),
+        sliderParams: categorySliderParams,
+      },
+      ...Object.entries(genreGroups).map(([genreName, genreMovies]) => ({
+        title: genreName,
+        movieItems: genreMovies.slice(0, 12),
+        sliderParams: categorySliderParams,
+      }))
+    ]
+
+    // Filmempfehlungen für angemeldete Benutzer auf der /movies oben in der Liste
+    if (auth && showRecommendations && recommendedMovies.length > 0) {
+      items.unshift({
+        title: 'Filmempfehlungen',
+        movieItems: recommendedMovies,
+        sliderParams: categorySliderParams,
+      })
+    }
+
     return [{
       title: 'Movies',
       isActive: true,
-      items: [
-        {
-          title: 'All Movies',
-          movieItems: movies.slice(0, 12),
-          sliderParams: categorySliderParams,
-        },
-        ...Object.entries(genreGroups).map(([genreName, genreMovies]) => ({
-          title: genreName,
-          movieItems: genreMovies.slice(0, 12),
-          sliderParams: categorySliderParams,
-        }))
-      ],
+      items,
     }]
-  }, [movies])
+  }, [movies, auth, showRecommendations, recommendedMovies])
 
   const tabItems = collectionGroups.map((group) => ({
     title: group.title,

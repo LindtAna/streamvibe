@@ -5,7 +5,7 @@ const HomePage = () => {
   return (
     <>
       <Hero />
-      <Movies />
+      <Movies showRecommendations={false} />
     </>
   )
 }
