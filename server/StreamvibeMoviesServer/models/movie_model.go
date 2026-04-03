@@ -5,6 +5,7 @@ package models
 
 import (
 	"go.mongodb.org/mongo-driver/v2/bson"
+	"time"
 )
 
 type Genre struct {
@@ -25,5 +26,16 @@ type Movie struct {
 	YouTubeID   string        `bson:"youtube_id" json:"youtube_id" validate:"required"`
 	Genre       []Genre       `bson:"genre" json:"genre" validate:"required,dive"`
 	AdminReview string        `bson:"admin_review" json:"admin_review"`
+	UserReviews []UserReview  `bson:"user_reviews" json:"user_reviews"`
 	Ranking     Ranking       `bson:"ranking" json:"ranking" validate:"required"`
+}
+
+type UserReview struct {
+	ReviewID  bson.ObjectID `bson:"review_id" json:"review_id"`
+	UserID    string        `bson:"user_id" json:"user_id"`
+	UserName  string        `bson:"user_name" json:"user_name"`
+	Country   string        `bson:"country" json:"country" validate:"required"`
+	Rating    int           `bson:"rating" json:"rating" validate:"required,min=1,max=5"`
+	Text      string        `bson:"text" json:"text" validate:"required"`
+	CreatedAt time.Time     `bson:"created_at" json:"created_at"`
 }

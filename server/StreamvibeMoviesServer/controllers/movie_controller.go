@@ -231,6 +231,79 @@ func GetReviewRanking(admin_review string, client *mongo.Client, c *gin.Context)
 	return response, rankVal, nil
 }
 
+func UserReviewUpdate(client *mongo.Client) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		role, err := utils.GetRoleFromContext(c)
+		if err != nil || role != "USER" {
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "User must be authorised"})
+			return
+		}
+
+		userId, err := utils.GetUserIdFromContext(c)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "User Id not found in context"})
+			return
+		}
+
+		movieId := c.Param("imdb_id")
+		if movieId == "" {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Movie Id required"})
+			return
+		}
+
+		var req struct {
+			Country string `json:"country" validate:"required"`
+			Rating  int    `json:"rating" validate:"required,min=1,max=5"`
+			Text    string `json:"text" validate:"required"`
+		}
+
+		if err := c.ShouldBindJSON(&req); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request body"})
+			return
+		}
+
+		var ctx, cancel = context.WithTimeout(context.Background(), 100*time.Second)
+		defer cancel()
+
+		var userCollection *mongo.Collection = database.OpenCollection("users", client)
+		var user models.User
+		err = userCollection.FindOne(ctx, bson.M{"user_id": userId}).Decode(&user)
+		if err != nil {
+			c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
+			return
+		}
+
+		newReview := models.UserReview{
+			ReviewID:  bson.NewObjectID(),
+			UserID:    userId,
+			UserName:  user.UserName,
+			Country:   req.Country,
+			Rating:    req.Rating,
+			Text:      req.Text,
+			CreatedAt: time.Now(),
+		}
+
+		var movieCollection *mongo.Collection = database.OpenCollection("movies", client)
+		filter := bson.M{"imdb_id": movieId}
+		update := bson.M{
+			"$push": bson.M{"user_reviews": newReview},
+		}
+
+		result, err := movieCollection.UpdateOne(ctx, filter, update)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Error updating movie with review"})
+			return
+		}
+
+		if result.MatchedCount == 0 {
+			c.JSON(http.StatusNotFound, gin.H{"error": "Movie not found"})
+			return
+		}
+
+		c.JSON(http.StatusOK, newReview)
+	}
+}
+
 func GetRankings(client *mongo.Client, c *gin.Context) ([]models.Ranking, error) {
 	var rankings []models.Ranking
 
