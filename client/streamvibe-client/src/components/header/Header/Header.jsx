@@ -196,7 +196,7 @@ const Header = ({ url, isFixed }) => {
 
             {auth && isLogoutVisible && (
               <Button
-                className="header__button button--red-06"
+                className="header__button"
                 label="Abmelden"
                 onClick={handleLogout}
               />

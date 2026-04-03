@@ -63,6 +63,13 @@
     &--black-08 {
         background-color: var(--colour-black-08);
         border: var(--border);
+
+        @include mobile {
+            padding: 8px;
+            font-size: 14px;
+            width: 160px; 
+        }
+
     }
 
     &--black-06 {

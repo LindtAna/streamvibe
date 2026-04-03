@@ -100,5 +100,21 @@
         }
     }
 
-
+    &__no-reviews {
+    padding: fluid(40, 24);
+    text-align: center;
+    color: var(--colour-grey-60);
+    background-color: var(--colour-black-06);
+    border: var(--border);
+    border-radius: var(--border-radius-l);
+ 
+    @include laptop {
+      border-radius: var(--border-radius-m);
+    }
+ 
+    p {
+      margin: 0;
+      font-size: fluid-to-laptop(18, 16);
+    }
+  }
 }

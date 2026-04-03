@@ -6,6 +6,7 @@ import Button from '../Button'
 import Icon from '../Icon'
 import Tags from '../Tags'
 import Ratings from '../Ratings'
+import AddReview from '../AddReview'
 
 import { apiService } from '../../../api/api'
 import './MovieDetails.scss'
@@ -40,42 +41,12 @@ const castItems = [
   { imgSrc: Actor2, imgAlt: 'Actress Test' },
 ]
 
-const reviewItems = [
-  {
-    name: 'Dennis Donohue',
-    subtitle: 'From USA',
-    description:
-      'Whereas Infinity War was a pulsating caffiene rush from beginning to end that could leave one shaking from the adrenaline dump, Endgame was an emotional walk home after a long night out.',
-    ratingValue: 5,
-  },
-  {
-    name: 'Klaus Martin',
-    subtitle: 'From Germany',
-    description:
-      'Nicht mehr die Avengers aus den Hit- und Marvel Comics. Mit Emotiönchen versehen, weil mitfühlen so gut zum Zeitgeist passt.',
-    ratingValue: 3,
-  },
-  {
-    name: 'Dennis Donohue',
-    subtitle: 'From USA',
-    description:
-      'Whereas Infinity War was a pulsating caffiene rush from beginning to end that could leave one shaking from the adrenaline dump, Endgame was an emotional walk home after a long night out.',
-    ratingValue: 5,
-  },
-  {
-    name: 'Klaus Martin',
-    subtitle: 'From Germany',
-    description:
-      'Nicht mehr die Avengers aus den Hit- und Marvel Comics. Mit Emotiönchen versehen, weil mitfühlen so gut zum Zeitgeist passt.',
-    ratingValue: 3,
-  },
-]
-
-
 const MovieDetails = ({ imdbId, seasons }) => {
   const [movie, setMovie] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
+  const [userReviews, setUserReviews] = useState([])
+  const [isReviewOpen, setIsReviewOpen] = useState(false)
 
   const titleId = 'movie-details-title'
   const castSliderNavigationId = 'movie-cast-slider-navigation'
@@ -84,15 +55,15 @@ const MovieDetails = ({ imdbId, seasons }) => {
     const fetchMovie = async () => {
       try {
         setLoading(true)
+        const movies = await apiService.getMovies()
 
-         const movies = await apiService.getMovies()
-  
         if (imdbId) {
-
           const foundMovie = movies.find(m => m.imdb_id === imdbId)
           setMovie(foundMovie || movies[0])
+          setUserReviews(foundMovie?.user_reviews || [])
         } else {
           setMovie(movies[0])
+          setUserReviews(movies[0]?.user_reviews || [])
         }
       } catch (err) {
         setError(err.message)
@@ -104,6 +75,10 @@ const MovieDetails = ({ imdbId, seasons }) => {
 
     fetchMovie()
   }, [imdbId])
+
+  const handleReviewAdded = (newReview) => {
+    setUserReviews((prev) => [...prev, newReview])
+  }
 
   if (loading) {
     return <div className="container">Loading movie details...</div>
@@ -120,8 +95,6 @@ const MovieDetails = ({ imdbId, seasons }) => {
   // IMDb-Bewertung (falls vorhanden) extrahieren
   const imdbRating = movie.ranking?.ranking_value || 0
   const streamVibeRating = movie.ranking?.ranking_value || 0
-
-
   const genreNames = movie.genre?.map(g => g.genre_name) || []
 
   return (
@@ -147,9 +120,6 @@ const MovieDetails = ({ imdbId, seasons }) => {
             <h3 className="movie-details__title">Handlung</h3>
             <div className="movie-details__description">
               <p>
-                {/* The surviving members of the Avengers and their allies attempt to
-                reverse Thanos's actions in Infinity War which erased half of all
-                life in the universe. */}
                 {movie.admin_review || 'No description available.'}
               </p>
             </div>
@@ -191,39 +161,60 @@ const MovieDetails = ({ imdbId, seasons }) => {
         <div className="movie-details__panel movie-details__panel--large-gap-y">
           <header className="movie-details__panel-header">
             <h3 className="movie-details__title">Bewertungen</h3>
+            
             <Button
               mode="black-08"
               iconSrc={PlusIcon}
               iconName="plus"
               label="Bewertung hinzufügen"
-              href="/"
+              onClick={() => setIsReviewOpen(true)}
             />
           </header>
-          <Slider
-            navigationMode="rounded"
-            isNavigationHiddenMobile={false}
-            sliderParams={{
-              slidesPerView: 2,
-              slidesPerGroup: 2,
-              breakpoints: {
-                0: {
-                  slidesPerView: 1,
-                  slidesPerGroup: 1,
-                  spaceBetween: 16,
+
+          <AddReview
+              imdbId={imdbId}
+              onReviewAdded={handleReviewAdded}
+              isOpen={isReviewOpen}
+              onClose={() => setIsReviewOpen(false)}
+            />
+
+          {userReviews.length > 0 ? (
+            <Slider
+              navigationMode="rounded"
+              isNavigationHiddenMobile={false}
+              sliderParams={{
+                slidesPerView: 2,
+                slidesPerGroup: 2,
+                breakpoints: {
+                  0: {
+                    slidesPerView: 1,
+                    slidesPerGroup: 1,
+                    spaceBetween: 16,
+                  },
+                  1024: {
+                    slidesPerView: 2,
+                    slidesPerGroup: 2,
+                    allowTouchMove: false,
+                    spaceBetween: 20,
+                  },
                 },
-                1024: {
-                  slidesPerView: 2,
-                  slidesPerGroup: 2,
-                  allowTouchMove: false,
-                  spaceBetween: 20,
-                },
-              },
-            }}
-          >
-            {reviewItems.map((item, index) => (
-              <ReviewCard key={index} {...item} />
-            ))}
-          </Slider>
+              }}
+            >
+              {userReviews.map((review, index) => (
+                <ReviewCard
+                  key={review.review_id || index}
+                  name={review.user_name}
+                  subtitle={`Aus ${review.country}`}
+                  description={review.text}
+                  ratingValue={review.rating}
+                />
+              ))}
+            </Slider>)
+            : (
+              <div className="movie-details__no-reviews">
+                <p>Noch keine Bewertungen. Sei der Erste!</p>
+              </div>
+            )}
         </div>
       </div>
 
@@ -259,8 +250,8 @@ const MovieDetails = ({ imdbId, seasons }) => {
               </h3>
               <Ratings
                 items={[
-                  { title: 'IMDb', ratingValue: 4.5 },
-                  { title: 'StreamVibe', ratingValue: 4 },
+                  { title: 'IMDb', ratingValue: imdbRating },
+                  { title: 'StreamVibe', ratingValue: streamVibeRating },
                 ]}
               />
             </div>
@@ -271,7 +262,7 @@ const MovieDetails = ({ imdbId, seasons }) => {
                 <Icon iconName="genres" src={GenresIcon} />
                 <span>Genres</span>
               </h3>
-               <Tags items={genreNames} />
+              <Tags items={genreNames} />
             </div>
 
             {/* Director */}

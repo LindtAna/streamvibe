@@ -1,134 +1,230 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import './AddReview.scss'
 import Field from '../../support-page/Field'
 import Button from '../Button'
 import RatingView from '../RatingView'
 import useAxiosPrivate from '../../../hooks/useAxiosPrivate'
-import { useLocation, useNavigate, useParams } from 'react-router-dom'
+import useAuth from '../../../hooks/useAuth'
+import { useNavigate} from 'react-router-dom'
 
-const AddReview = () => {
+const AddReview = ({imdbId, onReviewAdded, isOpen, onClose}) => {
   const titleId = 'add-review-title'
-
-  const [movie, setMovie] = useState({});
-  const [loading, setLoading] = useState(false);
-  const { imdb_id } = useParams();
-  const axiosPrivate = useAxiosPrivate();
+  const axiosPrivate = useAxiosPrivate()
+  const { auth } = useAuth()
   const navigate = useNavigate()
-  const location = useLocation()
+
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState(null)
+  const [success, setSuccess] = useState(null)
+ 
+  const dialogRef = useRef(null)
+  const openButtonRef = useRef(null)
 
   const [formData, setFormData] = useState({
     country: '',
-    rating: 5, 
+    rating: 0, 
     text: ''
   })
- const from = location.state?.from?.pathname || "/login"
 
+  // Verwalten des modalen Fensters
   useEffect(() => {
-    const fetchMovie = async () => {
-      setLoading(true);
-      try {
-        const response = await axiosPrivate.get(`/movie/${imdb_id}`);
-        setMovie(response.data);
-      } catch (error) {
-        console.error('Error fetching movie:', error);
-      } finally {
-        setLoading(false);
+    const dialog = dialogRef.current
+    if (!dialog) return
+ 
+    dialog.open = isOpen
+    document.documentElement.classList.toggle('is-lock', isOpen)
+ 
+    return () => {
+      document.documentElement.classList.remove('is-lock')
+    }
+  }, [isOpen])
+
+  // Schließen mit Escape
+  useEffect(() => {
+    if (!isOpen) return
+ 
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') {
+        closeModal()
       }
-    };
+    }
+ 
+    document.addEventListener('keydown', handleKeyDown)
+    return () => document.removeEventListener('keydown', handleKeyDown)
+  }, [isOpen])
 
-    fetchMovie();
-  }, [imdb_id, axiosPrivate]);
+  // success-meldung automatisch ausblenden
+  useEffect(() => {
+    if (success) {
+      const timer = setTimeout(() => setSuccess(null), 2000)
+      return () => clearTimeout(timer)
+    }
+  }, [success])
 
 
+  const closeModal = useCallback(() => {
+    onClose()
+    setFormData({
+      country: '',
+      rating: 0,
+      text: ''
+    })
+    setError(null)
+    setSuccess(null)
+    openButtonRef.current?.focus()
+  }, [])
+
+   const handleDialogClick = useCallback((e) => {
+    if (e.target === dialogRef.current) {
+      closeModal()
+    }
+  }, [closeModal])
+ 
   const handleChange = (field) => (e) => {
     setFormData((prev) => ({
       ...prev,
       [field]: e.target.value
-    }));
-  };
-
+    }))
+  }
  
   const handleRatingChange = (newRating) => {
     setFormData((prev) => ({
       ...prev,
       rating: newRating
-    }));
-  };
-
+    }))
+  }
+ 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    
+    e.preventDefault()
+    setError(null)
+    setSuccess(null)
+ 
+    if (!formData.country.trim()) {
+      setError('Bitte gib dein Land an.')
+      return
+    }
+ 
+    if (formData.rating === 0) {
+      setError('Bitte wähle eine Bewertung aus.')
+      return
+    }
+ 
+    if (!formData.text.trim()) {
+      setError('Bitte schreibe einen Kommentar.')
+      return
+    }
+ 
+    setLoading(true)
+ 
     try {
-      const response = await axiosPrivate.patch(`/addreview/${imdb_id}`, { 
-        country: formData.country,
+      const response = await axiosPrivate.patch(`/addreview/${imdbId}`, {
+        country: formData.country.trim(),
         rating: Number(formData.rating),
-        text: formData.text 
-      });
-
-      setMovie((prevMovie) => ({
-        ...prevMovie,
-        user_reviews: [...(prevMovie.user_reviews || []), response.data]
-      }));
-
-      setFormData({
-        country: '',
-        rating: 5,
-        text: ''
-      });
-
+        text: formData.text.trim()
+      })
+ 
+      setSuccess('Bewertung erfolgreich hinzugefügt!')
+      
+      // Callback zum Aktualisieren der Liste der Bewertungen auf der Filmseite
+      if (onReviewAdded) {
+        onReviewAdded(response.data)
+      }
+ 
+      setTimeout(() => {
+        closeModal()
+      }, 1500)
+ 
     } catch (err) {
-      console.error(err);
-      if (err.response && err.response.status === 401) {
-        console.error('Unauthorized access - redirecting to login');
-        localStorage.removeItem('user');
-        navigate(from, { replace: true })
+      console.error('Error adding review:', err)
+      
+      if (err.response?.status === 401) {
+        setError('Sitzung abgelaufen. Bitte melde dich erneut an.')
+        setTimeout(() => {
+          navigate('/login', { state: { from: { pathname: `/movie/${imdbId}` } } })
+        }, 2000)
       } else {
-        console.error('Error updating review:', err);
+        setError('Fehler beim Hinzufügen der Bewertung. Bitte versuche es erneut.')
       }
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  }; 
+  }
 
   return (
-    <section className="add-review" aria-labelledby={titleId}>
-      <form className="add-review__form" onSubmit={handleSubmit} noValidate>
-        <Field
-          className="add-review__form-cell"
-          label="Land"
-          placeholder="z. B. Deutschland"
-          isRequired
-          value={formData.country}
-          onChange={handleChange('country')}
-        />
-
-        <RatingView 
-          value={formData.rating} 
-          onChange={handleRatingChange} 
-          isInteractive={true} 
-        />
-
-        <Field
-          className="add-review__form-cell add-review__form-cell--wide"
-          label="Nachricht"
-          type="textarea"
-          placeholder="Schreibe deine Meinung zum Film…"
-          isRequired
-          value={formData.text}
-          onChange={handleChange('text')}
-        />
-
-        <div className="add-review__form-cell add-review__form-cell--wide add-review__form-cell--actions">
-          <Button
-            className="add-review__form-submit-button"
-            label={loading ? "Wird gesendet..." : "Absenden"}
-            type="submit"
-            disabled={loading}
-          />
+    <>
+    
+      <dialog
+        className="add-review__dialog"
+        ref={dialogRef}
+        onClick={handleDialogClick}
+      >
+        <div className="add-review__content">
+          <form className="add-review__form" onSubmit={handleSubmit} noValidate>
+            <h2 className="add-review__title h5" id={titleId}>
+              Bewertung hinzufügen
+            </h2>
+ 
+            {error && (
+              <div className="add-review__message add-review__message--error">
+                {error}
+              </div>
+            )}
+ 
+            {success && (
+              <div className="add-review__message add-review__message--success">
+                {success}
+              </div>
+            )}
+ 
+            <Field
+              className="add-review__form-cell"
+              label="Land"
+              placeholder="z. B. Deutschland"
+              isRequired
+              value={formData.country}
+              onChange={handleChange('country')}
+            />
+ 
+            <div className="add-review__form-cell">
+              <label className="add-review__rating-label">
+                Bewertung <span className="add-review__required-star">*</span>
+              </label>
+              <RatingView
+                value={formData.rating}
+                onChange={handleRatingChange}
+                isInteractive={true}
+              />
+            </div>
+ 
+            <Field
+              className="add-review__form-cell add-review__form-cell--wide"
+              label="Kommentar"
+              type="textarea"
+              placeholder="Schreibe deine Meinung zum Film…"
+              isRequired
+              value={formData.text}
+              onChange={handleChange('text')}
+            />
+ 
+            <div className="add-review__form-cell add-review__form-cell--wide add-review__form-cell--actions">
+              <Button
+                className="add-review__form-cancel-button button--black-08"
+                mode="transparent"
+                label="Abbrechen"
+                type="button"
+                onClick={closeModal}
+              />
+              <Button
+                className="add-review__form-submit-button  button--black-08"
+                label={loading ? 'Wird gesendet...' : 'Absenden'}
+                type="submit"
+                disabled={loading}
+              />
+            </div>
+          </form>
         </div>
-      </form>
-    </section>
+      </dialog>
+    </>
   )
 }
 

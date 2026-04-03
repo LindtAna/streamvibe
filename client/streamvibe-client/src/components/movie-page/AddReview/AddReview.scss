@@ -1,72 +1,129 @@
 .add-review {
+  
+  &__dialog {
+    position: fixed;
+    inset: 0;
+    display: none;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+    padding: 20px;
+    background-color: rgba(0, 0, 0, 0.75);
+    border: none;
+    transition-duration: var(--transition-duration);
+    transition-behavior: allow-discrete;
+    z-index: 5;
+
+    @mixin dialog-starting-styles {
+      opacity: 0;
+      scale: 0.9;
+    }
+
+    &[open] {
+      display: flex;
+
+      @starting-style {
+        @include dialog-starting-styles;
+      }
+    }
+
+    &:not([open]) {
+      display: none;
+      pointer-events: none;
+    }
+  }
+
+  &__content {
+    width: #{fluid(600, 400)};
+    max-height: 90vh;
+    overflow-y: auto;
+    background-color: var(--colour-black-08);
+    border: var(--border);
+    border-radius: var(--border-radius-l);
+
+    @include laptop {
+      border-radius: var(--border-radius-m);
+    }
+  }
+
+  &__title {
+    text-align: center;
+    color: var(--colour-white);
+    margin-bottom: fluid-to-laptop(20, 15);
+  }
+
+  &__message {
+    padding: 10px;
+    background-color: var(--colour-black-12);
+    border-radius: var(--border-radius-xs);
+    margin-bottom: fluid-to-laptop(20, 15);
+    text-align: center;
+
+    &--error {
+      color: var(--colour-red-50);
+    }
+
+    &--success {
+      color: var(--colour-green);
+    }
+  }
+
+  &__rating-label {
+    display: block;
+    margin-bottom: fluid-to-laptop(10, 8);
+    font-size: fluid-to-laptop(18, 16);
+    font-weight: 600;
+    color: var(--colour-white);
+  }
+
+  &__required-star {
+    color: var(--colour-red-50);
+  }
+
+  &__form {
     display: grid;
-    padding-block: var(--section-padding-y);
-    gap: 50px fluid-to-laptop(80, 50);
+    gap: fluid(30, 20);
+    padding: fluid(40, 24);
+    background-color: var(--colour-black-06);
+    border-radius: var(--border-radius-l);
 
-    @include mobile-above {
-        grid-template-columns: 33.5% 1fr;
+    @include laptop {
+      border-radius: var(--border-radius-m);
     }
 
-    &__body{
-        display: grid;
-        row-gap: fluid(50, 30);
+    .field {
+      --field-row-gap: #{fluid-to-laptop(10, 8)};
     }
 
-    &__info{
-        display: grid;
-        row-gap: fluid-to-laptop(14, 10);  
+    &-cell {
+      &--wide {
+        grid-column: -1/1;
+      }
+
+      &--actions {
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        gap: fluid-to-laptop(15, 10);
+
+        @include mobile-s {
+          flex-direction: column;
+          align-items: stretch;
+        }
+      }
     }
 
-    &__image{
-        width: 100%;
-        background-color: var(--colour-black-06);
-        border: outline;
-        border-radius: var(--border-radius-xs);
-
-        @include laptop{
-            border-radius: var(--border-radius-xxxs);
-        }
+    &-cancel-button {
+      @include mobile-s {
+        order: 1;
+      }
     }
 
-    &__form{
-        display: grid;
-        gap:fluid(50, 20) fluid-to-laptop(50, 20);
-        padding: fluid(50, 24);
-        background-color: var(--colour-black-06);
-        border: var(--border);
-        border-radius: var(--border-radius-l);
-
-        @include laptop{
-            border-radius: var(--border-radius-m);
-        }
-
-        @include mobile-s-above{
-            grid-template-columns: repeat(2, 1fr); grid-template-columns: repeat(2, 1fr); 
-
-        }
-
-        &-cell{
-            &--wide{
-                grid-column: -1/1;
-            }
-
-            &--actions{
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                gap: 20px;
-
-                @include mobile-s{
-                    flex-direction: column;
-                    align-items: stretch;
-        
-                }
-            }
-        }
-
-        &-agreement{
-            font-size: 14px;
-        }
+    &-submit-button {
+      @include mobile-s {
+        order: 0;
+      }
     }
-
+  }
 }

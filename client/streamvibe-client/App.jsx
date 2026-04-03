@@ -8,7 +8,6 @@ import HomePage from './src/components/home/HomePage'
 import { AuthProvider } from './src/context/AuthProvider'
 import Layout from './src/components/Layout'
 import RequiredAuth from './src/components/RequiredAuth'
-import AddReview from './src/components/movie-page/AddReview'
 
 function App() {
   return (
@@ -29,7 +28,6 @@ function App() {
               {/* Protected */}
               <Route path="/" element={<RequiredAuth />}>
                 {/* <Route path="/saved" element={<Saved />} /> */}
-                <Route path="/addreview" element={<AddReview />} />
               </Route>
 
             </Route>
