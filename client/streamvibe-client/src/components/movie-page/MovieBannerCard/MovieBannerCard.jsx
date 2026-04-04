@@ -68,7 +68,7 @@ const MovieBannerCard = ({
               mode="black-06"
               iconName="plus"
               iconSrc={plusIcon}
-              label="Add to playlist"
+              label="Zur Merkliste hinzufügen"
               isLabelHidden
             />
             <Button

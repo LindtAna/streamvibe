@@ -399,7 +399,7 @@ const UserLogin = ({ onClose }) => {
               onChange={handleChange('agreement')}
             />
             <Button
-              className="user-login__form-submit-button"
+              className="user-login__form-submit-button user-login__form-submit-button--login"
               label="Registrieren"
               type="submit"
             />
