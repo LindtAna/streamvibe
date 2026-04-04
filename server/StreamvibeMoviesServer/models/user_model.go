@@ -18,6 +18,7 @@ type User struct {
 	Token           string        `bson:"token" json:"token"`
 	RefreshToken    string        `bson:"refresh_token" json:"refresh_token"`
 	FavouriteGenres []Genre       `bson:"favourite_genres" json:"favourite_genres" validate:"required,dive"`
+	Watchlist       []string      `bson:"watchlist,omitempty" json:"watchlist,omitempty"`
 }
 
 type UserLogin struct {
@@ -26,11 +27,12 @@ type UserLogin struct {
 }
 
 type UserResponse struct {
-	UserId          string  `json:"user_id"`
-	UserName        string  `json:"user_name"`
-	Email           string  `json:"email"`
-	Role            string  `json:"role"`
-	Token           string  `json:"token"`
-	RefreshToken    string  `json:"refresh_token"`
-	FavouriteGenres []Genre `json:"favourite_genres"`
+	UserId          string   `json:"user_id"`
+	UserName        string   `json:"user_name"`
+	Email           string   `json:"email"`
+	Role            string   `json:"role"`
+	Token           string   `json:"token"`
+	RefreshToken    string   `json:"refresh_token"`
+	FavouriteGenres []Genre  `json:"favourite_genres"`
+	Watchlist       []string `json:"watchlist,omitempty"`
 }

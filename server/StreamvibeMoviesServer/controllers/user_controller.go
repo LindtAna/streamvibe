@@ -131,6 +131,7 @@ func LoginUser(client *mongo.Client) gin.HandlerFunc {
 			Token:           token,
 			RefreshToken:    refreshToken,
 			FavouriteGenres: foundUser.FavouriteGenres,
+			Watchlist:       foundUser.Watchlist,
 		})
 
 	}
