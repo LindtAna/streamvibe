@@ -8,6 +8,7 @@ import HomePage from './src/components/home/HomePage'
 import { AuthProvider } from './src/context/AuthProvider'
 import Layout from './src/components/Layout'
 import RequiredAuth from './src/components/RequiredAuth'
+import SavedPage from './src/components/saved-page/SavedPage'
 
 function App() {
   return (
@@ -24,10 +25,10 @@ function App() {
               <Route path="/movie/:imdbId" element={<Movie />} />
               <Route path="/support" element={<SupportPage />} />
               <Route path="/login" element={<UserLogin />} />
+              <Route path="/saved" element={<SavedPage />} />
 
               {/* Protected */}
               <Route path="/" element={<RequiredAuth />}>
-                {/* <Route path="/saved" element={<Saved />} /> */}
               </Route>
 
             </Route>

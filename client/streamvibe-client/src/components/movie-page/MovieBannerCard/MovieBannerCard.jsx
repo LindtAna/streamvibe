@@ -2,15 +2,30 @@ import './MovieBannerCard.scss'
 import Button from '../Button'
 import playIcon from '../../../assets/icons/play.svg'
 import plusIcon from '../../../assets/icons/plus.svg'
+import deleteIcon from '../../../assets/icons/delete.svg'
 import likeIcon from '../../../assets/icons/like.svg'
 import volumeIcon from '../../../assets/icons/volume.svg'
 import classNames from 'classnames'
+import { useState, useEffect } from 'react'
+import useAuth from '../../../hooks/useAuth'
+import useAxiosPrivate from '../../../hooks/useAxiosPrivate'
 
 const MovieBannerCard = ({
   movie,
   titleId,
   TitleTag = 'h2',
 }) => {
+
+  const { auth, setAuth } = useAuth()
+  const axiosPrivate = useAxiosPrivate()
+  const [isSaved, setIsSaved] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
+
+   useEffect(() => {
+    if (auth && auth.watchlist && movie) {
+      setIsSaved(auth.watchlist.includes(movie.imdb_id))
+    }
+  }, [auth, movie])
 
   if (!movie) {
     return null
@@ -21,6 +36,38 @@ const MovieBannerCard = ({
       window.open(`https://www.youtube.com/watch?v=${movie.youtube_id}`, '_blank')
     }
   }
+
+  const handleWatchlistClick = async () => {
+    if (!auth) {
+      // Button ist nur für eingeloggte Benutzer sichtbar
+      return
+    }
+    setIsLoading(true)
+    try {
+      if (isSaved) {
+        // Film entfernen
+        await axiosPrivate.delete(`/watchlist/${movie.imdb_id}`)
+        setIsSaved(false)
+        
+        // State aktualisieren
+        const updatedWatchlist = auth.watchlist.filter(id => id !== movie.imdb_id)
+        setAuth({ ...auth, watchlist: updatedWatchlist })
+      } else {
+        // Film hinzufügen
+        await axiosPrivate.post(`/watchlist/${movie.imdb_id}`)
+        setIsSaved(true)
+        
+        // State aktualisieren
+        const updatedWatchlist = [...(auth.watchlist || []), movie.imdb_id]
+        setAuth({ ...auth, watchlist: updatedWatchlist })
+      }
+    } catch (error) {
+      console.error('Fehler beim Aktualisieren der Merkliste:', error)
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
 
   return (
     <div className="movie-banner-card container">
@@ -64,13 +111,17 @@ const MovieBannerCard = ({
           
 
           <div className="movie-banner-card__actions">
-            <Button
-              mode="black-06"
-              iconName="plus"
-              iconSrc={plusIcon}
-              label="Zur Merkliste hinzufügen"
-              isLabelHidden
-            />
+              {auth && (
+              <Button
+                mode="black-06"
+                iconName={isSaved ? "delete" : "plus"}
+                iconSrc={isSaved ? deleteIcon : plusIcon}
+                label={isSaved ? "In Merkliste" : "Zur Merkliste hinzufügen"}
+                isLabelHidden
+                onClick={handleWatchlistClick}
+                extraAttrs={{ disabled: isLoading }}
+              />
+            )}
             <Button
               mode="black-06"
               iconName="like"

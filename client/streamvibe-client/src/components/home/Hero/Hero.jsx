@@ -1,7 +1,7 @@
 import './Hero.scss'
 import playImgSrc from '../../../assets/play.svg'
 
-const Hero = () => {
+const Hero = ({ children }) => {
   const titleId = 'hero-title'
 
   return (
@@ -13,10 +13,11 @@ const Hero = () => {
           src={playImgSrc}
         />
       <div className="hero__description h4">
-        <p>
+        {children}
+        {/* <p>
           Entdecke Millionen von Filmen & Serien. <br/>
           Du kannst auch Deine eigenen Merklisten erstellen, <br/>um die Inhalte, die Du ansehen möchtest, leichter zu finden.
-        </p>
+        </p> */}
       </div>
     </div>
 </section>
