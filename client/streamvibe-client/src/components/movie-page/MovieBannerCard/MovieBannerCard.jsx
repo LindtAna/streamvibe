@@ -1,14 +1,19 @@
+import { useNavigate } from 'react-router-dom'
+import { useState, useEffect } from 'react'
+import useAuth from '../../../hooks/useAuth'
+import useAxiosPrivate from '../../../hooks/useAxiosPrivate'
 import './MovieBannerCard.scss'
+
+import Videoplayer from '../../videoplayer/Videoplayer'
 import Button from '../Button'
+
 import playIcon from '../../../assets/icons/play.svg'
 import plusIcon from '../../../assets/icons/plus.svg'
 import deleteIcon from '../../../assets/icons/delete.svg'
 import likeIcon from '../../../assets/icons/like.svg'
 import volumeIcon from '../../../assets/icons/volume.svg'
-import classNames from 'classnames'
-import { useState, useEffect } from 'react'
-import useAuth from '../../../hooks/useAuth'
-import useAxiosPrivate from '../../../hooks/useAxiosPrivate'
+import muteIcon from '../../../assets/icons/mute.svg'
+
 
 const MovieBannerCard = ({
   movie,
@@ -20,6 +25,9 @@ const MovieBannerCard = ({
   const axiosPrivate = useAxiosPrivate()
   const [isSaved, setIsSaved] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
+  const [isMuted, setIsMuted] = useState(false)
+
+  const navigate = useNavigate()
 
    useEffect(() => {
     if (auth && auth.watchlist && movie) {
@@ -33,8 +41,12 @@ const MovieBannerCard = ({
 
   const handlePlayClick = () => {
     if (movie.youtube_id) {
-      window.open(`https://www.youtube.com/watch?v=${movie.youtube_id}`, '_blank')
+      navigate(`/stream/${movie.youtube_id}`, { state: { isMuted } })
     }
+  }
+
+  const handleMuteToggle = () => {
+    setIsMuted(prevState => !prevState)
   }
 
   const handleWatchlistClick = async () => {
@@ -131,10 +143,11 @@ const MovieBannerCard = ({
             />
             <Button
               mode="black-06"
-              iconName="volume"
-              iconSrc={volumeIcon}
-              label="Mute"
+              iconName={isMuted ? "mute" : "volume"}
+              iconSrc={isMuted ? muteIcon : volumeIcon}
+              label={isMuted ? "Audio anschalten" : "Audio ausschalten"}
               isLabelHidden
+              onClick={handleMuteToggle}
             />
           </div>
         </div>

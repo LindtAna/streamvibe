@@ -9,6 +9,7 @@ import { AuthProvider } from './src/context/AuthProvider'
 import Layout from './src/components/Layout'
 import RequiredAuth from './src/components/RequiredAuth'
 import SavedPage from './src/components/saved-page/SavedPage'
+import Videoplayer from './src/components/videoplayer/Videoplayer'
 
 function App() {
   return (
@@ -26,6 +27,7 @@ function App() {
               <Route path="/support" element={<SupportPage />} />
               <Route path="/login" element={<UserLogin />} />
               <Route path="/saved" element={<SavedPage />} />
+              <Route path="/stream/:yt_id" element={<Videoplayer />} />
 
               {/* Protected */}
               <Route path="/" element={<RequiredAuth />}>
