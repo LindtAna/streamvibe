@@ -7,8 +7,10 @@ import BurgerButton from '../BurgerButton'
 import { useNavigate, Link } from 'react-router-dom'
 import UserLogin from '../../auth/UserLogin/UserLogin'
 import useAuth from '../../../hooks/useAuth'
+import axiosClient from '../../../api/axiosConfig'
 
 import LoginIcon from '../../../assets/icons/login.svg'
+import LogoutIcon from '../../../assets/icons/logout.svg'
 import SearchIcon from '../../../assets/icons/search.svg'
 
 const menuItems = [
@@ -25,7 +27,7 @@ const menuItems = [
 const Header = ({ url, isFixed }) => {
   const [isOpen, setIsOpen] = useState(false)
   const [isLoginOpen, setIsLoginOpen] = useState(false)
-  const [isLogoutVisible, setIsLogoutVisible] = useState(false)
+  // const [isLogoutVisible, setIsLogoutVisible] = useState(false)
 
   const { auth, setAuth } = useAuth()
   const dialogRef = useRef(null)
@@ -38,7 +40,7 @@ const Header = ({ url, isFixed }) => {
 
   const isAnyModalOpen = isOpen || isLoginOpen
 
-  //   // EIN useEffect für Scroll-Lock
+  // EIN useEffect für Scroll-Lock
   useEffect(() => {
     const menuDialog = dialogRef.current
     const loginDialog = loginDialogRef.current
@@ -55,13 +57,12 @@ const Header = ({ url, isFixed }) => {
 
   // EIN useEffect für Escape handler
   useEffect(() => {
-    if (!isAnyModalOpen && !isLogoutVisible) return
+    // if (!isAnyModalOpen && !isLogoutVisible) return
+    if (!isAnyModalOpen) return
 
     const handleKeyDown = (e) => {
       if (e.key === 'Escape') {
-        if (isLogoutVisible) {
-          setIsLogoutVisible(false)
-        } else if (isLoginOpen) {
+        if (isLoginOpen) {
           closeLogin()
         } else if (isOpen) {
           close()
@@ -71,24 +72,24 @@ const Header = ({ url, isFixed }) => {
 
     document.addEventListener('keydown', handleKeyDown)
     return () => document.removeEventListener('keydown', handleKeyDown)
-  }, [isAnyModalOpen, isLoginOpen, isOpen, isLogoutVisible])
+  }, [isAnyModalOpen, isLoginOpen, isOpen])
 
 
   // logout wird ausgeblendet, wenn man außerhalb des Buttons klickt
-  useEffect(() => {
-    if (!isLogoutVisible) return
+  // useEffect(() => {
+  //   if (!isLogoutVisible) return
 
-    const handleClickOutside = (e) => {
-      if (!logoutContainerRef.current) return
+  //   const handleClickOutside = (e) => {
+  //     if (!logoutContainerRef.current) return
 
-      if (logoutContainerRef.current.contains(e.target)) return
+  //     if (logoutContainerRef.current.contains(e.target)) return
 
-      setIsLogoutVisible(false)
-    }
+  //     setIsLogoutVisible(false)
+  //   }
 
-    document.addEventListener('pointerdown', handleClickOutside)
-    return () => document.removeEventListener('pointerdown', handleClickOutside)
-  }, [isLogoutVisible])
+  //   document.addEventListener('pointerdown', handleClickOutside)
+  //   return () => document.removeEventListener('pointerdown', handleClickOutside)
+  // }, [isLogoutVisible])
 
 
   const handleDialogClick = useCallback((e) => {
@@ -102,7 +103,7 @@ const Header = ({ url, isFixed }) => {
   const open = useCallback(() => setIsOpen(true), [])
   const close = useCallback(() => {
     setIsOpen(false)
-    setIsLogoutVisible(false)
+    // setIsLogoutVisible(false)
     burgerRef.current?.focus()
   }, [])
 
@@ -124,23 +125,35 @@ const Header = ({ url, isFixed }) => {
   }, [])
 
 
-  const handleLoginButtonClick = useCallback((e) => {
-    e.stopPropagation()
-    if (auth) {
-      setIsLogoutVisible((prev) => !prev)
-    } else {
-      openLogin()
-    }
-  }, [auth, openLogin])
+  // const handleLoginButtonClick = useCallback((e) => {
+  //   e.stopPropagation()
+  //   if (auth) {
+  //     setIsLogoutVisible((prev) => !prev)
+  //   } else {
+  //     openLogin()
+  //   }
+  // }, [auth, openLogin])
 
   //// Logout
-  const handleLogout = useCallback(() => {
-    setAuth(null)
-    localStorage.removeItem('user')
-    localStorage.removeItem('token')
-    setIsLogoutVisible(false)
-    setIsOpen(false)
-    navigate('/')
+  const handleLogout = useCallback(async () => {
+    try {
+      const user = JSON.parse(localStorage.getItem('user'))
+
+      if (user?.UserId) {
+        await axiosClient.post('/logout', {
+          user_id: user.UserId
+        })
+      }
+    } catch (err) {
+      console.error('Logout error:', err)
+    } finally {
+      setAuth(null)
+      localStorage.removeItem('user')
+      localStorage.removeItem('token')
+      // setIsLogoutVisible(false)
+      setIsOpen(false)
+      navigate('/')
+    }
   }, [setAuth, navigate])
 
   return (
@@ -163,7 +176,7 @@ const Header = ({ url, isFixed }) => {
                       'is-active': href === url,
                     })}
                     to={href}
-                    onClick={close} 
+                    onClick={close}
                   >
                     {label}
                   </Link>
@@ -173,7 +186,7 @@ const Header = ({ url, isFixed }) => {
           </nav>
 
           {/* Aktionsbuttons (Search + User Login) */}
-          <div className="header__actions" ref={logoutContainerRef}>
+          <div className="header__actions">
             <Button
               className="header__button"
               label="Search"
@@ -183,7 +196,9 @@ const Header = ({ url, isFixed }) => {
               iconName="search"
               onClick={close}
             />
-            <Button
+
+
+            {/* <Button
               className="header__button"
               label="User Login"
               isLabelHidden
@@ -200,7 +215,32 @@ const Header = ({ url, isFixed }) => {
                 label="Abmelden"
                 onClick={handleLogout}
               />
+            )} */}
+
+            {!auth ? (
+              <Button
+                className="header__button"
+                label="Anmelden"
+                isLabelHidden
+                mode="transparent"
+                iconSrc={LoginIcon}
+                iconName="login"
+                onClick={openLogin}
+                extraAttrs={{ ref: loginButtonRef }}
+              />
+            ) : (
+              <Button
+                className="header__button"
+                label="Abmelden"
+                isLabelHidden
+                mode="transparent"
+                iconSrc={LogoutIcon}
+                iconName="logout"
+                onClick={handleLogout}
+              />
             )}
+
+
           </div>
         </dialog>
 
