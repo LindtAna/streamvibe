@@ -4,7 +4,7 @@ import (
 	"context"
 	"errors"
 	"os"
-	"strings"
+	// "strings"
 	"time"
 
 	"github.com/LindtAna/streamvibe/server/StreamvibeMoviesServer/database"
@@ -94,22 +94,26 @@ func UpdateAllTokens(userId, token, refreshToken string, client *mongo.Client) (
 }
 
 func GetAccessToken(c *gin.Context) (string, error) {
-	authHeader := c.Request.Header.Get("Authorization") //Authorization: Bearer <token>
+	// authHeader := c.Request.Header.Get("Authorization") //Authorization: Bearer <token>
 
-	if authHeader == "" {
-		return "", errors.New("Authorization header is required")
+	// if authHeader == "" {
+	// 	return "", errors.New("Authorization header is required")
+	// }
+	// // tokenString := authHeader[len("Bearer"):]
+	// tokenString := strings.TrimPrefix(authHeader, "Bearer ")
+
+	// if !strings.HasPrefix(authHeader, "Bearer ") {
+	// 	return "", errors.New("Invalid authorization header format")
+	// }
+
+	// if tokenString == "" {
+	// 	return "", errors.New("Bearer token is required")
+	// }
+
+	tokenString, err := c.Cookie("access_token")
+	if err != nil {
+		return "", err
 	}
-	// tokenString := authHeader[len("Bearer"):]
-	tokenString := strings.TrimPrefix(authHeader, "Bearer ")
-
-	if !strings.HasPrefix(authHeader, "Bearer ") {
-		return "", errors.New("Invalid authorization header format")
-	}
-
-	if tokenString == "" {
-		return "", errors.New("Bearer token is required")
-	}
-
 	return tokenString, nil
 }
 
@@ -174,4 +178,26 @@ func GetRoleFromContext(c *gin.Context) (string, error) {
 	}
 
 	return memberRole, nil
+}
+
+func ValidateRefreshToken(tokenString string) (*SignedDetails, error) {
+	claims := &SignedDetails{}
+	token, err := jwt.ParseWithClaims(tokenString, claims, func(token *jwt.Token) (interface{}, error) {
+
+		return []byte(SECRET_KEY_REFRESH_TOKEN), nil
+	})
+
+	if err != nil {
+		return nil, err
+	}
+
+	if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+		return nil, err
+	}
+
+	if claims.ExpiresAt.Time.Before(time.Now()) {
+		return nil, errors.New("refresh token has expired")
+	}
+
+	return claims, nil
 }

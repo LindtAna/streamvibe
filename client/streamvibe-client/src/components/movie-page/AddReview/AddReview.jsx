@@ -117,7 +117,7 @@ const AddReview = ({imdbId, onReviewAdded, isOpen, onClose}) => {
     setLoading(true)
  
     try {
-      const response = await axiosPrivate.patch(`/addreview/${imdbId}`, {
+      const response = await axiosPrivate.post(`/addreview/${imdbId}`, {
         country: formData.country.trim(),
         rating: Number(formData.rating),
         text: formData.text.trim()

@@ -38,7 +38,7 @@ const Header = ({ url, isFixed }) => {
 
   const isAnyModalOpen = isOpen || isLoginOpen
 
-  // EIN useEffect für Scroll-Lock
+  //useEffect für Scroll-Lock
   useEffect(() => {
     const menuDialog = dialogRef.current
     const loginDialog = loginDialogRef.current
@@ -52,7 +52,7 @@ const Header = ({ url, isFixed }) => {
     }
   }, [isAnyModalOpen, isOpen, isLoginOpen])
 
-  // EIN useEffect für Escape handler
+  //useEffect für Escape handler
   useEffect(() => {
     if (!isAnyModalOpen) return
 
@@ -79,6 +79,7 @@ const Header = ({ url, isFixed }) => {
   }, [])
 
   const open = useCallback(() => setIsOpen(true), [])
+
   const close = useCallback(() => {
     setIsOpen(false)
     burgerRef.current?.focus()
@@ -95,31 +96,24 @@ const Header = ({ url, isFixed }) => {
     })
   }, [])
 
+
   const closeLogin = useCallback(() => {
     setIsLoginOpen(false)
     loginButtonRef.current?.focus()
   }, [])
 
-  //// Logout
-  const handleLogout = useCallback(async () => {
+  ///LOGOUT////////////
+  const handleLogout = async () => {
     try {
-      const user = JSON.parse(localStorage.getItem('user'))
-
-      if (user?.UserId) {
-        await axiosClient.post('/logout', {
-          user_id: user.UserId
-        })
-      }
+      const response = await axiosClient.post('/logout', {user_id: auth.user_id})
+      setAuth(null)
     } catch (err) {
       console.error('Logout error:', err)
     } finally {
-      setAuth(null)
-      localStorage.removeItem('user')
-      localStorage.removeItem('token')
       setIsOpen(false)
       navigate('/')
     }
-  }, [setAuth, navigate])
+  }
 
   return (
     <header className={classNames('header', { 'is-fixed': isFixed })}>

@@ -100,7 +100,7 @@ const UserLogin = ({ onClose }) => {
     }
   }
 
-///LOGIN////////////
+///LOGIN//////////// handleLogout ist in Komponente Header.jsx
   const handleLogin = async () => {
 
     if (!formData.email || !formData.password) {
@@ -117,22 +117,16 @@ const UserLogin = ({ onClose }) => {
       const response = await axiosClient.post('/login', payload)
 
       if (response.data.error) {
-        setError(response.data.error);
-        return;
+        setError(response.data.error)
+        return
       }
-
       setAuth(response.data)
-      // localStorage.setItem('token', response.data.token)
-      // localStorage.setItem('user', JSON.stringify(response.data))
-
       setSuccess('Login erfolgreich! Weiterleitung...')
-
       setTimeout(() => {
         resetForm()
         if (onClose) onClose()
         navigate(from, { replace: true })
       }, 1000)
-
 
     } catch (err) {
       setError('Login fehlgeschlagen. Bitte überprüfe deine Anmeldedaten.')

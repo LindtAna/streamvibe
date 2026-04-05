@@ -4,6 +4,8 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"os"
+	"strings"
 	"time"
 
 	"github.com/LindtAna/streamvibe/server/StreamvibeMoviesServer/database"
@@ -17,15 +19,6 @@ import (
 func main() {
 	router := gin.Default()
 
-	router.Use(cors.New(cors.Config{
-		AllowOrigins:     []string{"http://localhost:5173"},
-		AllowMethods:     []string{"GET", "POST", "PUT", "PATCH", "DELETE"},
-		AllowHeaders:     []string{"Origin", "Content-Type", "Authorization"},
-		ExposeHeaders:    []string{"Content-Length"},
-		AllowCredentials: true,
-		MaxAge:           12 * time.Hour,
-	}))
-
 	router.GET("/hi", func(c *gin.Context) {
 		c.String(200, "hi, streamvibe")
 	})
@@ -34,6 +27,29 @@ func main() {
 	if err != nil {
 		log.Println("Warning: unable to find .env file")
 	}
+
+	allowedOrigins := os.Getenv("ALLOWED_ORIGINS")
+
+	var origins []string
+	if allowedOrigins != "" {
+		origins = strings.Split(allowedOrigins, ",")
+		for i := range origins {
+			origins[i] = strings.TrimSpace(origins[i])
+			log.Println("Allowed Origin:", origins[i])
+		}
+	} else {
+		origins = []string{"http://localhost:5173"}
+		log.Println("Allowed Origin: http://localhost:5173")
+	}
+
+	router.Use(cors.New(cors.Config{
+		AllowOrigins:     []string{"http://localhost:5173"},
+		AllowMethods:     []string{"GET", "POST", "PUT", "PATCH", "DELETE"},
+		AllowHeaders:     []string{"Origin", "Content-Type", "Authorization"},
+		ExposeHeaders:    []string{"Content-Length"},
+		AllowCredentials: true,
+		MaxAge:           12 * time.Hour,
+	}))
 
 	var client *mongo.Client = database.DBConnect()
 
