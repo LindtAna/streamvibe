@@ -1,4 +1,4 @@
-module github.com/LindtAna/streamvibe/server/StreamvibeMoviesServer
+module github.com/LindtAna/streamvibe/server/streamvibemoviesserver
 
 go 1.26.1
 
