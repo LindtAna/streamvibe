@@ -13,11 +13,13 @@ const Field = ({
   inputMode,
   // renderBefore — Slot für Select (Ländercode vor dem Eingabefeld)
   renderBefore,
+  error,
   // Die restlichen Eigenschaften werden an das Eingabefeld/Textfeld übergeben.
   ...rest
 }) => {
   const fieldId = id ?? getIdFromTitle(label ?? 'field')
   const Component = type === 'textarea' ? 'textarea' : 'input'
+  const hasError = error !== undefined ? Boolean(error) : false
 
   return (
     <div className={classNames(className, 'field')}>
@@ -32,15 +34,22 @@ const Field = ({
       <div className="field__body">
         {renderBefore?.('field__control')}
         <Component
-          className="field__control"
+          className={classNames('field__control', {
+            'field__control--error': hasError,
+          })}
           id={fieldId}
           {...(Component === 'input' ? { type } : {})}
           placeholder={placeholder}
-          required={isRequired}
+          required={error === undefined ? isRequired : false}
           inputMode={inputMode}
           {...rest}
         />
       </div>
+      {hasError && (
+  <div className="field__error">
+    {error}
+  </div>
+)}
     </div>
   )
 }

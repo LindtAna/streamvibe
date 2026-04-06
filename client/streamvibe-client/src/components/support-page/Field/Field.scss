@@ -39,22 +39,29 @@
             border-color: var(--colour-grey-97);
         }
 
-        &:user-invalid {
-            border-color: var(--colour-red-50);
-        }
-
         &:disabled {
             @include disabled;
         }
 
-        &::placeholder{
+        &::placeholder {
             color: var(--colour-grey-60);
+        }
+
+        &--error {
+            border-color: var(--colour-red-50);
         }
     }
 
-   textarea.field__control{
-    resize: vertical;
-    min-height: fluid(163, 109);
-    padding-block: fluid-to-laptop(20, 16);
-   }
+    textarea.field__control {
+        resize: vertical;
+        min-height: fluid(163, 109);
+        padding-block: fluid-to-laptop(20, 16);
+    }
+
+    
+    &__error {
+        color: var(--colour-red-45);
+        font-size: 14px;
+        line-height: 1.2;
+    }
 }

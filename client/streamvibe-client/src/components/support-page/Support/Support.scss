@@ -7,66 +7,104 @@
         grid-template-columns: 33.5% 1fr;
     }
 
-    &__body{
+    &__body {
         display: grid;
         row-gap: fluid(40, 30);
     }
 
-    &__info{
+    &__info {
         display: grid;
-        row-gap: fluid-to-laptop(14, 10);  
+        row-gap: fluid-to-laptop(14, 10);
     }
 
-    &__image{
+    &__image {
         width: 100%;
         background-color: var(--colour-black-06);
         border: outline;
         border-radius: var(--border-radius-xs);
 
-        @include laptop{
+        @include laptop {
             border-radius: var(--border-radius-xxxs);
         }
     }
 
-    &__form{
+    &__form {
         display: grid;
-        gap:fluid(50, 20) fluid-to-laptop(20, 20);
+        gap: fluid(50, 20) fluid-to-laptop(20, 20);
         padding: fluid(50, 24);
         background-color: var(--colour-black-06);
         border: var(--border);
         border-radius: var(--border-radius-l);
 
-        @include laptop{
+        @include laptop {
             border-radius: var(--border-radius-m);
         }
 
-        @include mobile-s-above{
-            grid-template-columns: repeat(2, 1fr); grid-template-columns: repeat(2, 1fr); 
-
+        @include mobile-s-above {
+            grid-template-columns: repeat(2, 1fr);
         }
 
-        &-cell{
-            &--wide{
+        &-cell {
+            &--wide {
                 grid-column: -1/1;
             }
 
-            &--actions{
+            &--actions {
                 display: flex;
                 justify-content: space-between;
                 align-items: center;
                 gap: 20px;
 
-                @include mobile-s{
+                @include mobile-s {
                     flex-direction: column;
                     align-items: stretch;
-        
                 }
+            }
+
+            &-wrapper {
+                grid-column: 2;
+                display: grid;
+                gap: 10px;
             }
         }
 
-        &-agreement{
+        &-agreement {
             font-size: 14px;
+
+            &-wrapper {
+                display: flex;
+                flex-direction: column;
+                gap: 4px;
+            }
+        }
+
+        &-submit-button {
+            flex-shrink: 0;
+            white-space: nowrap;
         }
     }
+//agreement error
+    &__error-text {
+        color: var(--colour-red-45);
+        font-size: 14px;
+        line-height: 1.2;
+    }
 
+
+    &__message {
+        grid-column: -1/1;
+        padding: 10px;
+        border-radius: var(--border-radius-xxxs);
+        margin-bottom: 5px;
+
+        &--error {
+            color: var(--colour-red-45);
+            background-color: rgba(211, 47, 47, 0.1);
+        }
+
+        &--success {
+            color: var(--colour-green);
+            background-color: rgba(56, 142, 60, 0.1);
+        }
+    }
 }
