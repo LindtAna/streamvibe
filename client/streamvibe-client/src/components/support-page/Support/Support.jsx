@@ -5,6 +5,7 @@ import Checkbox from '../Checkbox'
 import Button from '../../movie-page/Button'
 import Select from '../Select'
 import SupportBannerImgSrc from '../../../assets/support.png'
+import axiosClient from '../../../api/axiosConfig'
 
 
 const phonePrefixOptions = [
@@ -29,23 +30,91 @@ const Support = () => {
     agreement: false,
   })
 
+  const [loading, setLoading] = useState(false)
+  const [fieldErrors, setFieldErrors] = useState({})
+  const [globalError, setGlobalError] = useState(null)
+  const [success, setSuccess] = useState(null)
+
   const handleChange = (field) => (e) => {
     const value = e.target.type === 'checkbox' ? e.target.checked : e.target.value
     setFormData((prev) => ({ ...prev, [field]: value }))
+    setFieldErrors((prev) => ({ ...prev, [field]: null }))
+    setGlobalError(null)
+    setSuccess(null)
   }
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
-  
-    console.log('Form submitted:', formData)
-  }
+    setFieldErrors({})
+    setGlobalError(null)
+    setSuccess(null)
+ 
+    const errors = {}
 
+    if (!formData.firstName.trim()) errors.firstName = 'Bitte gib deinen Vornamen ein.'
+    if (!formData.lastName.trim()) errors.lastName = 'Bitte gib deinen Nachnamen ein.'
+    if (!formData.email.trim()) errors.email = 'Bitte gib deine E-Mail-Adresse ein.'
+    
+    if (!formData.message.trim()) {
+      errors.message = 'Bitte schreibe eine Nachricht.'
+    } else if (formData.message.trim().length < 10) {
+      errors.message = 'Mindestens 10 Zeichen lang.'
+    }
+
+    if (!formData.agreement) {
+      setGlobalError('Bitte akzeptiere die Nutzungsbedingungen.')
+      return
+    }
+
+    if (Object.keys(errors).length > 0) {
+      setFieldErrors(errors)
+      return
+    }
+ 
+    setLoading(true)
+ 
+    try {
+      const payload = {
+        first_name: formData.firstName.trim(),
+        last_name: formData.lastName.trim(),
+        email: formData.email.trim(),
+        phone: formData.phone.trim(), 
+        message: formData.message.trim(),
+      }
+ 
+      const response = await axiosClient.post('/support', payload)
+ 
+      if (response.status === 201) {
+        setSuccess('Deine Nachricht wurde erfolgreich gesendet! Wir werden uns bald bei dir melden.')
+        
+        setFormData({
+          firstName: '',
+          lastName: '',
+          email: '',
+          phone: '',
+          message: '',
+          agreement: false,
+        })
+      }
+    } catch (err) {
+      console.error('Support request error:', err)
+      
+      if (err.response?.data?.error) {
+        setGlobalError(`Fehler: ${err.response.data.error}`)
+      } else {
+        setGlobalError('Es gab ein Problem beim Senden deiner Nachricht. Bitte versuche es später erneut.')
+      }
+    } finally {
+      setLoading(false)
+    }
+  }
+ 
   return (
     <section className="support container" aria-labelledby={titleId}>
       <div className="support__body">
         <div className="support__info">
           <h1 className="support__title h3" id={titleId}>
-            Willkommen auf unserer<br/>Support-Seite!
+            Willkommen auf unserer<br />Support-Seite!
           </h1>
           <div className="support__description">
             <p>Wir sind hier, um dir bei allen Problemen mit unserem Produkt zu helfen</p>
@@ -59,11 +128,23 @@ const Support = () => {
         />
       </div>
 
+      {globalError && (
+        <div className="support__message support__message--error">
+          {globalError}
+        </div>
+      )}
+
+      {success && (
+        <div className="support__message support__message--success">
+          {success}
+        </div>
+      )}
+
       <form className="support__form" onSubmit={handleSubmit} noValidate>
         <Field
           className="support__form-cell"
           label="Vorname"
-          placeholder="Erika"
+          placeholder={fieldErrors.firstName || "Erika"}
           isRequired
           value={formData.firstName}
           onChange={handleChange('firstName')}
@@ -72,7 +153,7 @@ const Support = () => {
         <Field
           className="support__form-cell"
           label="Nachname"
-          placeholder="Musterfrau"
+          placeholder={fieldErrors.lastName || "Musterfrau"}
           isRequired
           value={formData.lastName}
           onChange={handleChange('lastName')}
@@ -82,7 +163,7 @@ const Support = () => {
           className="support__form-cell"
           label="Email"
           type="email"
-          placeholder="example@example.com"
+          placeholder={fieldErrors.email || "example@example.com"}
           isRequired
           value={formData.email}
           onChange={handleChange('email')}
@@ -108,7 +189,7 @@ const Support = () => {
           className="support__form-cell support__form-cell--wide"
           label="Nachricht"
           type="textarea"
-          placeholder="Hallo! Ich habe eine Frage..."
+          placeholder={fieldErrors.message || "Hallo! Ich habe eine Frage..."}
           isRequired
           value={formData.message}
           onChange={handleChange('message')}
@@ -124,8 +205,9 @@ const Support = () => {
           />
           <Button
             className="support__form-submit-button"
-            label="Nachricht senden"
+            label={loading ? 'Wird gesendet...' : 'Nachricht senden'}
             type="submit"
+            extraAttrs={{ disabled: loading }}
           />
         </div>
       </form>

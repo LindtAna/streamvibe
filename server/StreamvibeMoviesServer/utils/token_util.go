@@ -4,10 +4,11 @@ import (
 	"context"
 	"errors"
 	"os"
+
 	// "strings"
 	"time"
 
-	"github.com/LindtAna/streamvibe/server/StreamvibeMoviesServer/database"
+	"github.com/LindtAna/streamvibe/server/streamvibemoviesserver/database"
 	"github.com/gin-gonic/gin"
 	jwt "github.com/golang-jwt/jwt/v5"
 	"go.mongodb.org/mongo-driver/v2/bson"

@@ -1,23 +1,26 @@
 package routes
 
 import (
-	controller "github.com/LindtAna/streamvibe/server/StreamvibeMoviesServer/controllers"
-	"github.com/LindtAna/streamvibe/server/StreamvibeMoviesServer/middleware"
+	controller "github.com/LindtAna/streamvibe/server/streamvibemoviesserver/controllers"
+	"github.com/LindtAna/streamvibe/server/streamvibemoviesserver/middleware"
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/v2/mongo"
 )
 
 func SetupProtectedRoutes(router *gin.Engine, client *mongo.Client) {
-	router.Use(middleware.AuthMiddleware())
 
-	router.GET("/movie/:imdb_id", controller.GetMovie(client))
-	router.POST("/addmovie", controller.AddMovie(client))
-	router.GET("/recommendedmovies", controller.GetRecommendedMovies(client))
+	protected := router.Group("/")
 
-	router.PATCH("/updatereview/:imdb_id", controller.AdminReviewUpdate(client))
-	router.POST("/addreview/:imdb_id", controller.UserReviewUpdate(client))
+	protected.Use(middleware.AuthMiddleware())
 
-	router.POST("/watchlist/:imdb_id", controller.AddToWatchList(client))
-	router.DELETE("/watchlist/:imdb_id", controller.RemoveFromWatchlist(client))
-	router.GET("/watchlist", controller.GetWatchlist(client))
+	protected.GET("/movie/:imdb_id", controller.GetMovie(client))
+	protected.POST("/addmovie", controller.AddMovie(client))
+	protected.GET("/recommendedmovies", controller.GetRecommendedMovies(client))
+
+	protected.PATCH("/updatereview/:imdb_id", controller.AdminReviewUpdate(client))
+	protected.POST("/addreview/:imdb_id", controller.UserReviewUpdate(client))
+
+	protected.POST("/watchlist/:imdb_id", controller.AddToWatchList(client))
+	protected.DELETE("/watchlist/:imdb_id", controller.RemoveFromWatchlist(client))
+	protected.GET("/watchlist", controller.GetWatchlist(client))
 }

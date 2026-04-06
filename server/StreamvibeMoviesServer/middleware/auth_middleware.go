@@ -3,7 +3,7 @@ package middleware
 import (
 	"net/http"
 
-	"github.com/LindtAna/streamvibe/server/StreamvibeMoviesServer/utils"
+	"github.com/LindtAna/streamvibe/server/streamvibemoviesserver/utils"
 	"github.com/gin-gonic/gin"
 )
 

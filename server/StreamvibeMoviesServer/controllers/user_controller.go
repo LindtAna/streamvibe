@@ -6,9 +6,9 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/LindtAna/streamvibe/server/StreamvibeMoviesServer/database"
-	"github.com/LindtAna/streamvibe/server/StreamvibeMoviesServer/models"
-	"github.com/LindtAna/streamvibe/server/StreamvibeMoviesServer/utils"
+	"github.com/LindtAna/streamvibe/server/streamvibemoviesserver/database"
+	"github.com/LindtAna/streamvibe/server/streamvibemoviesserver/models"
+	"github.com/LindtAna/streamvibe/server/streamvibemoviesserver/utils"
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
 	"go.mongodb.org/mongo-driver/v2/bson"

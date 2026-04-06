@@ -8,8 +8,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/LindtAna/streamvibe/server/StreamvibeMoviesServer/database"
-	"github.com/LindtAna/streamvibe/server/StreamvibeMoviesServer/routes"
+	"github.com/LindtAna/streamvibe/server/streamvibemoviesserver/database"
+	"github.com/LindtAna/streamvibe/server/streamvibemoviesserver/routes"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"

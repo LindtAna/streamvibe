@@ -1,7 +1,7 @@
 package routes
 
 import (
-	controller "github.com/LindtAna/streamvibe/server/StreamvibeMoviesServer/controllers"
+	controller "github.com/LindtAna/streamvibe/server/streamvibemoviesserver/controllers"
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/v2/mongo"
 )
@@ -13,4 +13,5 @@ func SetupUnprotectedRoutes(router *gin.Engine, client *mongo.Client) {
 	router.POST("/login", controller.LoginUser(client))
 	router.POST("/logout", controller.LogoutHandler(client))
 	router.POST("/refresh", controller.RefreshTokenHandler(client))
+	router.POST("/support", controller.CreateSupportRequest(client))
 }

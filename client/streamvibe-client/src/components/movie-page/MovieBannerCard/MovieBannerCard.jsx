@@ -128,7 +128,7 @@ const MovieBannerCard = ({
                 mode="black-06"
                 iconName={isSaved ? "delete" : "plus"}
                 iconSrc={isSaved ? deleteIcon : plusIcon}
-                label={isSaved ? "In Merkliste" : "Zur Merkliste hinzufügen"}
+                label={isSaved ? "Aus Merkliste entfernen" : "Zur Merkliste hinzufügen"}
                 isLabelHidden
                 onClick={handleWatchlistClick}
                 extraAttrs={{ disabled: isLoading }}
@@ -145,7 +145,7 @@ const MovieBannerCard = ({
               mode="black-06"
               iconName={isMuted ? "mute" : "volume"}
               iconSrc={isMuted ? muteIcon : volumeIcon}
-              label={isMuted ? "Audio anschalten" : "Audio ausschalten"}
+              label={isMuted ? "Audio anschalten" : "Audio auschalten"}
               isLabelHidden
               onClick={handleMuteToggle}
             />
