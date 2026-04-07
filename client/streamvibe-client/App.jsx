@@ -18,7 +18,7 @@ function App() {
         <Header />
         <main>
           <Routes>
-            
+
             {/* Layout */}
             <Route path="/" element={<Layout />}>
               <Route path="/" element={<HomePage />} />
@@ -26,11 +26,11 @@ function App() {
               <Route path="/movie/:imdbId" element={<Movie />} />
               <Route path="/support" element={<SupportPage />} />
               <Route path="/login" element={<UserLogin />} />
-              <Route path="/saved" element={<SavedPage />} />
               <Route path="/stream/:yt_id" element={<Videoplayer />} />
 
               {/* Protected */}
               <Route path="/" element={<RequiredAuth />}>
+                <Route path="/saved" element={<SavedPage />} />
               </Route>
 
             </Route>
