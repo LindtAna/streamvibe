@@ -4,10 +4,10 @@ import './Select.scss'
 import getIdFromTitle from '../../movies-page/getIdFromTitle'
 
 
-// - кастомный dropdown с клавиатурной навигацией (стрелки, Space, Enter, Escape)
-// - синхронизацию с нативным <select> (для доступности на мобильных)
-// - автоматическое позиционирование dropdown (слева/справа от кнопки)
-// - нативный <select> на мобильных, кастомный — на десктопе
+//Benutzerdefiniertes Dropdown-Menü mit Tastaturnavigation (Pfeile, Leertaste, Eingabetaste, Escape)
+//Synchronisierung mit dem nativen <select>-Element (für mobile Barrierefreiheit)
+//Automatische Positionierung des Dropdown-Menüs
+//Natives <select>-Element auf Mobilgeräten, benutzerdefiniert auf Desktop-Computern
 
 const Select = ({
   id: idProp,
@@ -17,6 +17,8 @@ const Select = ({
   options = [],
   buttonClassName,
   onChange,
+  // 'auto' | 'up' | 'down' -- Öffnungsrichtung
+  forceDirection = 'auto',
 }) => {
   const reactId = useId()
   const baseId = idProp ?? (label ? getIdFromTitle(label) : reactId)
@@ -36,7 +38,8 @@ const Select = ({
     options.findIndex((o) => o.value === (defaultSelected?.value ?? ''))
   )
   const [dropdownSide, setDropdownSide] = useState('left') // 'left' | 'right'
-  const [dropdownVertical, setDropdownVertical] = useState('bottom') // 'top' | 'bottom'
+  const [dropdownVertical, setDropdownVertical] = useState(
+  forceDirection === 'up' ? 'top' : 'bottom') // 'top' | 'bottom'
 
   const rootRef = useRef(null)
   const buttonRef = useRef(null)
@@ -57,23 +60,29 @@ const Select = ({
     setDropdownSide(btnCenterX < viewportWidth / 2 ? 'left' : 'right')
 
     // TOP / BOTTOM 
-    const spaceBelow = viewportHeight - rect.bottom
-    const spaceAbove = rect.top
-
-
-    if (spaceBelow < 200 && spaceAbove > spaceBelow) {
+    if (forceDirection === 'up') {
       setDropdownVertical('top')
-    } else {
+    } else if (forceDirection === 'down') {
       setDropdownVertical('bottom')
+    } else {
+      // AUTO: определяем автоматически
+      const spaceBelow = viewportHeight - rect.bottom
+      const spaceAbove = rect.top
+
+      if (spaceBelow < 200 && spaceAbove > spaceBelow) {
+        setDropdownVertical('top')
+      } else {
+        setDropdownVertical('bottom')
+      }
     }
-  }, [])
+  }, [forceDirection])
 
   useEffect(() => {
     const timer = setTimeout(fixDropdownPosition, 500)
     return () => clearTimeout(timer)
   }, [fixDropdownPosition])
 
-  //Закрытие по клику вне компонента 
+  //Schließen beim Klick außerhalb der Komponente
   useEffect(() => {
     if (!isExpanded) return
     const handleOutsideClick = (e) => {
@@ -85,7 +94,7 @@ const Select = ({
     return () => document.removeEventListener('click', handleOutsideClick)
   }, [isExpanded])
 
-  //Выбор опции 
+  //Option auswählen
   const selectOption = useCallback(
     (index) => {
       const value = options[index]?.value
@@ -97,7 +106,7 @@ const Select = ({
     [options, onChange]
   )
 
-  // Клавиатурная навигация 
+  // Tastaturnavigation
   const handleKeyDown = useCallback(
     (e) => {
       const isButtonFocused = document.activeElement === buttonRef.current
@@ -141,7 +150,7 @@ const Select = ({
 
   return (
     <div className="select" ref={rootRef} onKeyDown={handleKeyDown}>
-      {/* Лейбл */}
+   
       <label
         className={classNames('select__label', {
           'visually-hidden': isLabelHidden,
@@ -152,7 +161,7 @@ const Select = ({
         {label}
       </label>
 
-      {/* Нативный select — виден только на мобильных (CSS: visible-mobile) */}
+      {/* Native Select - nur auf Mobilgeräten sichtbar (CSS: visible-mobile) */}
       <select
         className={classNames('select__original-control', buttonClassName)}
         id={ids.originalControl}
@@ -168,7 +177,7 @@ const Select = ({
         ))}
       </select>
 
-      {/* Кастомный select — виден только на десктопе */}
+      {/* Custom Select– nur auf dem Desktop sichtbar*/}
       <div className="select__body">
         <div
           className={classNames('select__button', buttonClassName, {

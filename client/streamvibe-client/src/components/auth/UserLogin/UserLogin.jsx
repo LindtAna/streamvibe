@@ -355,6 +355,7 @@ const UserLogin = ({ onClose }) => {
               isLabelHidden={false}
               options={genresOptions}
               onChange={handleGenreSelect}
+              forceDirection="up"
             />
 
             <div

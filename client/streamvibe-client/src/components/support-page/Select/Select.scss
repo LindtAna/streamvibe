@@ -104,10 +104,12 @@
 
         &.is-on-bottom {
             top: calc(100% + 4px);
+            // bottom: auto; 
         }
 
         &.is-on-top {
             bottom: calc(100% + 4px);
+            top: auto; 
         }
 
         &:not(.is-expanded) {
@@ -143,6 +145,4 @@
             border-color: var(--colour-white);
         }
     }
-
-
 }

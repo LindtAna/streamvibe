@@ -191,6 +191,7 @@ const Support = () => {
                 label="Phone number prefix"
                 buttonClassName={buttonClassName}
                 options={phonePrefixOptions}
+                forceDirection="bottom"
               />
             )}
           />
