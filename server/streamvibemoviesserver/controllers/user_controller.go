@@ -130,11 +130,11 @@ func LoginUser(client *mongo.Client) gin.HandlerFunc {
 			Path:  "/",
 			// Domain:   "localhost",
 			MaxAge: 86400,
-			// Secure:   true,
-			Secure:   false, //для локальной разработки !!!!
+			Secure: true,
+			// Secure:   false, //для локальной разработки !!!!
 			HttpOnly: true,
-			// SameSite: http.SameSiteNoneMode,
-			SameSite: http.SameSiteLaxMode, //для локальной разработки !!!!
+			SameSite: http.SameSiteNoneMode,
+			// SameSite: http.SameSiteLaxMode, //для локальной разработки !!!!
 		})
 
 		http.SetCookie(c.Writer, &http.Cookie{
@@ -190,11 +190,11 @@ func LogoutHandler(client *mongo.Client) gin.HandlerFunc {
 			Path:  "/",
 			// Domain:   "localhost",
 			MaxAge: -1,
-			// Secure:   true,
-			Secure:   false, //для локальной разработки !!!!
+			Secure: true,
+			// Secure:   false, //для локальной разработки !!!!
 			HttpOnly: true,
-			// SameSite: http.SameSiteNoneMode,
-			SameSite: http.SameSiteLaxMode, //для локальной разработки !!!!
+			SameSite: http.SameSiteNoneMode,
+			// SameSite: http.SameSiteLaxMode, //для локальной разработки !!!!
 		})
 
 		http.SetCookie(c.Writer, &http.Cookie{
@@ -202,11 +202,11 @@ func LogoutHandler(client *mongo.Client) gin.HandlerFunc {
 			Value:  "",
 			Path:   "/",
 			MaxAge: -1,
-			// Secure:   true,
-			Secure:   false, //для локальной разработки !!!!
+			Secure: true,
+			// Secure:   false, //для локальной разработки !!!!
 			HttpOnly: true,
-			// SameSite: http.SameSiteNoneMode,
-			SameSite: http.SameSiteLaxMode, //для локальной разработки !!!!
+			SameSite: http.SameSiteNoneMode,
+			// SameSite: http.SameSiteLaxMode, //для локальной разработки !!!!
 		})
 
 		c.JSON(http.StatusOK, gin.H{"message": "Logged out successfully"})
