@@ -27,10 +27,10 @@ function App() {
               <Route path="/support" element={<SupportPage />} />
               <Route path="/login" element={<UserLogin />} />
               <Route path="/stream/:yt_id" element={<Videoplayer />} />
+               <Route path="/saved" element={<SavedPage />} />
 
               {/* Protected */}
               <Route path="/" element={<RequiredAuth />}>
-                <Route path="/saved" element={<SavedPage />} />
               </Route>
 
             </Route>
