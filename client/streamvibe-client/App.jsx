@@ -1,15 +1,20 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
-import Header from './src/components/header/Header'
-import Movie from './src/components/movie-page/Movie/Movie'
-import Movies from './src/components/movies-page/Movies'
-import SupportPage from './src/components/support-page/SupportPage/SupportPage'
-import UserLogin from './src/components/auth/UserLogin'
-import HomePage from './src/components/home/HomePage'
+
 import { AuthProvider } from './src/context/AuthProvider'
-import Layout from './src/components/Layout'
-import RequiredAuth from './src/components/RequiredAuth'
-import SavedPage from './src/components/saved-page/SavedPage'
-import Videoplayer from './src/components/videoplayer/Videoplayer'
+import RequiredAuth from './src/app/RequiredAuth'
+
+import Header from './src/app/layouts/Header/Header'
+import Layout from './src/app/Layout'
+
+import UserLogin from './src/app/modals/Authentication/UserLogin'
+
+import HomePage from './src/app/pages/home/HomePage'
+import Movies from './src/app/pages/movies-page/Movies'
+import Movie from './src/app/pages/movie-page/Movie'
+import SavedPage from './src/app/pages/saved-page/SavedPage'
+import SupportPage from './src/app/pages/support-page/SupportPage'
+
+import Videoplayer from './src/app/components/Videoplayer/Videoplayer'
 
 function App() {
   return (
