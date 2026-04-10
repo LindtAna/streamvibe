@@ -23,7 +23,8 @@ function App() {
             <Route path="/" element={<Layout />}>
               <Route path="/" element={<HomePage />} />
               <Route path="/movies" element={<Movies showRecommendations={true} />} />
-              <Route path="/movie/:imdbId" element={<Movie />} />
+              {/* <Route path="/movie/:imdbId" element={<Movie />} /> */}
+               <Route path="/movie/:tmdbId" element={<Movie />} />
               <Route path="/support" element={<SupportPage />} />
               <Route path="/login" element={<UserLogin />} />
               <Route path="/stream/:yt_id" element={<Videoplayer />} />

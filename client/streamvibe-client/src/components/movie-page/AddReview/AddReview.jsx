@@ -7,7 +7,8 @@ import useAxiosPrivate from '../../../hooks/useAxiosPrivate'
 import useAuth from '../../../hooks/useAuth'
 import { useNavigate} from 'react-router-dom'
 
-const AddReview = ({imdbId, onReviewAdded, isOpen, onClose}) => {
+// const AddReview = ({imdbId, onReviewAdded, isOpen, onClose}) => {
+  const AddReview = ({tmdbId, onReviewAdded, isOpen, onClose}) => {
   const titleId = 'add-review-title'
   const axiosPrivate = useAxiosPrivate()
   const { auth } = useAuth()
@@ -117,7 +118,8 @@ const AddReview = ({imdbId, onReviewAdded, isOpen, onClose}) => {
     setLoading(true)
  
     try {
-      const response = await axiosPrivate.post(`/addreview/${imdbId}`, {
+      // const response = await axiosPrivate.post(`/addreview/${imdbId}`, {
+        const response = await axiosPrivate.post(`/addreview/${tmdbId}`, {
         country: formData.country.trim(),
         rating: Number(formData.rating),
         text: formData.text.trim()
@@ -140,7 +142,8 @@ const AddReview = ({imdbId, onReviewAdded, isOpen, onClose}) => {
       if (err.response?.status === 401) {
         setError('Sitzung abgelaufen. Bitte melde dich erneut an.')
         setTimeout(() => {
-          navigate('/login', { state: { from: { pathname: `/movie/${imdbId}` } } })
+          // navigate('/login', { state: { from: { pathname: `/movie/${imdbId}` } } })
+          navigate('/login', { state: { from: { pathname: `/movie/${tmdbId}` } } })
         }, 2000)
       } else {
         setError('Fehler beim Hinzufügen der Bewertung. Bitte versuche es erneut.')

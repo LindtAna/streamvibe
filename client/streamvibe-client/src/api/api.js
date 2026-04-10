@@ -6,8 +6,13 @@ export const apiService = {
     return response.data
   },
 
-  async getMovieById(imdbId) {
-    const response = await api.get(`/movies/${imdbId}`)
+  // async getMovieById(imdbId) {
+  //   const response = await api.get(`/movies/${imdbId}`)
+  //   return response.data
+  // }
+
+   async getMovieById(tmdbId) {
+    const response = await api.get(`/movie/${tmdbId}`)
     return response.data
   }
 }

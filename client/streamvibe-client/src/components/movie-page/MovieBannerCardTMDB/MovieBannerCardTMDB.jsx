@@ -2,9 +2,8 @@ import { useNavigate } from 'react-router-dom'
 import { useState, useEffect } from 'react'
 import useAuth from '../../../hooks/useAuth'
 import useAxiosPrivate from '../../../hooks/useAxiosPrivate'
-import './MovieBannerCard.scss'
+import './MovieBannerCardTMDB.scss'
 
-// import Videoplayer from '../../videoplayer/Videoplayer'
 import Button from '../Button'
 
 import playIcon from '../../../assets/icons/play.svg'
@@ -14,13 +13,7 @@ import likeIcon from '../../../assets/icons/like.svg'
 import volumeIcon from '../../../assets/icons/volume.svg'
 import muteIcon from '../../../assets/icons/mute.svg'
 
-
-const MovieBannerCard = ({
-  movie,
-  titleId,
-  TitleTag = 'h2',
-}) => {
-
+const MovieBannerCardTMDB = ({ movie, titleId, TitleTag = 'h2' }) => {
   const { auth, setAuth } = useAuth()
   const axiosPrivate = useAxiosPrivate()
   const [isSaved, setIsSaved] = useState(false)
@@ -29,9 +22,11 @@ const MovieBannerCard = ({
 
   const navigate = useNavigate()
 
-   useEffect(() => {
+  useEffect(() => {
     if (auth && auth.watchlist && movie) {
-      setIsSaved(auth.watchlist.includes(movie.imdb_id))
+      // TMDB ID 
+      const movieIdStr = String(movie.id)
+      setIsSaved(auth.watchlist.includes(movieIdStr))
     }
   }, [auth, movie])
 
@@ -40,8 +35,8 @@ const MovieBannerCard = ({
   }
 
   const handlePlayClick = () => {
-    if (movie.youtube_id) {
-      navigate(`/stream/${movie.youtube_id}`, { state: { isMuted } })
+    if (movie.trailer_key) {
+      navigate(`/stream/${movie.trailer_key}`, { state: { isMuted } })
     }
   }
 
@@ -51,26 +46,23 @@ const MovieBannerCard = ({
 
   const handleWatchlistClick = async () => {
     if (!auth) {
-      // Button ist nur für eingeloggte Benutzer sichtbar
       return
     }
     setIsLoading(true)
     try {
+      const movieIdStr = String(movie.id)
+      
       if (isSaved) {
-        // Film entfernen
-        await axiosPrivate.delete(`/watchlist/${movie.imdb_id}`)
+        await axiosPrivate.delete(`/watchlist/${movieIdStr}`)
         setIsSaved(false)
         
-        // State aktualisieren
-        const updatedWatchlist = auth.watchlist.filter(id => id !== movie.imdb_id)
+        const updatedWatchlist = auth.watchlist.filter(id => id !== movieIdStr)
         setAuth({ ...auth, watchlist: updatedWatchlist })
       } else {
-        // Film hinzufügen
-        await axiosPrivate.post(`/watchlist/${movie.imdb_id}`)
+        await axiosPrivate.post(`/watchlist/${movieIdStr}`)
         setIsSaved(true)
         
-        // State aktualisieren
-        const updatedWatchlist = [...(auth.watchlist || []), movie.imdb_id]
+        const updatedWatchlist = [...(auth.watchlist || []), movieIdStr]
         setAuth({ ...auth, watchlist: updatedWatchlist })
       }
     } catch (error) {
@@ -80,13 +72,15 @@ const MovieBannerCard = ({
     }
   }
 
+  // Backdrop oder Poster als Hintergrund
+  const backgroundImage = movie.backdrop_path || movie.poster_path
 
   return (
     <div className="movie-banner-card container">
       {/* Blurred background poster */}
       <div
         className="movie-banner-card__background"
-        style={{ backgroundImage: `url(${movie.poster_path})` }}
+        style={{ backgroundImage: `url(${backgroundImage})` }}
         aria-hidden="true"
       />
 
@@ -111,24 +105,28 @@ const MovieBannerCard = ({
             {movie.title}
           </TitleTag>
 
-
-          <Button
-            className="movie-banner-card__play-button"
-            iconName="play"
-            iconSrc={playIcon}
-            label="Trailer abspielen"
-            hasFillIcon
-            onClick={handlePlayClick}
-          />
-          
+          {movie.trailer_key && (
+            <Button
+              className="movie-banner-card__play-button"
+              iconName="play"
+              iconSrc={playIcon}
+              label="Trailer abspielen"
+              hasFillIcon
+              onClick={handlePlayClick}
+            />
+          )}
 
           <div className="movie-banner-card__actions">
-              {auth && (
+            {auth && (
               <Button
                 mode="black-06"
-                iconName={isSaved ? "delete" : "plus"}
+                iconName={isSaved ? 'delete' : 'plus'}
                 iconSrc={isSaved ? deleteIcon : plusIcon}
-                label={isSaved ? "Aus Merkliste entfernen" : "Zur Merkliste hinzufügen"}
+                label={
+                  isSaved
+                    ? 'Aus Merkliste entfernen'
+                    : 'Zur Merkliste hinzufügen'
+                }
                 isLabelHidden
                 onClick={handleWatchlistClick}
                 extraAttrs={{ disabled: isLoading }}
@@ -143,9 +141,9 @@ const MovieBannerCard = ({
             />
             <Button
               mode="black-06"
-              iconName={isMuted ? "mute" : "volume"}
+              iconName={isMuted ? 'mute' : 'volume'}
               iconSrc={isMuted ? muteIcon : volumeIcon}
-              label={isMuted ? "Audio anschalten" : "Audio auschalten"}
+              label={isMuted ? 'Audio anschalten' : 'Audio auschalten'}
               isLabelHidden
               onClick={handleMuteToggle}
             />
@@ -156,4 +154,4 @@ const MovieBannerCard = ({
   )
 }
 
-export default MovieBannerCard
+export default MovieBannerCardTMDB
