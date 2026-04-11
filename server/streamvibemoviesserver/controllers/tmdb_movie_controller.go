@@ -4,6 +4,7 @@ import (
 	"context"
 	"log"
 	"net/http"
+	"sync"
 	"time"
 
 	"github.com/LindtAna/streamvibe/server/streamvibemoviesserver/database"
@@ -113,7 +114,7 @@ func UserReviewUpdateTMDB(client *mongo.Client) gin.HandlerFunc {
 			CreatedAt: time.Now(),
 		}
 
-		// wird in der user_reviews Colllection mit movie_id geschpeichert
+		// wird in der user_reviews Collection mit movie_id geschpeichert
 		var userReviewCollection *mongo.Collection = database.OpenCollection("user_reviews", client)
 
 		reviewWithMovieID := bson.M{
@@ -134,5 +135,51 @@ func UserReviewUpdateTMDB(client *mongo.Client) gin.HandlerFunc {
 		}
 
 		c.JSON(http.StatusOK, newReview)
+	}
+}
+
+// ruft alle Sammlungen für die Homepage parallel ab
+func GetHomeCollections(client *mongo.Client) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		var wg sync.WaitGroup
+		var trending, topRated, nowPlaying []models.MovieCollectionItem
+
+		// WaitGroup, 3 parallele Aufgaben
+		wg.Add(3)
+
+		// Trending
+		go func() {
+			defer wg.Done()
+			if items, err := utils.FetchTMDBMovieList("/trending/movie/week?language=de-DE"); err == nil {
+				trending = utils.ConvertToCollectionItems(items)
+			}
+		}()
+
+		// Top Rated
+		go func() {
+			defer wg.Done()
+			if items, err := utils.FetchTMDBMovieList("/movie/top_rated?language=de-DE&page=1"); err == nil {
+				topRated = utils.ConvertToCollectionItems(items)
+			}
+		}()
+
+		// Now Playing Im Kino
+		go func() {
+			defer wg.Done()
+			if items, err := utils.FetchTMDBMovieList("/movie/now_playing?language=de-DE&page=1&region=DE"); err == nil {
+				nowPlaying = utils.ConvertToCollectionItems(items)
+			}
+		}()
+
+		// warten auf den Abschluss aller drei Anfragen
+		wg.Wait()
+
+		response := models.HomeCollectionsResponse{
+			Trending:   trending,
+			TopRated:   topRated,
+			NowPlaying: nowPlaying,
+		}
+
+		c.JSON(http.StatusOK, response)
 	}
 }

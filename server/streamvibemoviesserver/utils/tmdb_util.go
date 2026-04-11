@@ -184,3 +184,56 @@ func ConvertToMovieDetailsResponse(tmdbMovie *models.TMDBMovieDetails, userRevie
 		UserReviews:      userReviews,
 	}
 }
+
+// allgemeine Funktion zum Abrufen von Listen aus TMDB
+func FetchTMDBMovieList(endpoint string) ([]models.TMDBMovieItem, error) {
+	tmdbAPIKey := os.Getenv("TMDB_API_KEY")
+	if tmdbAPIKey == "" {
+		return nil, errors.New("TMDB_API_KEY not set")
+	}
+
+	url := fmt.Sprintf("%s%s", TMDBBaseURL, endpoint)
+
+	req, err := http.NewRequest("GET", url, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("accept", "application/json")
+	req.Header.Add("Authorization", "Bearer "+tmdbAPIKey)
+
+	client := &http.Client{Timeout: 10 * time.Second}
+	res, err := client.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	defer res.Body.Close()
+
+	if res.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("TMDB API error: status %d", res.StatusCode)
+	}
+
+	var response models.TMDBMovieListResponse
+	if err := json.NewDecoder(res.Body).Decode(&response); err != nil {
+		return nil, err
+	}
+
+	return response.Results, nil
+}
+
+// convertiert das TMDB-Array in ein Array von MovieCards für client
+func ConvertToCollectionItems(items []models.TMDBMovieItem) []models.MovieCollectionItem {
+	result := make([]models.MovieCollectionItem, 0, len(items))
+
+	for _, item := range items {
+		result = append(result, models.MovieCollectionItem{
+			ID:          item.ID,
+			Title:       item.Title,
+			PosterPath:  GetPosterURL(item.PosterPath, "w500"),
+			ReleaseDate: item.ReleaseDate,
+			Rating:      item.VoteAverage,
+		})
+	}
+
+	return result
+}

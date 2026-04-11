@@ -82,3 +82,31 @@ type CastInfo struct {
 	Character   string  `json:"character"`
 	ProfilePath *string `json:"profile_path"`
 }
+
+type TMDBMovieListResponse struct {
+	Results []TMDBMovieItem `json:"results"`
+}
+
+type TMDBMovieItem struct {
+	ID          int     `json:"id"`
+	Title       string  `json:"-"`
+	PosterPath  string  `json:"poster_path"`
+	ReleaseDate string  `json:"release_date"`
+	VoteAverage float64 `json:"vote_average"`
+}
+
+// MovieCards
+type MovieCollectionItem struct {
+	ID          int     `json:"id"`
+	Title       string  `json:"-"`
+	PosterPath  string  `json:"poster_path"`
+	ReleaseDate string  `json:"release_date"`
+	Rating      float64 `json:"rating"`
+}
+
+// responce for HomePage
+type HomeCollectionsResponse struct {
+	Trending   []MovieCollectionItem `json:"trending"`
+	TopRated   []MovieCollectionItem `json:"top_rated"`
+	NowPlaying []MovieCollectionItem `json:"now_playing"`
+}
