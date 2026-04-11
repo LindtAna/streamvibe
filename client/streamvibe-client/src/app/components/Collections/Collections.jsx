@@ -41,7 +41,7 @@ const CollectionSection = ({
   // Dynamische Anpassung von Slider abhängig von der Anzahl der Elemente
   const itemCount = categoryItems?.length || movieItems?.length || 0
 
-  
+
   const adjustedSliderParams = useMemo(() => {
     const params = { ...sliderParams }
 
@@ -80,21 +80,24 @@ const CollectionSection = ({
           : movieItems.map((item, index) => (
             <MovieCard
               key={index}
-              title={item.title}
+              // title={item.title}
               imgSrc={item.poster_path}
+              href={`/movie/${item.id}`}
+              // href={`/movie/${item.imdb_id}`}
               rating={{
-                value: item.ranking?.ranking_value || 0,
-                label: item.ranking?.ranking_name || 'N/A'
+                value: item.rating ? (item.rating / 2) : 0,
+                label: item.rating ? item.rating.toFixed(1) : 'N/A'
               }}
-              href={`/movie/${item.imdb_id}`}
-            />
+              
+             released={item.release_date || null}
+             />
           ))}
       </Slider>
     </Section>
   )
 }
 
-const Collections = ({ movies = [], showRecommendations = false }) => {
+const Collections = ({ movies = [], tmdbCollections, showRecommendations = false }) => {
   const { auth } = useAuth()
   const axiosPrivate = useAxiosPrivate()
   const [recommendedMovies, setRecommendedMovies] = useState([])
@@ -143,6 +146,34 @@ const Collections = ({ movies = [], showRecommendations = false }) => {
 
 
   const collectionGroups = useMemo(() => {
+    // TMDB collections
+    if (tmdbCollections) {
+      const items = [
+        {
+          title: 'Trends: Diese Woche',
+          movieItems: tmdbCollections.trending,
+          sliderParams: categorySliderParams,
+        },
+        {
+          title: 'Beliebt',
+          movieItems: tmdbCollections.top_rated,
+          sliderParams: categorySliderParams,
+        },
+        {
+          title: 'Im Kino',
+          movieItems: tmdbCollections.now_playing,
+          sliderParams: categorySliderParams,
+        }
+      ]
+
+      return [{
+        title: 'Filme',
+        isActive: true,
+        items,
+      }]
+    }
+
+    // DataBase Collections
     if (!movies.length) return []
 
     const genreGroups = groupMoviesByGenre(movies)
@@ -179,7 +210,7 @@ const Collections = ({ movies = [], showRecommendations = false }) => {
       isActive: true,
       items,
     }]
-  }, [movies, auth, showRecommendations, recommendedMovies, recommendationsLoaded])
+  }, [movies, auth, tmdbCollections, showRecommendations, recommendedMovies, recommendationsLoaded])
 
   if (showRecommendations &&
     loadingRecommendations &&

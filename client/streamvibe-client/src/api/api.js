@@ -14,5 +14,10 @@ export const apiService = {
    async getMovieById(tmdbId) {
     const response = await api.get(`/movie/${tmdbId}`)
     return response.data
+  },
+
+  async getHomeCollections(options = {}) {
+    const response = await api.get('/home-collections', options)
+    return response.data
   }
 }

@@ -5,8 +5,6 @@ import { Link } from 'react-router-dom'
 import Badge from '../Badge'
 import RatingView from '../RatingView'
 
-import CatalogIcon from '../../../assets/icons/catalog.svg'
-import EyeIcon from '../../../assets/icons/eye.svg'
 import ClockIcon from '../../../assets/icons/clock.svg'
 
 const MovieCard = ({
@@ -43,20 +41,13 @@ const MovieCard = ({
           </Badge>
         )}
 
-        {views && (
-          <Badge iconName="eye" iconSrc={EyeIcon} iconAriaLabel="Views" hasFillIcon>
-            {views}
-          </Badge>
-        )}
-
-        {released && (
+        {Boolean(released) && (
           <Badge className="movie-card__released-badge">
-            Released at{' '}
             <time
               className="movie-card__released-badge-label"
-              dateTime={released.dateTime}
+              dateTime={released}
             >
-              {released.label}
+              {released}
             </time>
           </Badge>
         )}
