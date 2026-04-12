@@ -14,7 +14,6 @@ const MovieCard = ({
   views,
   released,
   rating,
-  season,
   href = '/movie',
 }) => {
   return (
