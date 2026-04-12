@@ -1,35 +1,37 @@
-.slider{
+.slider {
     position: relative;
-    
-    &--beyond-the-viewport-on-mobile-s{
-        @include mobile-s{
+
+    &--beyond-the-viewport-on-mobile-s {
+        @include mobile-s {
             width: calc(100vw - var(--container-padding-x));
         }
     }
 
-     &__list {
+    &__list {
         margin: 0;
         padding: 0;
     }
 
-    &__item{
+    &__item {
         width: auto;
     }
 
-    &__navigation{
+    &__navigation {
         margin-top: fluid(40, 24);
     }
 
-    &__scrollbar{
-        @include abs-x;
+    &__scrollbar {
 
-        top: calc(100% + 24px);
+        position: absolute;
+        left: 80%;
+        translate: -50%;
+        top: calc(100% + 26px);
         width: 80px;
-        height: 5px;
+        height: 8px;
         background-color: var(--colour-black-20);
         border-radius: 20px;
 
-        &-drag{
+        &-drag {
             height: 100%;
             background-color: var(--colour-red-45);
         }
