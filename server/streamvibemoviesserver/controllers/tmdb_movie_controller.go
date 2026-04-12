@@ -138,7 +138,7 @@ func UserReviewUpdateTMDB(client *mongo.Client) gin.HandlerFunc {
 	}
 }
 
-// ruft alle Sammlungen für die Homepage parallel ab
+// ruft Sammlungen für die Homepage parallel ab
 func GetHomeCollections(client *mongo.Client) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var wg sync.WaitGroup
@@ -178,6 +178,74 @@ func GetHomeCollections(client *mongo.Client) gin.HandlerFunc {
 			Trending:   trending,
 			TopRated:   topRated,
 			NowPlaying: nowPlaying,
+		}
+
+		c.JSON(http.StatusOK, response)
+	}
+}
+
+// ruft Sammlungen nach Genres für die Movies-Seite ab
+func GetMoviesPageCollections(client *mongo.Client) gin.HandlerFunc {
+	return func(c *gin.Context) {
+
+		// Definierte Genres für die Movies-Seite
+		selectedGenres := []struct {
+			ID   int //id from tmdb
+			Name string
+		}{
+			{16, "Animation"},
+			{28, "Action"},
+			{99, "Dokumentarfilm"},
+			{14, "Fantasy"},
+			{36, "Historie"},
+			{35, "Komödie"},
+			{80, "Krimi"},
+			{10749, "Liebesfilm"},
+			{878, "Science Fiction"},
+		}
+
+		var wg sync.WaitGroup
+		collections := make([]models.GenreCollection, len(selectedGenres))
+
+		// Mutex für thread-safe Schreibvorgänge
+		var mu sync.Mutex
+
+		// Parallele Anfragen für jedes Genre
+		for i, genre := range selectedGenres {
+			wg.Add(1)
+			go func(index int, genreID int, genreName string) {
+				defer wg.Done()
+
+				// Filme für dieses Genre abrufen (20 pro Genre)
+				items, err := utils.FetchTMDBMoviesByGenre(genreID, 1)
+				if err != nil {
+					log.Printf("Error fetching genre %s: %v", genreName, err)
+					return
+				}
+
+				// Maximal 20 Filme nehmen (tmdb standart response)
+				maxMovies := 20
+				if len(items) > maxMovies {
+					items = items[:maxMovies]
+				}
+
+				movies := utils.ConvertToCollectionItems(items)
+
+				mu.Lock()
+				collections[index] = models.GenreCollection{
+					GenreID:   genreID,
+					GenreName: genreName,
+					Movies:    movies,
+				}
+				mu.Unlock()
+			}(i, genre.ID, genre.Name)
+		}
+
+		// Warten auf alle Anfragen
+		wg.Wait()
+
+		response := models.MoviesPageCollectionsResponse{
+			Collections: collections,
 		}
 
 		c.JSON(http.StatusOK, response)

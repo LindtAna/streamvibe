@@ -110,3 +110,14 @@ type HomeCollectionsResponse struct {
 	TopRated   []MovieCollectionItem `json:"top_rated"`
 	NowPlaying []MovieCollectionItem `json:"now_playing"`
 }
+
+// response for Movies Page - collections by genres
+type GenreCollection struct {
+	GenreID   int                   `json:"genre_id"`
+	GenreName string                `json:"genre_name"`
+	Movies    []MovieCollectionItem `json:"movies"`
+}
+
+type MoviesPageCollectionsResponse struct {
+	Collections []GenreCollection `json:"collections"`
+}

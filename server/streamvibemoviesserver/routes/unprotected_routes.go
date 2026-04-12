@@ -16,4 +16,5 @@ func SetupUnprotectedRoutes(router *gin.Engine, client *mongo.Client) {
 	router.POST("/support", controller.CreateSupportRequest(client))
 	router.GET("/movie/:tmdb_id", controller.GetMovieTMDB(client))
 	router.GET("/home-collections", controller.GetHomeCollections(client))
+	router.GET("/movies-page-collections", controller.GetMoviesPageCollections(client))
 }
