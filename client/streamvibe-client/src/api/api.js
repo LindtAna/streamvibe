@@ -5,12 +5,7 @@ export const apiService = {
     const response = await api.get('/movies')
     return response.data
   },
-
-  // async getMovieById(imdbId) {
-  //   const response = await api.get(`/movies/${imdbId}`)
-  //   return response.data
-  // }
-
+  
    async getMovieById(tmdbId) {
     const response = await api.get(`/movie/${tmdbId}`)
     return response.data
@@ -18,6 +13,11 @@ export const apiService = {
 
   async getHomeCollections(options = {}) {
     const response = await api.get('/home-collections', options)
+    return response.data
+  },
+
+  async getMoviesPageCollections(options = {}) {
+    const response = await api.get('/movies-page-collections', options)
     return response.data
   }
 }

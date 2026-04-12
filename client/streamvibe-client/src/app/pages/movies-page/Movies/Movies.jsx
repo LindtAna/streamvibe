@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 
-import axiosClient from '../../../../api/axiosConfig'
+// import axiosClient from '../../../../api/axiosConfig'
 import { apiService } from '../../../../api/api'
 
 import Collections from '../../../components/Collections'
@@ -13,15 +13,17 @@ const Movies = ({ showRecommendations = false }) => {
 
   useEffect(() => {
     const controller = new AbortController()
-    const fetchHomeData = async () => {
+
+    const fetchMoviesData = async () => {
       setLoading(true)
       try {
-       const data = await apiService.getHomeCollections({ 
-          signal: controller.signal 
+        // Для страницы Movies используем новый эндпоинт с жанрами
+        const data = await apiService.getMoviesPageCollections({
+          signal: controller.signal
         })
         setCollections(data)
       } catch (err) {
-       if (err.name !== 'CanceledError') {
+        if (err.name !== 'CanceledError') {
           console.error('Fehler beim Laden der Kollektionen:', err)
           setError('Fehler beim Laden der Filme.')
         }
@@ -29,21 +31,24 @@ const Movies = ({ showRecommendations = false }) => {
         setLoading(false)
       }
     }
-    fetchHomeData()
+
+    fetchMoviesData()
     return () => controller.abort()
   }, [])
 
-  const isEmpty = !loading && !error && (!collections || Object.values(collections).every(arr => arr.length === 0))
+
+  const isEmpty = !loading && !error && (!collections || !collections.collections || collections.collections.length === 0)
 
   return (
     <div className="container">
       {loading && <p>Loading...</p>}
       {error && <h2 className="h3">{error}</h2>}
-      {isEmpty && <h2 className="h3">Zurzeit sind keine Filmdaten vorhanden.</h2>}
-{!loading && !error && collections && (
-        <Collections 
-          tmdbCollections={collections} 
-          showRecommendations={showRecommendations} 
+      {isEmpty && <h2 className="h3">Zurzeit sind keine Filme vorhanden.</h2>}
+    
+      {!loading && !error && collections && (
+        <Collections
+          genreCollections={collections.collections}
+          showRecommendations={showRecommendations}
         />
       )}
     </div>

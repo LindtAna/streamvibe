@@ -80,24 +80,28 @@ const CollectionSection = ({
           : movieItems.map((item, index) => (
             <MovieCard
               key={index}
-              // title={item.title}
+              // title={item.title} //optional
               imgSrc={item.poster_path}
               href={`/movie/${item.id}`}
-              // href={`/movie/${item.imdb_id}`}
               rating={{
                 value: item.rating ? (item.rating / 2) : 0,
                 label: item.rating ? item.rating.toFixed(1) : 'N/A'
               }}
-              
-             released={item.release_date || null}
-             />
+
+              released={item.release_date || null}
+            />
           ))}
       </Slider>
     </Section>
   )
 }
 
-const Collections = ({ movies = [], tmdbCollections, showRecommendations = false }) => {
+const Collections = ({
+  movies = [],
+  tmdbCollections,
+  genreCollections,
+  showRecommendations = false
+}) => {
   const { auth } = useAuth()
   const axiosPrivate = useAxiosPrivate()
   const [recommendedMovies, setRecommendedMovies] = useState([])
@@ -146,7 +150,34 @@ const Collections = ({ movies = [], tmdbCollections, showRecommendations = false
 
 
   const collectionGroups = useMemo(() => {
-    // TMDB collections
+    //Genres-Collcection TMDB für Movie-Page
+    if (genreCollections) {
+      const items = genreCollections.map(genreCollection => ({
+        title: genreCollection.genre_name,
+        movieItems: genreCollection.movies,
+        sliderParams: categorySliderParams,
+      }))
+
+      if (auth &&
+        showRecommendations &&
+        recommendationsLoaded &&
+        recommendedMovies.length > 0
+      ) {
+        items.unshift({
+          title: 'Filmempfehlungen',
+          movieItems: recommendedMovies,
+          sliderParams: categorySliderParams,
+        })
+      }
+
+      return [{
+        title: 'Filme',
+        isActive: true,
+        items,
+      }]
+    }
+
+    // Trends usw Collections für Home-Page
     if (tmdbCollections) {
       const items = [
         {
@@ -179,7 +210,7 @@ const Collections = ({ movies = [], tmdbCollections, showRecommendations = false
     const genreGroups = groupMoviesByGenre(movies)
     const items = []
 
-    // Filmempfehlungen am Anfang, falls sie geladen sind.
+    // Filmempfehlungen am Anfang, falls sie geladen sind
     if (auth &&
       showRecommendations &&
       recommendationsLoaded &&
@@ -210,7 +241,9 @@ const Collections = ({ movies = [], tmdbCollections, showRecommendations = false
       isActive: true,
       items,
     }]
-  }, [movies, auth, tmdbCollections, showRecommendations, recommendedMovies, recommendationsLoaded])
+  }, [movies, auth, tmdbCollections,
+    genreCollections, showRecommendations,
+    recommendedMovies, recommendationsLoaded])
 
   if (showRecommendations &&
     loadingRecommendations &&

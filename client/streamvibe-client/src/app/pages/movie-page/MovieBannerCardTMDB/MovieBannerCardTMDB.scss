@@ -33,16 +33,16 @@
     background-size: cover;
     background-position: center 25%;
     background-repeat: no-repeat;
-    filter: blur(8px);
+    filter: blur(5px);
     transform: scale(1.1);
     z-index: 0;
 
     @include laptop {
-      filter: blur(15px);
+      filter: blur(12px);
     }
 
     @include mobile {
-      filter: blur(8px);
+      filter: blur(5px);
       background-position: center 40%;
     }
 
@@ -53,10 +53,10 @@
 
     background: linear-gradient(
       to bottom,
-     rgb(20, 20, 20) 0%,
+     rgba(21, 21, 21, 0.632) 0%,
       rgba(20, 20, 20, 0.269) 20%,
-      rgba(20, 20, 20, 0.514) 80%,
-      rgb(20, 20, 20) 100%
+      rgba(20, 20, 20, 0.322) 80%,
+      rgba(20, 20, 20, 0.635) 100%
     );
 
     pointer-events: none;
