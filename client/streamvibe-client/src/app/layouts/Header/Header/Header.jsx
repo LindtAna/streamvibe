@@ -20,7 +20,7 @@ import SearchIcon from '../../../../assets/icons/search.svg'
 const menuItems = [
   { label: 'Home', href: '/' },
   { label: 'Filme', href: '/movies' },
-  { label: 'Serien', href: '/serial' },
+  { label: 'Serien', href: '/series' },
   { label: 'Merkliste', href: '/saved' },
   { label: 'Support', href: '/support' },
 ]

@@ -10,6 +10,7 @@ import UserLogin from './src/app/modals/Authentication/UserLogin'
 
 import HomePage from './src/app/pages/home/HomePage'
 import Movies from './src/app/pages/movies-page/Movies'
+import Series from './src/app/pages/series-page/Series'
 import Movie from './src/app/pages/movie-page/Movie'
 import SavedPage from './src/app/pages/saved-page/SavedPage'
 import SupportPage from './src/app/pages/support-page/SupportPage'
@@ -28,7 +29,7 @@ function App() {
             <Route path="/" element={<Layout />}>
               <Route path="/" element={<HomePage />} />
               <Route path="/movies" element={<Movies showRecommendations={true} />} />
-              {/* <Route path="/movie/:imdbId" element={<Movie />} /> */}
+             <Route path="/series" element={<Series showRecommendations={true} />} />
                <Route path="/movie/:tmdbId" element={<Movie />} />
               <Route path="/support" element={<SupportPage />} />
               <Route path="/login" element={<UserLogin />} />
