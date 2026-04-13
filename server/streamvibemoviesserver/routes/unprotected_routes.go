@@ -18,5 +18,6 @@ func SetupUnprotectedRoutes(router *gin.Engine, client *mongo.Client) {
 	router.GET("/home-collections", controller.GetHomeCollections(client))
 	router.GET("/movies-page-collections", controller.GetMoviesPageCollections(client))
 	router.GET("/home-collections-series", controller.GetHomeCollectionsSeries(client))
+	router.GET("/series-page-collections", controller.GetSeriesPageCollections(client))
 
 }

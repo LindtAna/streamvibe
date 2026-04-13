@@ -161,3 +161,41 @@ func ConvertToSerieDetailsResponse(tmdbSerie *models.TMDBSerieDetails, userRevie
 		UserReviews: userReviews,
 	}
 }
+
+// Abrufen von Filmen nach Genre
+func FetchTMDBSeriesByGenre(genreID int, page int) ([]models.TMDBSerieItem, error) {
+	tmdbAPIKey := os.Getenv("TMDB_API_KEY")
+	if tmdbAPIKey == "" {
+		return nil, errors.New("TMDB_API_KEY not set")
+	}
+
+	// endpoint für Serien nach Genre
+	url := fmt.Sprintf("%s/discover/tv?with_genres=%d&language=de-DE&page=%d&sort_by=popularity.desc",
+		TMDBBaseURL, genreID, page)
+
+	req, err := http.NewRequest("GET", url, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("accept", "application/json")
+	req.Header.Add("Authorization", "Bearer "+tmdbAPIKey)
+
+	client := &http.Client{Timeout: 10 * time.Second}
+	res, err := client.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	defer res.Body.Close()
+
+	if res.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("TMDB API error: status %d", res.StatusCode)
+	}
+
+	var response models.TMDBSerieListResponse
+	if err := json.NewDecoder(res.Body).Decode(&response); err != nil {
+		return nil, err
+	}
+
+	return response.Results, nil
+}

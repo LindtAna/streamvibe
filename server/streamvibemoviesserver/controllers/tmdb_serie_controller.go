@@ -103,3 +103,69 @@ func GetHomeCollectionsSeries(client *mongo.Client) gin.HandlerFunc {
 		c.JSON(http.StatusOK, response)
 	}
 }
+
+// ruft Sammlungen nach Genres für die Series-Seite ab
+func GetSeriesPageCollections(client *mongo.Client) gin.HandlerFunc {
+	return func(c *gin.Context) {
+
+		// Definierte Genres für die Series-Seite
+		selectedGenres := []struct {
+			ID   int //id from tmdb
+			Name string
+		}{
+			{10759, "Action"},
+			{16, "Animation"},
+			{35, "Komödie"},
+			{80, "Krimi"},
+			{99, "Doku"},
+			{18, "Drama"},
+			{10765, "Sci-Fi & Fantasy"},
+			{10768, "War & Politics"},
+		}
+
+		var wg sync.WaitGroup
+		collections := make([]models.GenreCollectionSeries, len(selectedGenres))
+
+		// Mutex für thread-safe Schreibvorgänge
+		var mu sync.Mutex
+
+		// Parallele Anfragen für jedes Genre
+		for i, genre := range selectedGenres {
+			wg.Add(1)
+			go func(index int, genreID int, genreName string) {
+				defer wg.Done()
+
+				items, err := utils.FetchTMDBSeriesByGenre(genreID, 1)
+				if err != nil {
+					log.Printf("Error fetching genre %s: %v", genreName, err)
+					return
+				}
+
+				// Maximal 20 Serien nehmen (tmdb standart response)
+				maxSeries := 20
+				if len(items) > maxSeries {
+					items = items[:maxSeries]
+				}
+
+				series := utils.ConvertToCollectionSerieItems(items)
+
+				mu.Lock()
+				collections[index] = models.GenreCollectionSeries{
+					GenreID:   genreID,
+					GenreName: genreName,
+					Series:    series,
+				}
+				mu.Unlock()
+			}(i, genre.ID, genre.Name)
+		}
+
+		// Warten auf alle Anfragen
+		wg.Wait()
+
+		response := models.SeriesPageCollectionsResponse{
+			Collections: collections,
+		}
+
+		c.JSON(http.StatusOK, response)
+	}
+}

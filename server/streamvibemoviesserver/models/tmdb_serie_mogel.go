@@ -81,3 +81,8 @@ type SerieDetailsResponse struct {
 	Cast             []CastInfo   `json:"cast"`
 	UserReviews      []UserReview `json:"user_reviews"`
 }
+
+type TMDBGenreSerie struct {
+	ID   int    `json:"id"`
+	Name string `json:"name"`
+}
