@@ -199,3 +199,65 @@ func FetchTMDBSeriesByGenre(genreID int, page int) ([]models.TMDBSerieItem, erro
 
 	return response.Results, nil
 }
+
+// generiert die vollständige Poster-URL
+func GetSeriePosterURL(posterPath string, size string) string {
+	if posterPath == "" {
+		return ""
+	}
+	// Verfügbare Größen: w92, w154, w185, w342, w500, w780, original
+	if size == "" {
+		size = "w500"
+	}
+	return fmt.Sprintf("%s/%s%s", TMDBImageBaseURL, size, posterPath)
+}
+
+// generiert die vollständige Profilbild-URL
+func GetSerieProfileURL(profilePath *string, size string) string {
+	if profilePath == nil || *profilePath == "" {
+		return ""
+	}
+	// Verfügbare Größen: w45, w185, h632, original
+	if size == "" {
+		size = "w185"
+	}
+	return fmt.Sprintf("%s/%s%s", TMDBImageBaseURL, size, *profilePath)
+}
+
+// sucht den Creator in der Crew
+func FindCreator(crew []models.TMDBCrewMember) *models.PersonInfo {
+	for _, member := range crew {
+		if member.Job == "Creator" || member.Job == "Executive Producer" {
+			profileURL := GetProfileURL(member.ProfilePath, "w185")
+			var profilePtr *string
+			if profileURL != "" {
+				profilePtr = &profileURL
+			}
+			return &models.PersonInfo{
+				ID:          member.ID,
+				Name:        member.Name,
+				ProfilePath: profilePtr,
+			}
+		}
+	}
+	return nil
+}
+
+// sucht den offiziellen YouTube-Trailer
+func FindSerieOfficialTrailer(videos []models.TMDBVideo) string {
+	// Zuerst nach offiziellem Trailer suchen
+	for _, video := range videos {
+		if video.Site == "YouTube" && video.Type == "Trailer" && video.Official {
+			return video.Key
+		}
+	}
+
+	// Falls kein offizieller gefunden, nach beliebigem Trailer suchen
+	for _, video := range videos {
+		if video.Site == "YouTube" && video.Type == "Trailer" {
+			return video.Key
+		}
+	}
+
+	return ""
+}

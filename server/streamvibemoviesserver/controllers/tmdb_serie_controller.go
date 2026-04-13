@@ -169,3 +169,79 @@ func GetSeriesPageCollections(client *mongo.Client) gin.HandlerFunc {
 		c.JSON(http.StatusOK, response)
 	}
 }
+
+func UserReviewSerieUpdateTMDB(client *mongo.Client) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		role, err := utils.GetRoleFromContext(c)
+		if err != nil || role != "USER" {
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "User must be authorised"})
+			return
+		}
+
+		userId, err := utils.GetUserIdFromContext(c)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "User Id not found in context"})
+			return
+		}
+
+		serieId := c.Param("tmdb_id")
+		if serieId == "" {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Serie Id required"})
+			return
+		}
+
+		var req struct {
+			Country string `json:"country" validate:"required"`
+			Rating  int    `json:"rating" validate:"required,min=1,max=5"`
+			Text    string `json:"text" validate:"required"`
+		}
+
+		if err := c.ShouldBindJSON(&req); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request body"})
+			return
+		}
+
+		var ctx, cancel = context.WithTimeout(context.Background(), 100*time.Second)
+		defer cancel()
+
+		var userCollection *mongo.Collection = database.OpenCollection("users", client)
+		var user models.User
+		err = userCollection.FindOne(ctx, bson.M{"user_id": userId}).Decode(&user)
+		if err != nil {
+			c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
+			return
+		}
+
+		newReview := models.UserReview{
+			ReviewID:  bson.NewObjectID(),
+			UserID:    userId,
+			UserName:  user.UserName,
+			Country:   req.Country,
+			Rating:    req.Rating,
+			Text:      req.Text,
+			CreatedAt: time.Now(),
+		}
+
+		// wird in der user_reviews Collection mit serie_id geschpeichert
+		var userReviewCollection *mongo.Collection = database.OpenCollection("user_reviews", client)
+
+		reviewWithSerieID := bson.M{
+			"review_id":  newReview.ReviewID,
+			"user_id":    newReview.UserID,
+			"user_name":  newReview.UserName,
+			"country":    newReview.Country,
+			"rating":     newReview.Rating,
+			"text":       newReview.Text,
+			"created_at": newReview.CreatedAt,
+			"serie_id":   serieId,
+		}
+
+		_, err = userReviewCollection.InsertOne(ctx, reviewWithSerieID)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Error saving review"})
+			return
+		}
+
+		c.JSON(http.StatusOK, newReview)
+	}
+}

@@ -86,3 +86,46 @@ type TMDBGenreSerie struct {
 	ID   int    `json:"id"`
 	Name string `json:"name"`
 }
+
+type TMDBCreditsSerie struct {
+	Cast []TMDBCastMember `json:"cast"`
+	Crew []TMDBCrewMember `json:"crew"`
+}
+
+type TMDBCastMemberSerie struct {
+	ID          int     `json:"id"`
+	Name        string  `json:"name"`
+	ProfilePath *string `json:"profile_path"`
+}
+
+type TMDBCrewMemberSerie struct {
+	ID          int     `json:"id"`
+	Name        string  `json:"name"`
+	Job         string  `json:"job"`
+	ProfilePath *string `json:"profile_path"`
+}
+
+type TMDBVideosSeries struct {
+	Results []TMDBVideo `json:"results"`
+}
+
+type TMDBVideoSerie struct {
+	Key      string `json:"key"`
+	Site     string `json:"site"`
+	Type     string `json:"type"`
+	Name     string `json:"name"`
+	Official bool   `json:"official"`
+}
+
+type PersonInfoSerie struct {
+	ID          int     `json:"id"`
+	Name        string  `json:"name"`
+	ProfilePath *string `json:"profile_path"`
+}
+
+type CastInfoSerie struct {
+	ID          int     `json:"id"`
+	Name        string  `json:"name"`
+	Character   string  `json:"character"`
+	ProfilePath *string `json:"profile_path"`
+}
