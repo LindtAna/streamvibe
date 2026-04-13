@@ -72,7 +72,7 @@ type SerieDetailsResponse struct {
 	Overview         string       `json:"overview"`
 	FirstAirDate     string       `json:"first_air_date"`
 	Status           string       `json:"status"`
-	Network          string       `json:"network"`
+	Network          *NetworkInfo `json:"network"`
 	OriginalLanguage string       `json:"original_language"`
 	Rating           float64      `json:"rating"`
 	VoteCount        int          `json:"vote_count"`
@@ -80,6 +80,11 @@ type SerieDetailsResponse struct {
 	Creator          *PersonInfo  `json:"creator"`
 	Cast             []CastInfo   `json:"cast"`
 	UserReviews      []UserReview `json:"user_reviews"`
+}
+
+type NetworkInfo struct {
+	Name     string `json:"name"`
+	LogoPath string `json:"logo_path"`
 }
 
 type TMDBGenreSerie struct {

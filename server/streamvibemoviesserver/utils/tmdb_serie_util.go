@@ -137,9 +137,21 @@ func ConvertToSerieDetailsResponse(tmdbSerie *models.TMDBSerieDetails, userRevie
 		})
 	}
 
-	network := ""
+	// network := ""
+	// if len(tmdbSerie.Networks) > 0 {
+	// 	network = tmdbSerie.Networks[0].Name
+	// }
+	var networkInfo *models.NetworkInfo
 	if len(tmdbSerie.Networks) > 0 {
-		network = tmdbSerie.Networks[0].Name
+		net := tmdbSerie.Networks[0]
+		logoURL := ""
+		if net.Logo != "" {
+			logoURL = fmt.Sprintf("%s/w154%s", TMDBImageBaseURL, net.Logo)
+		}
+		networkInfo = &models.NetworkInfo{
+			Name:     net.Name,
+			LogoPath: logoURL,
+		}
 	}
 
 	return &models.SerieDetailsResponse{
@@ -151,14 +163,14 @@ func ConvertToSerieDetailsResponse(tmdbSerie *models.TMDBSerieDetails, userRevie
 		Overview:         tmdbSerie.Overview,
 		FirstAirDate:     tmdbSerie.FirstAirDate,
 		Status:           tmdbSerie.Status,
-		Network:          network,
+		Network:          networkInfo,
 		OriginalLanguage: tmdbSerie.OriginalLanguage,
 		Rating:           tmdbSerie.VoteAverage,
 		VoteCount:        tmdbSerie.VoteCount,
 		Genres:           tmdbSerie.Genres,
-		// Creator:          FindCreator(tmdbSerie.Credits.Crew),
-		Cast:        cast,
-		UserReviews: userReviews,
+		Creator:          FindCreator(tmdbSerie.Credits.Crew),
+		Cast:             cast,
+		UserReviews:      userReviews,
 	}
 }
 
