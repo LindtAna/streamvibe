@@ -22,6 +22,8 @@ const Tabs = ({
 }) => {
   if (!items.length) return null
 
+  const isKeyboardNavigation = useRef(false)
+
   const initialIndex = items.findIndex((item) => item.isActive)
   const [activeIndex, setActiveIndex] = useState(
     initialIndex >= 0 ? initialIndex : 0
@@ -60,6 +62,7 @@ const Tabs = ({
 
   const handleKeyDown = useCallback(
     (e) => {
+      isKeyboardNavigation.current = true
       const limit = items.length - 1
       const actions = {
         ArrowLeft: () => setActiveIndex((i) => (i === 0 ? limit : i - 1)),
@@ -88,8 +91,11 @@ const Tabs = ({
   )
 
   useEffect(() => {
+  if (isKeyboardNavigation.current) {
     buttonRefs.current[activeIndex]?.focus()
-  }, [activeIndex])
+  }
+  isKeyboardNavigation.current = false
+}, [activeIndex])
 
   const baseId = getIdFromTitle(title || 'tabs')
   const navId = navigationTargetElementId || `${baseId}-navigation`
