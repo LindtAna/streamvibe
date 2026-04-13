@@ -42,7 +42,7 @@ const Series = ({ showRecommendations = false }) => {
     <div className="container">
       {loading && <p>Loading...</p>}
       {error && <h2 className="h3">{error}</h2>}
-      {isEmpty && <h2 className="h3">Zurzeit sind keine Serie vorhanden.</h2>}
+      {isEmpty && <h2 className="h4">Wir zaubern Dir die Serien gleich herbei!n.</h2>}
     
       {!loading && !error && collections && (
         <CollectionsSeries

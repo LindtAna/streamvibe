@@ -59,7 +59,7 @@ const HomePage = () => {
       <div className="container">
         {loading && <p>Loading...</p>}
         {error && <h2 className="h3">{error}</h2>}
-        {isEmpty && <h2 className="h3">Zurzeit sind keine Filmdaten vorhanden.</h2>}
+        {isEmpty && <h2 className="h4">Wir zaubern Dir die Filme gleich herbei!</h2>}
 
         {!loading && !error && movieCollections && !isMoviesEmpty && (
           <Collections

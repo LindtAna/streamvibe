@@ -1,0 +1,196 @@
+@use '../../../../styles/helpers' as *;
+
+.serie-banner-card {
+  position: relative;
+  width: 100%;
+  min-height: calc(100vh - 200px);
+  max-height: 700px;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  border: var(--border);
+
+
+  @include laptop {
+    min-height: calc(100vh - 80px);
+    max-height: 700px;
+  }
+
+  @include tablet {
+    min-height: 600px;
+    max-height: 600px;
+  }
+
+  @include mobile {
+    min-height: 500px;
+    max-height: 500px;
+  }
+
+  // Blurred background poster
+ &__background {
+    @include abs-cover;
+
+    background-size: cover;
+    background-position: center 25%;
+    background-repeat: no-repeat;
+    filter: blur(5px);
+    transform: scale(1.1);
+    z-index: 0;
+
+    @include laptop {
+      filter: blur(12px);
+    }
+
+    @include mobile {
+      filter: blur(5px);
+      background-position: center 40%;
+    }
+
+     &::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+
+    background: linear-gradient(
+      to bottom,
+     rgba(21, 21, 21, 0.632) 0%,
+      rgba(20, 20, 20, 0.269) 20%,
+      rgba(20, 20, 20, 0.322) 80%,
+      rgba(20, 20, 20, 0.635) 100%
+    );
+
+    pointer-events: none;
+  }
+  }
+
+
+  // Dark gradient overlay
+  &__overlay {
+    @include abs-cover;
+
+    background: linear-gradient(90deg,
+        rgba(20, 20, 20, 0.95) 0%,
+        rgba(20, 20, 20, 0.8) 40%,
+        rgba(20, 20, 20, 0.6) 70%,
+        rgba(20, 20, 20, 0.4) 100%);
+    z-index: 1;
+
+    @include tablet {
+      background: linear-gradient(to bottom,
+          rgba(20, 20, 20, 0.7) 0%,
+          rgba(20, 20, 20, 0.85) 50%,
+          rgba(20, 20, 20, 0.95) 100%);
+    }
+  }
+
+  // Content container - 50/50 
+  &__content {
+    position: relative;
+    z-index: 2;
+    display: grid;
+    grid-template-columns: 1fr 1fr; // 50% | 50%
+    width: 100%;
+    height: 100%;
+    align-items: center;
+
+    @include tablet {
+      grid-template-columns: 1fr;
+      grid-template-rows: auto auto;
+      gap: fluid(30, 20);
+      padding-block: fluid(40, 24);
+    }
+  }
+
+
+  &__left {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    padding: fluid(40, 20);
+
+    @include tablet {
+      padding: 0;
+      justify-content: center;
+    }
+  }
+
+  &__poster {
+    width: 100%;
+    max-width: fluid(450, 280);
+    height: auto;
+    border: var(--border);
+    border-radius: var(--border-radius-l);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+    transition: transform var(--transition-duration);
+
+    @include laptop {
+      max-width: fluid-to-laptop(380, 260);
+      border-radius: var(--border-radius-m);
+    }
+
+    @include tablet {
+      max-width: fluid(320, 200);
+    }
+
+    @include hover {
+      transform: scale(1.02);
+    }
+  }
+
+  // RIGHT HALF - Info area
+  &__right {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    gap: fluid(30, 20);
+    height: 100%;
+    padding: fluid(40, 20);
+    padding-right: fluid(60, 30);
+
+    @include tablet {
+      padding: 0;
+      align-items: center;
+      text-align: center;
+    }
+
+    @include mobile {
+      gap: fluid(20, 16);
+    }
+  }
+
+  &__title {
+    color: var(--colour-white);
+    text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.5);
+    margin: 0;
+
+    @include tablet {
+      text-align: center;
+    }
+  }
+
+  &__play-button {
+    @include tablet {
+      align-self: center;
+    }
+
+    @include mobile-s {
+      width: 200px;
+    }
+  }
+
+  &__actions {
+    display: flex;
+    align-items: center;
+    gap: fluid-to-laptop(10, 8);
+
+    @include tablet {
+      justify-content: center;
+    }
+
+    @include mobile {
+      gap: 8px;
+    }
+  }
+}

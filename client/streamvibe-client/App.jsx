@@ -12,6 +12,7 @@ import HomePage from './src/app/pages/home/HomePage'
 import Movies from './src/app/pages/movies-page/Movies'
 import Series from './src/app/pages/series-page/Series'
 import Movie from './src/app/pages/movie-page/Movie'
+import Serie from './src/app/pages/serie-page/Serie'
 import SavedPage from './src/app/pages/saved-page/SavedPage'
 import SupportPage from './src/app/pages/support-page/SupportPage'
 
@@ -31,6 +32,7 @@ function App() {
               <Route path="/movies" element={<Movies showRecommendations={true} />} />
              <Route path="/series" element={<Series showRecommendations={true} />} />
                <Route path="/movie/:tmdbId" element={<Movie />} />
+               <Route path="/serie/:tmdbId" element={<Serie />} />
               <Route path="/support" element={<SupportPage />} />
               <Route path="/login" element={<UserLogin />} />
               <Route path="/stream/:yt_id" element={<Videoplayer />} />
