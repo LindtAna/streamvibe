@@ -18,6 +18,7 @@
         @include square(fluid-to-laptop(26, 20));
 
         margin: 0;
+        flex-shrink: 0;
         background-color: var(--colour-black-06);
         border: var(--border);
         border-radius: var(--border-radius-xxxs);

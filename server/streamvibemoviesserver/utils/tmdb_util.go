@@ -7,7 +7,11 @@ import (
 	"io"
 	"net/http"
 	"os"
+	"strings"
 	"time"
+
+	"golang.org/x/text/language"
+	"golang.org/x/text/language/display"
 
 	"github.com/LindtAna/streamvibe/server/streamvibemoviesserver/models"
 )
@@ -174,14 +178,15 @@ func ConvertToMovieDetailsResponse(tmdbMovie *models.TMDBMovieDetails, userRevie
 		TrailerKey:       FindOfficialTrailer(tmdbMovie.Videos.Results),
 		Overview:         tmdbMovie.Overview,
 		ReleaseDate:      tmdbMovie.ReleaseDate,
-		OriginalLanguage: tmdbMovie.OriginalLanguage,
-		Rating:           tmdbMovie.VoteAverage,
-		VoteCount:        tmdbMovie.VoteCount,
-		Genres:           tmdbMovie.Genres,
-		Director:         FindDirector(tmdbMovie.Credits.Crew),
-		Composer:         FindComposer(tmdbMovie.Credits.Crew),
-		Cast:             cast,
-		UserReviews:      userReviews,
+		OriginalLanguage: GetFullLanguageName(tmdbMovie.OriginalLanguage),
+		// OriginalLanguage: tmdbMovie.OriginalLanguage,
+		Rating:      tmdbMovie.VoteAverage,
+		VoteCount:   tmdbMovie.VoteCount,
+		Genres:      tmdbMovie.Genres,
+		Director:    FindDirector(tmdbMovie.Credits.Crew),
+		Composer:    FindComposer(tmdbMovie.Credits.Crew),
+		Cast:        cast,
+		UserReviews: userReviews,
 	}
 }
 
@@ -274,4 +279,22 @@ func ConvertToCollectionItems(items []models.TMDBMovieItem) []models.MovieCollec
 	}
 
 	return result
+}
+
+func GetFullLanguageName(code string) string {
+	if code == "" {
+		return "N/A"
+	}
+	tag, err := language.Parse(code)
+	if err != nil {
+		return strings.ToUpper(code)
+	}
+
+	name := display.German.Tags().Name(tag)
+
+	if name != "" {
+		return strings.Title(name)
+	}
+
+	return strings.ToUpper(code)
 }

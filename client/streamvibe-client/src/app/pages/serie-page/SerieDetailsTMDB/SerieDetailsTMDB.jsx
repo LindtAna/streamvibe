@@ -76,7 +76,7 @@ const SerieDetailsTMDB = ({ tmdbId, seasons }) => {
   
   const genreNames = serie.genres?.map(g => g.name) || []
   
-  const originalLanguage = serie.original_language?.toUpperCase() || 'N/A'
+ const originalLanguage = serie.original_language || 'N/A'
 
   return (
     <section className="serie-details container" aria-labelledby={titleId}>
@@ -280,7 +280,7 @@ const SerieDetailsTMDB = ({ tmdbId, seasons }) => {
             {/* Creator */}
             {serie.creator && (
               <div className="serie-details__group">
-                <h3 className="serie-details__title">Regie</h3>
+                <h3 className="serie-details__title">Creator</h3>
                 <PersonCardTMDB
                   name={serie.creator.name}
                   imgSrc={serie.creator.profile_path || ''}

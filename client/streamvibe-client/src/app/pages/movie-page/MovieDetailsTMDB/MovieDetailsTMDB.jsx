@@ -79,7 +79,7 @@ const MovieDetailsTMDB = ({ tmdbId, seasons }) => {
   const genreNames = movie.genres?.map(g => g.name) || []
   
   // Язык оригинала
-  const originalLanguage = movie.original_language?.toUpperCase() || 'N/A'
+  const originalLanguage = movie.original_language || 'N/A'
 
   return (
     <section className="movie-details container" aria-labelledby={titleId}>

@@ -164,13 +164,14 @@ func ConvertToSerieDetailsResponse(tmdbSerie *models.TMDBSerieDetails, userRevie
 		FirstAirDate:     tmdbSerie.FirstAirDate,
 		Status:           tmdbSerie.Status,
 		Network:          networkInfo,
-		OriginalLanguage: tmdbSerie.OriginalLanguage,
-		Rating:           tmdbSerie.VoteAverage,
-		VoteCount:        tmdbSerie.VoteCount,
-		Genres:           tmdbSerie.Genres,
-		Creator:          FindCreator(tmdbSerie.Credits.Crew),
-		Cast:             cast,
-		UserReviews:      userReviews,
+		OriginalLanguage: GetFullLanguageName(tmdbSerie.OriginalLanguage),
+		// OriginalLanguage: tmdbSerie.OriginalLanguage,
+		Rating:      tmdbSerie.VoteAverage,
+		VoteCount:   tmdbSerie.VoteCount,
+		Genres:      tmdbSerie.Genres,
+		Creator:     FindCreator(tmdbSerie.Credits.Crew),
+		Cast:        cast,
+		UserReviews: userReviews,
 	}
 }
 
