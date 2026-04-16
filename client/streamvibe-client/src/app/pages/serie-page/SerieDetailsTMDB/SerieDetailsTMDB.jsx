@@ -37,7 +37,7 @@ const SerieDetailsTMDB = ({ tmdbId, seasons }) => {
       try {
         setLoading(true)
         const serieData = await apiService.getSerieById(tmdbId)
-        
+
         setSerie(serieData)
         setUserReviews(serieData?.user_reviews || [])
       } catch (err) {
@@ -71,12 +71,12 @@ const SerieDetailsTMDB = ({ tmdbId, seasons }) => {
 
 
   const releaseYear = serie.first_air_date ? new Date(serie.first_air_date).getFullYear() : 'N/A'
-  
+
   const tmdbRating = serie.rating ? parseFloat(serie.rating.toFixed(1)) : 0
-  
+
   const genreNames = serie.genres?.map(g => g.name) || []
-  
- const originalLanguage = serie.original_language || 'N/A'
+
+  const originalLanguage = serie.original_language || 'N/A'
 
   return (
     <section className="serie-details container" aria-labelledby={titleId}>
@@ -85,7 +85,7 @@ const SerieDetailsTMDB = ({ tmdbId, seasons }) => {
       </h2>
 
       <div className="serie-details__main">
-  
+
         {/* Description */}
         <div className="serie-details__panel serie-details__panel--description-tablet-order">
           <div className="serie-details__group">
@@ -128,7 +128,9 @@ const SerieDetailsTMDB = ({ tmdbId, seasons }) => {
                 <PersonCardTMDB
                   key={index}
                   imgSrc={castMember.profile_path || ''}
-                  imgAlt={`${castMember.name} als ${castMember.character}`}
+                  imgAlt={castMember.name}
+                  name={castMember.name}
+                  hideNameText={true}
                 />
               ))}
             </Slider>
@@ -139,7 +141,7 @@ const SerieDetailsTMDB = ({ tmdbId, seasons }) => {
         <div className="movie-details__panel movie-details__panel--large-gap-y">
           <header className="movie-details__panel-header">
             <h3 className="movie-details__title">Bewertungen</h3>
-            
+
             <Button
               mode="black-08"
               iconSrc={PlusIcon}
@@ -213,34 +215,34 @@ const SerieDetailsTMDB = ({ tmdbId, seasons }) => {
               </div>
             </div>
 
-             {/* Status */}
+            {/* Status */}
             <div className="serie-details__group">
               <h3 className="serie-details__title">
                 <Icon iconName="genres" src={GenresIcon} />
                 <span>Status</span>
               </h3>
               <div className="serie-details__description">
-                  {serie.status || 'N/A'}
+                {serie.status || 'N/A'}
               </div>
             </div>
-{/* Network / Sender */}
+            {/* Network / Sender */}
             <div className="serie-details__group">
               <h3 className="serie-details__title">
                 <Icon iconName="genres" src={GenresIcon} />
                 <span>Sender</span>
               </h3>
               <div className="serie-details__description">
-      
-                  {serie.network && serie.network.logo_path ? (
-                    <img 
-                      src={serie.network.logo_path} 
-                      alt={serie.network.name} 
-                      title={serie.network.name}
-                      style={{ maxHeight: '30px', objectFit: 'contain' }} 
-                    />
-                  ) : (
-                    serie.network?.name || 'N/A'
-                  )}
+
+                {serie.network && serie.network.logo_path ? (
+                  <img
+                    src={serie.network.logo_path}
+                    alt={serie.network.name}
+                    title={serie.network.name}
+                    style={{ maxHeight: '30px', objectFit: 'contain' }}
+                  />
+                ) : (
+                  serie.network?.name || 'N/A'
+                )}
               </div>
             </div>
 

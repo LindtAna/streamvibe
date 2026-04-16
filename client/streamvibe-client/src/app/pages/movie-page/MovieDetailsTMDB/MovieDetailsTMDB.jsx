@@ -140,9 +140,9 @@ const MovieDetailsTMDB = ({ tmdbId, seasons }) => {
                 <PersonCardTMDB
                   key={index}
                   imgSrc={castMember.profile_path || ''}
-                  imgAlt={`${castMember.name} als ${castMember.character}`}
-                  // name={castMember.name}
-                  // subtitle={castMember.character}
+                  imgAlt={castMember.name}
+                  name={castMember.name}
+                  hideNameText={true}
                 />
               ))}
             </Slider>

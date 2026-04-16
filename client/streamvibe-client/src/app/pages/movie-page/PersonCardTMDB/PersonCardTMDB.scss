@@ -24,6 +24,8 @@
             width: fluid(102, 70);
             border: 1px solid transparent;
             border-radius: var(--border-radius-l);
+            aspect-ratio: 400 / 471;
+            object-fit: cover;
             transition-duration: var(--transition-duration);
 
             @include laptop {
