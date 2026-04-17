@@ -118,7 +118,7 @@ func ConvertToCollectionSerieItems(items []models.TMDBSerieItem) []models.SerieC
 func ConvertToSerieDetailsResponse(tmdbSerie *models.TMDBSerieDetails, userReviews []models.UserReview) *models.SerieDetailsResponse {
 	// Cast konvertieren (nur die ersten 12 Schauspieler)
 	cast := make([]models.CastInfo, 0)
-	maxCast := 12
+	maxCast := 25
 	if len(tmdbSerie.Credits.Cast) < maxCast {
 		maxCast = len(tmdbSerie.Credits.Cast)
 	}
@@ -165,13 +165,12 @@ func ConvertToSerieDetailsResponse(tmdbSerie *models.TMDBSerieDetails, userRevie
 		Status:           tmdbSerie.Status,
 		Network:          networkInfo,
 		OriginalLanguage: GetFullLanguageName(tmdbSerie.OriginalLanguage),
-		// OriginalLanguage: tmdbSerie.OriginalLanguage,
-		Rating:      tmdbSerie.VoteAverage,
-		VoteCount:   tmdbSerie.VoteCount,
-		Genres:      tmdbSerie.Genres,
-		Creator:     FindCreator(tmdbSerie.Credits.Crew),
-		Cast:        cast,
-		UserReviews: userReviews,
+		Rating:           tmdbSerie.VoteAverage,
+		VoteCount:        tmdbSerie.VoteCount,
+		Genres:           tmdbSerie.Genres,
+		Creator:          FindCreator(tmdbSerie.Credits.Crew),
+		Cast:             cast,
+		UserReviews:      userReviews,
 	}
 }
 

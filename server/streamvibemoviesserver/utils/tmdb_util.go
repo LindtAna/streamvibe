@@ -151,7 +151,7 @@ func FindOfficialTrailer(videos []models.TMDBVideo) string {
 func ConvertToMovieDetailsResponse(tmdbMovie *models.TMDBMovieDetails, userReviews []models.UserReview) *models.MovieDetailsResponse {
 	// Cast konvertieren (nur die ersten 12 Schauspieler)
 	cast := make([]models.CastInfo, 0)
-	maxCast := 12
+	maxCast := 25
 	if len(tmdbMovie.Credits.Cast) < maxCast {
 		maxCast = len(tmdbMovie.Credits.Cast)
 	}
@@ -179,14 +179,13 @@ func ConvertToMovieDetailsResponse(tmdbMovie *models.TMDBMovieDetails, userRevie
 		Overview:         tmdbMovie.Overview,
 		ReleaseDate:      tmdbMovie.ReleaseDate,
 		OriginalLanguage: GetFullLanguageName(tmdbMovie.OriginalLanguage),
-		// OriginalLanguage: tmdbMovie.OriginalLanguage,
-		Rating:      tmdbMovie.VoteAverage,
-		VoteCount:   tmdbMovie.VoteCount,
-		Genres:      tmdbMovie.Genres,
-		Director:    FindDirector(tmdbMovie.Credits.Crew),
-		Composer:    FindComposer(tmdbMovie.Credits.Crew),
-		Cast:        cast,
-		UserReviews: userReviews,
+		Rating:           tmdbMovie.VoteAverage,
+		VoteCount:        tmdbMovie.VoteCount,
+		Genres:           tmdbMovie.Genres,
+		Director:         FindDirector(tmdbMovie.Credits.Crew),
+		Composer:         FindComposer(tmdbMovie.Credits.Crew),
+		Cast:             cast,
+		UserReviews:      userReviews,
 	}
 }
 
