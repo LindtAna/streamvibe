@@ -37,5 +37,12 @@ export const apiService = {
   async getSeriesPageCollections(options = {}) {
     const response = await api.get('/series-page-collections', options)
     return response.data
+  },
+
+   async searchTMDB(query, page = 1) {
+    const response = await api.get('/search', {
+      params: { q: query, page }
+    })
+    return response.data
   }
 }

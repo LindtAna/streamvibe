@@ -1,7 +1,7 @@
 import './Header.scss'
 
 import { useState, useEffect, useRef, useCallback } from 'react'
-import { useNavigate, Link } from 'react-router-dom'
+import { useNavigate, Link, useLocation } from 'react-router-dom'
 import classNames from 'classnames'
 
 import useAuth from '../../../../hooks/useAuth'
@@ -12,6 +12,7 @@ import UserLogin from '../../../modals/Authentication/UserLogin'
 
 import BurgerButton from '../BurgerButton'
 import Logo from '../Logo'
+import SearchBar from '../SearchBar'
 
 import LoginIcon from '../../../../assets/icons/login.svg'
 import LogoutIcon from '../../../../assets/icons/logout.svg'
@@ -24,111 +25,121 @@ const menuItems = [
   { label: 'Merkliste', href: '/saved' },
   { label: 'Support', href: '/support' },
 ]
-// isOpen steuert dialog[open] und die is-active-Klasse des Burger-Menüs
-// Schließen per Escape (ein einziger Handler für beide Modalfenster)
-// Schließen beim Klick auf den Backdrop
-// Fokus-Management beim Öffnen/Schließen
+
 const Header = ({ url, isFixed }) => {
   const [isOpen, setIsOpen] = useState(false)
   const [isLoginOpen, setIsLoginOpen] = useState(false)
+  const [isSearchOpen, setIsSearchOpen] = useState(false)
 
   const { auth, setAuth } = useAuth()
+  
   const dialogRef = useRef(null)
   const loginDialogRef = useRef(null)
   const burgerRef = useRef(null)
   const loginButtonRef = useRef(null)
+  const searchButtonRef = useRef(null)
 
+  const location = useLocation()
   const navigate = useNavigate()
 
-  const isAnyModalOpen = isOpen || isLoginOpen
+  const isAnyModalOpen = isOpen || isLoginOpen || isSearchOpen
 
-  //useEffect für Scroll-Lock
   useEffect(() => {
-    const menuDialog = dialogRef.current
-    const loginDialog = loginDialogRef.current
     document.documentElement.classList.toggle('is-lock', isAnyModalOpen)
-    // Den open-Attributwert für jedes Dialog-Element separat setzen
-    if (menuDialog) menuDialog.open = isOpen
-    if (loginDialog) loginDialog.open = isLoginOpen
-
     return () => {
       document.documentElement.classList.remove('is-lock')
     }
-  }, [isAnyModalOpen, isOpen, isLoginOpen])
+  }, [isAnyModalOpen])
 
-  //useEffect für Escape handler
+ 
   useEffect(() => {
-    if (!isAnyModalOpen) return
+    const menuDialog = dialogRef.current
+    if (!menuDialog) return
 
-    const handleKeyDown = (e) => {
-      if (e.key === 'Escape') {
-        if (isLoginOpen) {
-          closeLogin()
-        } else if (isOpen) {
-          close()
-        }
-      }
+    if (isOpen && !menuDialog.open) {
+      menuDialog.showModal()
+    } else if (!isOpen && menuDialog.open) {
+      menuDialog.close()
     }
+  }, [isOpen])
 
-    document.addEventListener('keydown', handleKeyDown)
-    return () => document.removeEventListener('keydown', handleKeyDown)
-  }, [isAnyModalOpen, isLoginOpen, isOpen])
+  useEffect(() => {
+    const loginDialog = loginDialogRef.current
+    if (!loginDialog) return
 
-  const handleDialogClick = useCallback((e) => {
-    if (e.target === dialogRef.current) close()
-  }, [])
+    if (isLoginOpen && !loginDialog.open) {
+      loginDialog.showModal()
+    } else if (!isLoginOpen && loginDialog.open) {
+      loginDialog.close()
+    }
+  }, [isLoginOpen])
 
-  const handleLoginDialogClick = useCallback((e) => {
-    if (e.target === loginDialogRef.current) closeLogin()
-  }, [])
+  useEffect(() => {
+    if (location.pathname !== '/search') {
+      setIsSearchOpen(false);
+    }
+  }, [location.pathname]);
 
-  const open = useCallback(() => setIsOpen(true), [])
 
-  const close = useCallback(() => {
+  // HANDLERS
+  const closeMenu = useCallback(() => {
     setIsOpen(false)
     burgerRef.current?.focus()
   }, [])
 
-  const toggle = useCallback(() => {
+  const toggleMenu = useCallback(() => {
     setIsOpen((prev) => !prev)
   }, [])
 
   const openLogin = useCallback(() => {
     setIsOpen(false)
-    requestAnimationFrame(() => {
-      setIsLoginOpen(true)
-    })
+    setIsLoginOpen(true)
   }, [])
-
 
   const closeLogin = useCallback(() => {
     setIsLoginOpen(false)
     loginButtonRef.current?.focus()
   }, [])
 
-  ///LOGOUT////////////
-  const handleLogout = async () => {
+  const openSearch = useCallback(() => {
+    setIsOpen(false)
+    setIsSearchOpen(true)
+  }, [])
+
+  const closeSearch = useCallback(() => {
+    setIsSearchOpen(false)
+    searchButtonRef.current?.focus()
+  }, [])
+
+  const handleLogout = useCallback(async () => {
     try {
-      const response = await axiosClient.post('/logout', {user_id: auth.user_id})
-      setAuth(null)
+      await axiosClient.post('/logout', { user_id: auth.user_id })
     } catch (err) {
       console.error('Logout error:', err)
     } finally {
+      setAuth(null)
       setIsOpen(false)
       navigate('/')
     }
-  }
+  }, [auth, setAuth, navigate])
 
-  return (
+  const handleDialogBackdropClick = useCallback((e, closeFunc) => {
+    if (e.target === e.currentTarget) {
+      closeFunc()
+    }
+  }, [])
+
+  
+ return (
     <header className={classNames('header', { 'is-fixed': isFixed })}>
       <div className="header__inner container">
         <Logo className="header__logo" loading="eager" />
 
-        {/* Overlay-Menü (mobil + Desktop-actions) */}
         <dialog
           className="header__overlay-menu-dialog"
           ref={dialogRef}
-          onClick={handleDialogClick}
+          onClick={(e) => handleDialogBackdropClick(e, closeMenu)}
+          onClose={closeMenu}
         >
           <nav className="header__menu">
             <ul className="header__menu-list">
@@ -139,7 +150,7 @@ const Header = ({ url, isFixed }) => {
                       'is-active': href === url,
                     })}
                     to={href}
-                    onClick={close}
+                    onClick={closeMenu}
                   >
                     {label}
                   </Link>
@@ -148,7 +159,6 @@ const Header = ({ url, isFixed }) => {
             </ul>
           </nav>
 
-          {/* Aktionsbuttons (Search + User Login/Logout) */}
           <div className="header__actions">
             <Button
               className="header__button"
@@ -157,7 +167,8 @@ const Header = ({ url, isFixed }) => {
               mode="transparent"
               iconSrc={SearchIcon}
               iconName="search"
-              onClick={close}
+              onClick={openSearch}
+              extraAttrs={{ ref: searchButtonRef }}
             />
 
             <Button
@@ -176,16 +187,19 @@ const Header = ({ url, isFixed }) => {
         <BurgerButton
           className="header__burger-button visible-tablet"
           isActive={isOpen}
-          onClick={toggle}
+          onClick={toggleMenu}
           ref={burgerRef}
         />
       </div>
 
-      {/* Login-Modal */}
+      {/* SearchBar теперь только для ввода и редиректа */}
+      <SearchBar isOpen={isSearchOpen} onClose={closeSearch} />
+
       <dialog
         className="header__login-dialog"
         ref={loginDialogRef}
-        onClick={handleLoginDialogClick}
+        onClick={(e) => handleDialogBackdropClick(e, closeLogin)}
+        onClose={closeLogin}
       >
         <div className="header__login-content">
           <UserLogin onClose={closeLogin} />

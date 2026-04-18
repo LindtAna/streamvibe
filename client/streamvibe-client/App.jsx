@@ -15,6 +15,9 @@ import Movie from './src/app/pages/movie-page/Movie'
 import Serie from './src/app/pages/serie-page/Serie'
 import SavedPage from './src/app/pages/saved-page/SavedPage'
 import SupportPage from './src/app/pages/support-page/SupportPage'
+import SearchPage from './src/app/pages/search-page/SearchPage'
+
+
 
 import Videoplayer from './src/app/components/Videoplayer/Videoplayer'
 
@@ -30,13 +33,15 @@ function App() {
             <Route path="/" element={<Layout />}>
               <Route path="/" element={<HomePage />} />
               <Route path="/movies" element={<Movies showRecommendations={true} />} />
-             <Route path="/series" element={<Series showRecommendations={true} />} />
-               <Route path="/movie/:tmdbId" element={<Movie />} />
-               <Route path="/serie/:tmdbId" element={<Serie />} />
+              <Route path="/series" element={<Series showRecommendations={true} />} />
+              <Route path="/movie/:tmdbId" element={<Movie />} />
+              <Route path="/serie/:tmdbId" element={<Serie />} />
               <Route path="/support" element={<SupportPage />} />
               <Route path="/login" element={<UserLogin />} />
               <Route path="/stream/:yt_id" element={<Videoplayer />} />
-               <Route path="/saved" element={<SavedPage />} />
+              <Route path="/saved" element={<SavedPage />} />
+
+              <Route path="/search" element={<SearchPage />} />
 
               {/* Protected */}
               <Route path="/" element={<RequiredAuth />}>
