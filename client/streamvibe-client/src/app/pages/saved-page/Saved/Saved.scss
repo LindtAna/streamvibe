@@ -3,9 +3,15 @@
   
 
   &__title {
-    margin-bottom: fluid(40, 24);
+    margin-bottom: fluid(20, 20);
     color: var(--colour-white);
   }
+
+  &__category-title{
+    margin-block: fluid(20, 10);
+    color: var(--colour-white);
+  }
+
 
   &__empty {
     display: grid;
