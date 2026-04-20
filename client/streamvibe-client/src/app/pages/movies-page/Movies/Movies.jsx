@@ -17,7 +17,7 @@ const Movies = ({ showRecommendations = false }) => {
     const fetchMoviesData = async () => {
       setLoading(true)
       try {
-        // Для страницы Movies используем новый эндпоинт с жанрами
+
         const data = await apiService.getMoviesPageCollections({
           signal: controller.signal
         })

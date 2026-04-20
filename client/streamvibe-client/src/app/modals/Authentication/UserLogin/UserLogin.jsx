@@ -1,7 +1,7 @@
 import './UserLogin.scss'
 
 import { useState, useEffect } from 'react'
-import { useLocation, useNavigate} from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 
 import axiosClient from '../../../../api/axiosConfig'
 import useAuth from '../../../../hooks/useAuth'
@@ -16,7 +16,7 @@ import Tags from '../../../components/Tags'
 const UserLogin = ({ onClose }) => {
   const titleId = 'user-login-title'
 
-  const {setAuth} = useAuth()
+  const { setAuth } = useAuth()
   const [mode, setMode] = useState("login")
 
   const [formData, setFormData] = useState({
@@ -28,14 +28,18 @@ const UserLogin = ({ onClose }) => {
   })
 
   const genresOptions = [
-  { value: 'Comedy', isSelected: true },
-  { value: 'Drama' },
-  { value: 'Action' },
-  { value: 'Horror' },
-  { value: 'Romantik' },
-  { value: 'Sci-Fi' },
-  { value: 'Fantasy' },
-]
+    { value: 'Animation', isSelected: true },
+    { value: 'Action' },
+    { value: 'Doku' },
+    { value: 'Fantasy' },
+    { value: 'Komödie' },
+    { value: 'Krimi' },
+    { value: 'Science Fiction' },
+    { value: 'Drama' },
+    { value: 'Thriller' },
+    { value: 'Horror' },
+
+  ]
 
   const [favouriteGenres, setFavouriteGenres] = useState([])
 
@@ -48,27 +52,27 @@ const UserLogin = ({ onClose }) => {
   const from = location.state?.from?.pathname || "/"
 
   useEffect(() => {
-  if (success) {
-    const timer = setTimeout(() => setSuccess(null), 1500)
-    return () => clearTimeout(timer)
-  }
-}, [success])
+    if (success) {
+      const timer = setTimeout(() => setSuccess(null), 1500)
+      return () => clearTimeout(timer)
+    }
+  }, [success])
 
 
-///CHECKBOX////////////
+  ///CHECKBOX////////////
   const handleChange = (field) => (e) => {
-  const { type, checked, value } = e.target
-  setFormData(prev => ({
-    ...prev,
-    [field]: type === 'checkbox' ? checked : value
-  }))
-}
+    const { type, checked, value } = e.target
+    setFormData(prev => ({
+      ...prev,
+      [field]: type === 'checkbox' ? checked : value
+    }))
+  }
 
-///GENRES////////////
+  ///GENRES////////////
   const handleGenreSelect = (genre) => {
     setFavouriteGenres(prev =>
-  prev.includes(genre) ? prev : [...prev, genre]
-)
+      prev.includes(genre) ? prev : [...prev, genre]
+    )
   }
 
   const handleRemoveGenre = (genre) => {
@@ -102,7 +106,7 @@ const UserLogin = ({ onClose }) => {
     }
   }
 
-///LOGIN//////////// handleLogout ist in Komponente Header.jsx
+  ///LOGIN//////////// handleLogout ist in Komponente Header.jsx
   const handleLogin = async () => {
 
     if (!formData.email || !formData.password) {
@@ -231,7 +235,7 @@ const UserLogin = ({ onClose }) => {
       setLoading(false);
     }
   };
- 
+
 
   return (
     <form className="user-login__form" onSubmit={handleSubmit} noValidate>

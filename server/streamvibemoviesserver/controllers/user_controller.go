@@ -13,6 +13,7 @@ import (
 	"github.com/go-playground/validator/v10"
 	"go.mongodb.org/mongo-driver/v2/bson"
 	"go.mongodb.org/mongo-driver/v2/mongo"
+	"go.mongodb.org/mongo-driver/v2/mongo/options"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -275,4 +276,53 @@ func RefreshTokenHandler(client *mongo.Client) gin.HandlerFunc {
 
 		c.JSON(http.StatusOK, gin.H{"message": "Tokens refreshed"})
 	}
+}
+
+func GetUsersFavouriteGenres(userId string, c *gin.Context, client *mongo.Client) ([]string, error) {
+
+	var ctx, cancel = context.WithTimeout(c, 100*time.Second)
+	defer cancel()
+
+	filter := bson.D{{Key: "user_id", Value: userId}} //bson.D is a slice(dynamic wrapper over an array) that stores fields strictly in the specified order
+
+	projection := bson.M{
+		"favourite_genres.genre_name": 1,
+		"_id":                         0,
+	}
+
+	opts := options.FindOne().SetProjection(projection)
+	var result bson.M
+
+	var userCollection *mongo.Collection = database.OpenCollection("users", client)
+	err := userCollection.FindOne(ctx, filter, opts).Decode(&result)
+
+	if err != nil {
+
+		if err == mongo.ErrNoDocuments {
+			return []string{}, nil
+		}
+		return nil, err
+	}
+
+	favGenresArray, ok := result["favourite_genres"].(bson.A) //bson.A = slice([]interface{}), which stores array elements from MongoDB
+
+	if !ok {
+		return []string{}, nil
+	}
+	var genreNames []string
+
+	for _, item := range favGenresArray {
+		if genreMap, ok := item.(bson.D); ok {
+			for _, elem := range genreMap {
+				if elem.Key == "genre_name" {
+					if name, ok := elem.Value.(string); ok {
+						genreNames = append(genreNames, name)
+					}
+				}
+			}
+		}
+	}
+
+	return genreNames, nil
+
 }

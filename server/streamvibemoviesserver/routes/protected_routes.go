@@ -15,13 +15,14 @@ func SetupProtectedRoutes(router *gin.Engine, client *mongo.Client) {
 
 	// protected.GET("/movie/:imdb_id", controller.GetMovie(client))
 	// protected.POST("/addmovie", controller.AddMovie(client))
-	protected.GET("/recommendedmovies", controller.GetRecommendedMovies(client))
 
 	protected.PATCH("/updatereview/:imdb_id", controller.AdminReviewUpdate(client))
-	// protected.POST("/addreview/:imdb_id", controller.UserReviewUpdate(client))
 	protected.POST("/addreview/:tmdb_id", controller.UserReviewUpdateTMDB(client))
 
 	protected.POST("/watchlist/:tmdb_id", controller.AddToWatchList(client))
 	protected.DELETE("/watchlist/:tmdb_id", controller.RemoveFromWatchlist(client))
 	protected.GET("/watchlist", controller.GetWatchlist(client))
+
+	protected.GET("/recommendedmovies", controller.GetRecommendedMoviesTMDB(client))
+	protected.GET("/recommendedseries", controller.GetRecommendedSeriesTMDB(client))
 }

@@ -14,6 +14,7 @@ import (
 	"github.com/go-playground/validator/v10"
 	"go.mongodb.org/mongo-driver/v2/bson"
 	"go.mongodb.org/mongo-driver/v2/mongo"
+	// "go.mongodb.org/mongo-driver/v2/mongo/options"
 )
 
 var validateTMDB = validator.New()
@@ -249,5 +250,48 @@ func GetMoviesPageCollections(client *mongo.Client) gin.HandlerFunc {
 		}
 
 		c.JSON(http.StatusOK, response)
+	}
+}
+
+// generiert Film-Empfehlungen basierend auf TMDB-Daten
+// für jedes Lieblingsgenre des Benutzers werden 4 Filme abgerufen
+// 2 mit den höchsten Bewertungen (top-rated)
+// 2 die im aktuellen Monat am beliebtesten sind (popular)
+func GetRecommendedMoviesTMDB(client *mongo.Client) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		userId, err := utils.GetUserIdFromContext(c)
+
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "User Id not found in context"})
+			return
+		}
+
+		favourite_genres, err := GetUsersFavouriteGenres(userId, c, client)
+
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
+
+		// Genre-Namen zu TMDB-IDs konvertieren
+		genreIDs := utils.MapGenreNamesToTMDBIDs(favourite_genres, true)
+
+		if len(genreIDs) == 0 {
+			c.JSON(http.StatusOK, []models.MovieCollectionItem{})
+			return
+		}
+
+		// Empfehlungen von TMDB abrufen (4 Filme pro Genre)
+		recommendations, err := utils.FetchMovieRecommendationsByGenres(genreIDs)
+		if err != nil {
+			log.Printf("Error fetching movie recommendations: %v", err)
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Error fetching recommendations"})
+			return
+		}
+
+		// duplikate entfernen (falls ein Film in mehreren Genres vorkommt)
+		uniqueRecommendations := utils.DeduplicateMovies(recommendations)
+
+		c.JSON(http.StatusOK, uniqueRecommendations)
 	}
 }

@@ -245,3 +245,46 @@ func UserReviewSerieUpdateTMDB(client *mongo.Client) gin.HandlerFunc {
 		c.JSON(http.StatusOK, newReview)
 	}
 }
+
+// generiert Serien-Empfehlungen basierend auf TMDB-Daten
+// für jedes Lieblingsgenre des Benutzers werden 4 Serien abgerufen
+// 2 mit den höchsten Bewertungen (top-rated)
+// 2 die im aktuellen Jahr am beliebtesten sind (popular)
+func GetRecommendedSeriesTMDB(client *mongo.Client) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		userId, err := utils.GetUserIdFromContext(c)
+
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "User Id not found in context"})
+			return
+		}
+
+		favourite_genres, err := GetUsersFavouriteGenres(userId, c, client)
+
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
+
+		// Genre-Namen zu TMDB-IDs konvertieren
+		genreIDs := utils.MapGenreNamesToTMDBIDs(favourite_genres, false) // false = series
+
+		if len(genreIDs) == 0 {
+			c.JSON(http.StatusOK, []models.SerieCollectionItem{})
+			return
+		}
+
+		// Empfehlungen von TMDB abrufen (4 Serien pro Genre)
+		recommendations, err := utils.FetchSerieRecommendationsByGenres(genreIDs)
+		if err != nil {
+			log.Printf("Error fetching series recommendations: %v", err)
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Error fetching recommendations"})
+			return
+		}
+
+		// Duplikate entfernen (falls eine Serie in mehreren Genres vorkommt)
+		uniqueRecommendations := utils.DeduplicateSeries(recommendations)
+
+		c.JSON(http.StatusOK, uniqueRecommendations)
+	}
+}

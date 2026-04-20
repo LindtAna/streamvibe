@@ -6,7 +6,8 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"strconv"
+
+	// "strconv"
 	"strings"
 	"time"
 
@@ -19,7 +20,7 @@ import (
 	"github.com/tmc/langchaingo/llms/openai"
 	"go.mongodb.org/mongo-driver/v2/bson"
 	"go.mongodb.org/mongo-driver/v2/mongo"
-	"go.mongodb.org/mongo-driver/v2/mongo/options"
+	// "go.mongodb.org/mongo-driver/v2/mongo/options"
 )
 
 var validate = validator.New()
@@ -326,129 +327,6 @@ func GetRankings(client *mongo.Client, c *gin.Context) ([]models.Ranking, error)
 	return rankings, nil
 }
 
-func GetRecommendedMovies(client *mongo.Client) gin.HandlerFunc {
-	return func(c *gin.Context) {
-		userId, err := utils.GetUserIdFromContext(c)
-
-		if err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"error": "User Id not found in context"})
-			return
-		}
-
-		favourite_genres, err := GetUsersFavouriteGenres(userId, c, client)
-
-		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-			return
-		}
-
-		// // Wenn der Benutzer keine Fav.genres hat, wird ein leeres Array zurückgegeben
-		if len(favourite_genres) == 0 {
-			c.JSON(http.StatusOK, []models.Movie{})
-			return
-		}
-
-		err = godotenv.Load(".env")
-		if err != nil {
-			log.Println("Warning: .env file not found")
-		}
-		var recommendedMovieLimitVal int64 = 10
-
-		recommendedMovieLimitStr := os.Getenv("RECOMMENDED_MOVIE_LIMIT")
-
-		if recommendedMovieLimitStr != "" {
-			recommendedMovieLimitVal, _ = strconv.ParseInt(recommendedMovieLimitStr, 10, 64)
-		}
-
-		findOptions := options.Find()
-
-		findOptions.SetSort(bson.D{{Key: "ranking.ranking_value", Value: 1}})
-
-		findOptions.SetLimit(recommendedMovieLimitVal)
-
-		filter := bson.D{
-			{Key: "genre.genre_name", Value: bson.D{
-				{Key: "$in", Value: favourite_genres},
-			}},
-		}
-
-		var ctx, cancel = context.WithTimeout(c, 100*time.Second)
-		defer cancel()
-
-		var movieCollection *mongo.Collection = database.OpenCollection("movies", client)
-
-		cursor, err := movieCollection.Find(ctx, filter, findOptions)
-
-		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "Error fetching recommended movies"})
-			return
-		}
-		defer cursor.Close(ctx)
-
-		var recommendedMovies []models.Movie
-
-		if err := cursor.All(ctx, &recommendedMovies); err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-			return
-		}
-		// Всегда возвращаем массив, даже если он пустой
-		if recommendedMovies == nil {
-			recommendedMovies = []models.Movie{}
-		}
-
-		c.JSON(http.StatusOK, recommendedMovies)
-	}
-}
-
-func GetUsersFavouriteGenres(userId string, c *gin.Context, client *mongo.Client) ([]string, error) {
-
-	var ctx, cancel = context.WithTimeout(c, 100*time.Second)
-	defer cancel()
-
-	filter := bson.D{{Key: "user_id", Value: userId}} //bson.D is a slice(dynamic wrapper over an array) that stores fields strictly in the specified order
-
-	projection := bson.M{
-		"favourite_genres.genre_name": 1,
-		"_id":                         0,
-	}
-
-	opts := options.FindOne().SetProjection(projection)
-	var result bson.M
-
-	var userCollection *mongo.Collection = database.OpenCollection("users", client)
-	err := userCollection.FindOne(ctx, filter, opts).Decode(&result)
-
-	if err != nil {
-
-		if err == mongo.ErrNoDocuments {
-			return []string{}, nil
-		}
-		return nil, err
-	}
-
-	favGenresArray, ok := result["favourite_genres"].(bson.A) //bson.A = slice([]interface{}), which stores array elements from MongoDB
-
-	if !ok {
-		return []string{}, nil
-	}
-	var genreNames []string
-
-	for _, item := range favGenresArray {
-		if genreMap, ok := item.(bson.D); ok {
-			for _, elem := range genreMap {
-				if elem.Key == "genre_name" {
-					if name, ok := elem.Value.(string); ok {
-						genreNames = append(genreNames, name)
-					}
-				}
-			}
-		}
-	}
-
-	return genreNames, nil
-
-}
-
 func GetGenres(client *mongo.Client) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var ctx, cancel = context.WithTimeout(c, 100*time.Second)
@@ -472,3 +350,77 @@ func GetGenres(client *mongo.Client) gin.HandlerFunc {
 
 	}
 }
+
+// func GetRecommendedMovies(client *mongo.Client) gin.HandlerFunc {
+// 	return func(c *gin.Context) {
+// 		userId, err := utils.GetUserIdFromContext(c)
+
+// 		if err != nil {
+// 			c.JSON(http.StatusBadRequest, gin.H{"error": "User Id not found in context"})
+// 			return
+// 		}
+
+// 		favourite_genres, err := GetUsersFavouriteGenres(userId, c, client)
+
+// 		if err != nil {
+// 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+// 			return
+// 		}
+
+// 		// // Wenn der Benutzer keine Fav.genres hat, wird ein leeres Array zurückgegeben
+// 		if len(favourite_genres) == 0 {
+// 			c.JSON(http.StatusOK, []models.Movie{})
+// 			return
+// 		}
+
+// 		err = godotenv.Load(".env")
+// 		if err != nil {
+// 			log.Println("Warning: .env file not found")
+// 		}
+// 		var recommendedMovieLimitVal int64 = 10
+
+// 		recommendedMovieLimitStr := os.Getenv("RECOMMENDED_MOVIE_LIMIT")
+
+// 		if recommendedMovieLimitStr != "" {
+// 			recommendedMovieLimitVal, _ = strconv.ParseInt(recommendedMovieLimitStr, 10, 64)
+// 		}
+
+// 		findOptions := options.Find()
+
+// 		findOptions.SetSort(bson.D{{Key: "ranking.ranking_value", Value: 1}})
+
+// 		findOptions.SetLimit(recommendedMovieLimitVal)
+
+// 		filter := bson.D{
+// 			{Key: "genre.genre_name", Value: bson.D{
+// 				{Key: "$in", Value: favourite_genres},
+// 			}},
+// 		}
+
+// 		var ctx, cancel = context.WithTimeout(c, 100*time.Second)
+// 		defer cancel()
+
+// 		var movieCollection *mongo.Collection = database.OpenCollection("movies", client)
+
+// 		cursor, err := movieCollection.Find(ctx, filter, findOptions)
+
+// 		if err != nil {
+// 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Error fetching recommended movies"})
+// 			return
+// 		}
+// 		defer cursor.Close(ctx)
+
+// 		var recommendedMovies []models.Movie
+
+// 		if err := cursor.All(ctx, &recommendedMovies); err != nil {
+// 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+// 			return
+// 		}
+// 		// Всегда возвращаем массив, даже если он пустой
+// 		if recommendedMovies == nil {
+// 			recommendedMovies = []models.Movie{}
+// 		}
+
+// 		c.JSON(http.StatusOK, recommendedMovies)
+// 	}
+// }
