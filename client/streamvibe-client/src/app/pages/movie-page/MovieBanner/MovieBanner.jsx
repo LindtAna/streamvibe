@@ -4,7 +4,7 @@ import { apiService } from '../../../../api/api'
 
 import MovieBannerCard from '../MovieBannerCard'
 
-const MovieBanner = ({ imdbId }) => {
+const MovieBanner = ({ dbId }) => {
   const [movie, setMovie] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
@@ -13,16 +13,9 @@ const MovieBanner = ({ imdbId }) => {
     const fetchMovie = async () => {
       try {
         setLoading(true)
-
-        const movies = await apiService.getMovies()
-
-        // Wenn eine bestimmte IMDb-ID angegeben wird, wird den entsprechenden Film geladen
-        // Andernfalls werden alle Filme geladen und den ersten gewählt
-        if (imdbId) {
-          const foundMovie = movies.find(m => m.imdb_id === imdbId)
-          setMovie(foundMovie || movies[0])
-        } else {
-          setMovie(movies[0])
+        if (dbId) {
+          const movieData = await apiService.getDBMovieById(dbId)
+          setMovie(movieData)
         }
       } catch (err) {
         setError(err.message)
@@ -31,9 +24,10 @@ const MovieBanner = ({ imdbId }) => {
         setLoading(false)
       }
     }
-
-    fetchMovie()
-  }, [imdbId])
+    if (dbId) {
+      fetchMovie()
+    }
+  }, [dbId])
 
   if (loading) {
     return <div className="container">Loading...</div>
@@ -49,8 +43,7 @@ const MovieBanner = ({ imdbId }) => {
 
 
   return (
-    <MovieBannerCard
-      movie={movie} />
+    <MovieBannerCard movie={movie} />
   )
 }
 

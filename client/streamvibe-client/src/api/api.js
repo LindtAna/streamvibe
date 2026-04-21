@@ -1,18 +1,25 @@
 import api from './axiosConfig'
 
 export const apiService = {
-  async getMovies() {
-    const response = await api.get('/movies')
+
+   // Database Movies
+  async getDBMovies() {
+    const response = await api.get('/db-movies')
+    return response.data
+  },
+ 
+  async getDBMovieById(dbId) {
+    const response = await api.get(`/db-movie/${dbId}`)
     return response.data
   },
 
-  //Movies TMDB
+
+  // TMDB Movies & Series
    async getMovieById(tmdbId) {
     const response = await api.get(`/movie/${tmdbId}`)
     return response.data
   },
 
-   // Series TMDB
   async getSerieById(tmdbId) {
     const response = await api.get(`/serie/${tmdbId}`)
     return response.data

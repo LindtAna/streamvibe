@@ -10,14 +10,14 @@ import UserLogin from './src/app/modals/Authentication/UserLogin'
 
 import HomePage from './src/app/pages/home/HomePage'
 import Movies from './src/app/pages/movies-page/Movies'
-import Series from './src/app/pages/series-page/Series'
 import Movie from './src/app/pages/movie-page/Movie'
+import Series from './src/app/pages/series-page/Series'
 import Serie from './src/app/pages/serie-page/Serie'
+
 import SavedPage from './src/app/pages/saved-page/SavedPage'
-import SupportPage from './src/app/pages/support-page/SupportPage'
 import SearchPage from './src/app/pages/search-page/SearchPage'
 
-
+import SupportPage from './src/app/pages/support-page/SupportPage'
 
 import Videoplayer from './src/app/components/Videoplayer/Videoplayer'
 
@@ -29,20 +29,26 @@ function App() {
         <main>
           <Routes>
 
-            {/* Layout */}
             <Route path="/" element={<Layout />}>
               <Route path="/" element={<HomePage />} />
+
               <Route path="/movies" element={<Movies showRecommendations={true} />} />
               <Route path="/series" element={<Series showRecommendations={true} />} />
+
+               {/* Database movies */}
+              <Route path="/db-movie/:dbId" element={<Movie />} />
+
+              {/* TMDB */}
               <Route path="/movie/:tmdbId" element={<Movie />} />
               <Route path="/serie/:tmdbId" element={<Serie />} />
-              <Route path="/support" element={<SupportPage />} />
-              <Route path="/login" element={<UserLogin />} />
-              <Route path="/stream/:yt_id" element={<Videoplayer />} />
               <Route path="/saved" element={<SavedPage />} />
-
               <Route path="/search" element={<SearchPage />} />
 
+              <Route path="/stream/:yt_id" element={<Videoplayer />} />
+
+              <Route path="/login" element={<UserLogin />} />
+              <Route path="/support" element={<SupportPage />} />
+              
               {/* Protected */}
               <Route path="/" element={<RequiredAuth />}>
               </Route>

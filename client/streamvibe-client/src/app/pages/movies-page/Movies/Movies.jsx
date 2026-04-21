@@ -7,7 +7,8 @@ import Collections from '../../../components/Collections'
 
 const Movies = ({ showRecommendations = false }) => {
 
-  const [collections, setCollections] = useState(null)
+  const [tmdbCollections, setTmdbCollections] = useState(null)
+  const [dbMovies, setDbMovies] = useState([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
@@ -17,11 +18,16 @@ const Movies = ({ showRecommendations = false }) => {
     const fetchMoviesData = async () => {
       setLoading(true)
       try {
-
-        const data = await apiService.getMoviesPageCollections({
-          signal: controller.signal
-        })
-        setCollections(data)
+  const [tmdbData, dbData] = await Promise.all([
+          apiService.getMoviesPageCollections({
+            signal: controller.signal
+          }),
+          apiService.getDBMovies({
+            signal: controller.signal
+          })
+        ])
+        setTmdbCollections(tmdbData)
+        setDbMovies(dbData || [])
       } catch (err) {
         if (err.name !== 'CanceledError') {
           console.error('Fehler beim Laden der Kollektionen:', err)
@@ -31,13 +37,13 @@ const Movies = ({ showRecommendations = false }) => {
         setLoading(false)
       }
     }
-
     fetchMoviesData()
     return () => controller.abort()
   }, [])
 
-
-  const isEmpty = !loading && !error && (!collections || !collections.collections || collections.collections.length === 0)
+const isEmpty = !loading && !error && 
+    (!tmdbCollections || !tmdbCollections.collections || tmdbCollections.collections.length === 0) &&
+    (!dbMovies || dbMovies.length === 0)
 
   return (
     <div className="container">
@@ -45,9 +51,10 @@ const Movies = ({ showRecommendations = false }) => {
       {error && <h2 className="h3">{error}</h2>}
       {isEmpty && <h2 className="h4">Wir zaubern Dir die Filme gleich herbei!</h2>}
     
-      {!loading && !error && collections && (
+      {!loading && !error && (tmdbCollections || dbMovies.length > 0) && (
         <Collections
-          genreCollections={collections.collections}
+          genreCollections={tmdbCollections?.collections}
+          dbMovies={dbMovies}
           showRecommendations={showRecommendations}
         />
       )}
