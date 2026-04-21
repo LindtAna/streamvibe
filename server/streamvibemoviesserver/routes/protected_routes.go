@@ -13,10 +13,8 @@ func SetupProtectedRoutes(router *gin.Engine, client *mongo.Client) {
 
 	protected.Use(middleware.AuthMiddleware())
 
-	// protected.GET("/movie/:imdb_id", controller.GetMovie(client))
 	// protected.POST("/addmovie", controller.AddMovie(client))
 
-	protected.PATCH("/updatereview/:imdb_id", controller.AdminReviewUpdate(client))
 	protected.POST("/addreview/:tmdb_id", controller.UserReviewUpdateTMDB(client))
 
 	protected.POST("/watchlist/:tmdb_id", controller.AddToWatchList(client))
