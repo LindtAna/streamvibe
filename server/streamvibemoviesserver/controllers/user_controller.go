@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"os"
 	"time"
 
 	"github.com/LindtAna/streamvibe/server/streamvibemoviesserver/database"
@@ -17,63 +18,66 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
+// Text-Passwort mithilfe des bcrypt-Algorithmus verschlüsselt
 func HashPassword(password string) (string, error) {
 	HashPassword, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 	if err != nil {
 		return "", err
 	}
-
 	return string(HashPassword), nil
-
 }
 
+// erstellt einen neuen Benutzer in der Datenbank
 func RegisterUser(client *mongo.Client) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var user models.User
 
+		// Überprüft, ob die eingehenden JSON-Daten dem user_model entsprechen
 		if err := c.ShouldBindJSON(&user); err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid input data"})
 			return
 		}
-		validate := validator.New()
 
+		// Validiert die Struktur der Benutzerdaten
+		validate := validator.New()
 		if err := validate.Struct(user); err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": "Validation failed", "details": err.Error()})
 			return
 
 		}
 
+		// Verschlüsselt das Passwort vor dem Speichern in der Datenbank
 		hashedPassword, err := HashPassword(user.Password)
-
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Unable to hash password"})
 			return
 		}
 
-		var ctx, cancel = context.WithTimeout(context.Background(), 100*time.Second)
+		// Setzt ein Timeout für die Datenbankabfrage
+		var ctx, cancel = context.WithTimeout(context.Background(), 10*time.Second)
 		defer cancel()
 
 		var userCollection *mongo.Collection = database.OpenCollection("users", client)
 
+		// Prüft, ob bereits ein Benutzer mit dieser E-Mail-Adresse existiert
 		count, err := userCollection.CountDocuments(ctx, bson.D{{Key: "email", Value: user.Email}})
-
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to check existing user"})
 			return
 		}
-
 		if count > 0 {
 			c.JSON(http.StatusConflict, gin.H{"error": "User already exists"})
 			return
 		}
 
+		// Generiert eine neue ObjectID + Erstellungszeitstempel
 		user.UserID = bson.NewObjectID().Hex()
 		user.CreatedAt = time.Now()
 		user.UpdatedAt = time.Now()
 		user.Password = hashedPassword
 
+		// Benutzer in die Datenbank eingwfügt
 		result, err := userCollection.InsertOne(ctx, user)
-
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create user"})
 			return
@@ -84,78 +88,85 @@ func RegisterUser(client *mongo.Client) gin.HandlerFunc {
 	}
 }
 
+// authentifiziert den Benutzer und setzt JWT-Cookies
 func LoginUser(client *mongo.Client) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var userLogin models.UserLogin
-
+		//liest die Anmeldedaten aus dem Request-Body
 		if err := c.ShouldBindJSON(&userLogin); err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid input data"})
 			return
 		}
-
-		var ctx, cancel = context.WithTimeout(context.Background(), 100*time.Second)
+		var ctx, cancel = context.WithTimeout(context.Background(), 10*time.Second)
 		defer cancel()
 
 		var foundUser models.User
 		var userCollection *mongo.Collection = database.OpenCollection("users", client)
 
+		//sucht user anhand der e-mail-Adresse in der DB
 		err := userCollection.FindOne(ctx, bson.D{{Key: "email", Value: userLogin.Email}}).Decode(&foundUser)
 		if err != nil {
 			c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid email or password"})
 			return
 		}
 
+		// Vergleicht das eingegebene Passwort mit dem gespeicherten Hash
 		err = bcrypt.CompareHashAndPassword([]byte(foundUser.Password), []byte(userLogin.Password))
 		if err != nil {
 			c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid email or password"})
 			return
 		}
 
+		//Generiert neue access & refresh tokens
 		token, refreshToken, err := utils.GenerateAllTokens(foundUser.Email, foundUser.UserName, foundUser.Role, foundUser.UserID)
-
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to generate tokens"})
 			return
 		}
 
+		//aktualisiert die Tokens in der DB
 		err = utils.UpdateAllTokens(foundUser.UserID, token, refreshToken, client)
-
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update tokens"})
 			return
 		}
 
-		http.SetCookie(c.Writer, &http.Cookie{
-			Name:  "access_token",
-			Value: token,
-			Path:  "/",
-			// Domain:   "localhost",
-			MaxAge: 86400,
-			// Secure: true,
-			Secure:   false, //для локальной разработки !!!!
-			HttpOnly: true,
-			// SameSite: http.SameSiteNoneMode,
-			SameSite: http.SameSiteLaxMode, //для локальной разработки !!!!
-		})
+		// konfiguriert die Cookie-Sicherheitseinstellungen basierend auf der Umgebung (Produktion/Entwicklung)
+		isProd := os.Getenv("ENV") == "production"
 
+		sameSiteMode := http.SameSiteLaxMode
+		if isProd {
+			sameSiteMode = http.SameSiteNoneMode
+		}
+
+		// Setzt das Access-Token als HttpOnly-Cookie
 		http.SetCookie(c.Writer, &http.Cookie{
-			Name:  "refresh_token",
-			Value: refreshToken,
-			Path:  "/",
-			// Domain:   "localhost",
+			Name:     "access_token",
+			Value:    token,
+			Path:     "/",
 			MaxAge:   86400,
-			Secure:   true,
+			Secure:   isProd,
 			HttpOnly: true,
-			SameSite: http.SameSiteNoneMode,
+			SameSite: sameSiteMode,
 		})
 
+		// Setzt das Refresh-Token als HttpOnly-Cookie
+		http.SetCookie(c.Writer, &http.Cookie{
+			Name:     "refresh_token",
+			Value:    refreshToken,
+			Path:     "/",
+			MaxAge:   86400,
+			Secure:   isProd,
+			HttpOnly: true,
+			SameSite: sameSiteMode,
+		})
+
+		//sendet die Benutzerdaten (ohne sensible Informationen) an den Client zurück
 		c.JSON(http.StatusOK, models.UserResponse{
-			UserId:   foundUser.UserID,
-			UserName: foundUser.UserName,
-			Email:    foundUser.Email,
-			Role:     foundUser.Role,
-			// Token:           token,
-			// RefreshToken:    refreshToken,
+			UserId:          foundUser.UserID,
+			UserName:        foundUser.UserName,
+			Email:           foundUser.Email,
+			Role:            foundUser.Role,
 			FavouriteGenres: foundUser.FavouriteGenres,
 			Watchlist:       foundUser.Watchlist,
 		})
@@ -163,13 +174,13 @@ func LoginUser(client *mongo.Client) gin.HandlerFunc {
 	}
 }
 
+// meldet den Benutzer ab, indem die Token-Cookies und DB-inträge gelöscht werden
 func LogoutHandler(client *mongo.Client) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		// Clear the access_token cookie
 		var UserLogout struct {
 			UserId string `json:"user_id"`
 		}
-
+		// Liest die Benutzer-ID aus dem Request
 		err := c.ShouldBindJSON(&UserLogout)
 		if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request payload"})
@@ -178,42 +189,46 @@ func LogoutHandler(client *mongo.Client) gin.HandlerFunc {
 
 		fmt.Println("User ID from Logout request:", UserLogout.UserId)
 
+		// Löscht die Tokens in der DB
 		err = utils.UpdateAllTokens(UserLogout.UserId, "", "", client) // Clear tokens in the database
-
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Error logging out"})
 			return
 		}
 
+		isProd := os.Getenv("ENV") == "production"
+
+		sameSiteMode := http.SameSiteLaxMode
+		if isProd {
+			sameSiteMode = http.SameSiteNoneMode
+		}
+
+		//entfernt das Access-Token-Cookie: MaxAge wird auf -1 gesetzt
 		http.SetCookie(c.Writer, &http.Cookie{
-			Name:  "access_token",
-			Value: "",
-			Path:  "/",
-			// Domain:   "localhost",
-			MaxAge: -1,
-			// Secure: true,
-			Secure:   false, //для локальной разработки !!!!
+			Name:     "access_token",
+			Value:    "",
+			Path:     "/",
+			MaxAge:   -1,
+			Secure:   isProd,
 			HttpOnly: true,
-			// SameSite: http.SameSiteNoneMode,
-			SameSite: http.SameSiteLaxMode, //для локальной разработки !!!!
+			SameSite: sameSiteMode,
 		})
 
 		http.SetCookie(c.Writer, &http.Cookie{
-			Name:   "refresh_token",
-			Value:  "",
-			Path:   "/",
-			MaxAge: -1,
-			// Secure: true,
-			Secure:   false, //для локальной разработки !!!!
+			Name:     "refresh_token",
+			Value:    "",
+			Path:     "/",
+			MaxAge:   -1,
+			Secure:   isProd,
 			HttpOnly: true,
-			// SameSite: http.SameSiteNoneMode,
-			SameSite: http.SameSiteLaxMode, //для локальной разработки !!!!
+			SameSite: sameSiteMode,
 		})
 
 		c.JSON(http.StatusOK, gin.H{"message": "Logged out successfully"})
 	}
 }
 
+// erstellt neue Tokens, wenn das Access-Token abgelaufen ist
 func RefreshTokenHandler(client *mongo.Client) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var ctx, cancel = context.WithTimeout(c, 100*time.Second)
@@ -227,6 +242,7 @@ func RefreshTokenHandler(client *mongo.Client) gin.HandlerFunc {
 			return
 		}
 
+		// Überprüft die Gültigkeit des Refresh-Tokens
 		claim, err := utils.ValidateRefreshToken(refreshToken)
 		if err != nil || claim == nil {
 			fmt.Println("error", err.Error())
@@ -235,15 +251,16 @@ func RefreshTokenHandler(client *mongo.Client) gin.HandlerFunc {
 		}
 
 		var userCollection *mongo.Collection = database.OpenCollection("users", client)
-
 		var user models.User
-		err = userCollection.FindOne(ctx, bson.D{{Key: "user_id", Value: claim.UserId}}).Decode(&user)
 
+		// Findet den Benutzer anhand der ID aus den Token-Claims
+		err = userCollection.FindOne(ctx, bson.D{{Key: "user_id", Value: claim.UserId}}).Decode(&user)
 		if err != nil {
 			c.JSON(http.StatusUnauthorized, gin.H{"error": "User not found"})
 			return
 		}
 
+		// Generiert ein neues Token-Paar
 		newToken, newRefreshToken, _ := utils.GenerateAllTokens(user.Email, user.UserName, user.Role, user.UserID)
 		err = utils.UpdateAllTokens(user.UserID, newToken, newRefreshToken, client)
 		if err != nil {
@@ -251,40 +268,47 @@ func RefreshTokenHandler(client *mongo.Client) gin.HandlerFunc {
 			return
 		}
 
-		c.SetCookie("access_token", newToken, 86400, "/", "localhost", true, true)          //для локальной разработки !!!!
-		c.SetCookie("refresh_token", newRefreshToken, 604800, "/", "localhost", true, true) //для локальной разработки !!!!
+		isProd := os.Getenv("ENV") == "production"
 
-		// http.SetCookie(c.Writer, &http.Cookie{
-		// 	Name:     "access_token",
-		// 	Value:    newToken,
-		// 	Path:     "/",
-		// 	MaxAge:   86400,
-		// 	Secure:   true,
-		// 	HttpOnly: true,
-		// 	SameSite: http.SameSiteNoneMode,
-		// })
+		sameSiteMode := http.SameSiteLaxMode
+		if isProd {
+			sameSiteMode = http.SameSiteNoneMode
+		}
+		// Setzt die neuen Cookies im Browser des Clients
+		http.SetCookie(c.Writer, &http.Cookie{
+			Name:     "access_token",
+			Value:    newToken,
+			Path:     "/",
+			MaxAge:   86400,
+			Secure:   isProd,
+			HttpOnly: true,
+			SameSite: sameSiteMode,
+		})
 
-		// http.SetCookie(c.Writer, &http.Cookie{
-		// 	Name:     "refresh_token",
-		// 	Value:    newRefreshToken,
-		// 	Path:     "/",
-		// 	MaxAge:   604800,
-		// 	Secure:   true,
-		// 	HttpOnly: true,
-		// 	SameSite: http.SameSiteNoneMode,
-		// })
+		http.SetCookie(c.Writer, &http.Cookie{
+			Name:     "refresh_token",
+			Value:    newRefreshToken,
+			Path:     "/",
+			MaxAge:   604800,
+			Secure:   isProd,
+			HttpOnly: true,
+			SameSite: sameSiteMode,
+		})
 
 		c.JSON(http.StatusOK, gin.H{"message": "Tokens refreshed"})
 	}
 }
 
+// ruft die bevorzugten Filmgenres eines Benutzers ab
 func GetUsersFavouriteGenres(userId string, c *gin.Context, client *mongo.Client) ([]string, error) {
 
 	var ctx, cancel = context.WithTimeout(c, 100*time.Second)
 	defer cancel()
 
+	// Filtert nach der Benutzer-ID
 	filter := bson.D{{Key: "user_id", Value: userId}} //bson.D is a slice(dynamic wrapper over an array) that stores fields strictly in the specified order
 
+	// Projection schränkt die zurückgegebenen Felder ein, um Bandbreite zu sparen
 	projection := bson.M{
 		"favourite_genres.genre_name": 1,
 		"_id":                         0,
@@ -297,20 +321,20 @@ func GetUsersFavouriteGenres(userId string, c *gin.Context, client *mongo.Client
 	err := userCollection.FindOne(ctx, filter, opts).Decode(&result)
 
 	if err != nil {
-
 		if err == mongo.ErrNoDocuments {
 			return []string{}, nil
 		}
 		return nil, err
 	}
 
+	// Extrahiert das Array mit den Lieblingsgenres
 	favGenresArray, ok := result["favourite_genres"].(bson.A) //bson.A = slice([]interface{}), which stores array elements from MongoDB
-
 	if !ok {
 		return []string{}, nil
 	}
 	var genreNames []string
 
+	// Iteriert durch die BSON-Struktur, um die reinen Genrenamen als Strings zu erhalten
 	for _, item := range favGenresArray {
 		if genreMap, ok := item.(bson.D); ok {
 			for _, elem := range genreMap {
