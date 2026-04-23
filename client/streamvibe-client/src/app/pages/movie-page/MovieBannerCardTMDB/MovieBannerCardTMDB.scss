@@ -21,9 +21,9 @@
     max-height: 600px;
   }
 
-  @include mobile {
+ @include mobile {
     min-height: 500px;
-    max-height: 500px;
+    max-height: none;
   }
 
   // Blurred background poster

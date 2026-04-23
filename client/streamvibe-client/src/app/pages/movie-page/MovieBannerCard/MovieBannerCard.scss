@@ -3,64 +3,59 @@
 .movie-banner-card {
   position: relative;
   width: 100%;
-  min-height: calc(100vh - 200px);
-  max-height: 700px;
+  min-height: calc(100vh - fluid(250, 200));
+  max-height: fluid(800, 700);
   display: flex;
   align-items: center;
   overflow: hidden;
   border: var(--border);
 
-
   @include laptop {
-    min-height: calc(100vh - 80px);
-    max-height: 700px;
+    min-height: calc(100vh - fluid-to-laptop(120, 80));
+    max-height: fluid-to-laptop(750, 700);
   }
 
   @include tablet {
-    min-height: 600px;
-    max-height: 600px;
+    min-height: fluid(650, 600);
+    max-height: fluid(650, 600);
   }
 
   @include mobile {
-    min-height: 500px;
-    max-height: 500px;
+    min-height: fluid(550, 500);
+    max-height: none;
   }
 
   // Blurred background poster
- &__background {
+  &__background {
     @include abs-cover;
 
     background-size: cover;
     background-position: center 25%;
     background-repeat: no-repeat;
-    filter: blur(8px);
+    filter: blur(fluid-to-laptop(8, 5));
     transform: scale(1.1);
     z-index: 0;
 
     @include laptop {
-      filter: blur(15px);
+      filter: blur(fluid-to-laptop(14, 12));
     }
 
     @include mobile {
-      filter: blur(8px);
+      filter: blur(fluid-to-laptop(6, 5));
       background-position: center 40%;
     }
 
-     &::after {
-    content: '';
-    position: absolute;
-    inset: 0;
+    &::after {
+      @include abs-cover;
 
-    background: linear-gradient(
-      to bottom,
-     rgb(20, 20, 20) 0%,
-      rgba(20, 20, 20, 0.269) 20%,
-      rgba(20, 20, 20, 0.514) 80%,
-      rgb(20, 20, 20) 100%
-    );
-
-    pointer-events: none;
-  }
+      content: '';
+      background: linear-gradient(to bottom,
+          rgb(20, 20, 20) 0%,
+          rgba(20, 20, 20, 0.269) 20%,
+          rgba(20, 20, 20, 0.514) 80%,
+          rgb(20, 20, 20) 100%);
+      pointer-events: none;
+    }
   }
 
 
@@ -121,7 +116,7 @@
     height: auto;
     border: var(--border);
     border-radius: var(--border-radius-l);
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 fluid-to-laptop(24, 20) fluid-to-laptop(64, 60) rgba(0, 0, 0, 0.5);
     transition: transform var(--transition-duration);
 
     @include laptop {
@@ -162,7 +157,7 @@
 
   &__title {
     color: var(--colour-white);
-    text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.5);
+   text-shadow: fluid-to-laptop(3, 2) fluid-to-laptop(3, 2) fluid-to-laptop(10, 8) rgba(0, 0, 0, 0.5);
     margin: 0;
 
     @include tablet {
@@ -176,7 +171,7 @@
     }
 
     @include mobile-s {
-      width: 200px;
+     width: fluid(220, 200);
     }
   }
 
@@ -190,7 +185,7 @@
     }
 
     @include mobile {
-      gap: 8px;
+      gap: fluid-to-laptop(10, 8);
     }
   }
 }

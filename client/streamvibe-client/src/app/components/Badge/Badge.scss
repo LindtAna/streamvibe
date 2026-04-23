@@ -1,8 +1,8 @@
 .badge{
     @include flex-center(true);
 
-    column-gap: 2px;
-    padding: 6px 10px;
+    column-gap: fluid-to-laptop(4, 2);
+    padding: fluid-to-laptop(8, 6) fluid-to-laptop(12, 10);
     font-size: fluid-to-laptop(14, 12);
     font-weight: 500;
     line-height: 1;
@@ -13,7 +13,7 @@
     border-radius: 50px;
 
     @include mobile{
-        padding-inline: 8px;
+        padding-inline: fluid-to-laptop(10, 8);
     }
 
     &--red{

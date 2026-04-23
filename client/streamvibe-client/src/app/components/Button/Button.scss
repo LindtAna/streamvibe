@@ -1,7 +1,7 @@
 .button {
     @include flex-center(true);
 
-    column-gap: 4px;
+    column-gap: fluid-to-laptop(6, 4);
     padding: fluid-to-laptop(18, 14) fluid-to-laptop(24, 20);
     font-weight: 600;
     font-size: fluid-to-laptop(18, 16);
@@ -43,13 +43,13 @@
         background-color: transparent;
 
         &:has(.button__icon:only-child) {
-            @include square(44px);
+             @include square(fluid-to-laptop(50, 44));
 
             .button__icon {
                 --iconSize: #{fluid-to-laptop(34, 24)};
  //icon size mobile!!
-                @include mobile {
-                    --iconSize: #{fluid-to-laptop(50, 36)};
+                 @include mobile {
+                    --iconSize: #{fluid-to-laptop(40, 30)};
                 }
             }
         }
@@ -65,9 +65,9 @@
         border: var(--border);
 
         @include mobile {
-            padding: 8px;
-            font-size: 14px;
-            width: 160px; 
+            padding: fluid-to-laptop(10, 8);
+            font-size: fluid-to-laptop(16, 14);
+            width: fluid(180, 160);
         }
 
     }
