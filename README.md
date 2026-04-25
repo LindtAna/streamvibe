@@ -16,18 +16,19 @@ Web-Plattform zum Entdecken und Verwalten von Filmen und Serien mit personalisie
 
 ## Inhaltsverzeichnis
 
-- [Über das Projekt](#über-das-projekt)
+- [Über das Projekt](#uber-das-projekt)
 - [Features](#features)
 - [Technologie-Stack](#technologie-stack)
 - [Repository-Struktur](#repository-struktur)
 - [Umgebungsvariablen](#umgebungsvariablen)
 - [API-Dokumentation](#api-dokumentation)
-- [Datenbank-Schema](#datenbank-schema)
+- [Datenbank-Schema](#datenbank-schema-models)
 - [Architektur](#architektur)
 - [Sicherheit & Authentifizierung](#sicherheit--authentifizierung)
 - [Deployment](#deployment)
-- [UI-Design](#ui-design)
+- [UI-Design](#ui-design--design-system)
 - [Roadmap](#roadmap)
+
 
 ---
 
@@ -152,16 +153,16 @@ streamvibe/
 │   │   │   ├── useFetch.js
 │   │   │   └── useSearchCache.js
 │   │   ├── styles/             # Globale Styles & Helpers
-│   │   │   ├── helpers/
-│   │   │   │   ├── constants.scss
-│   │   │   │   ├── functions.scss
-│   │   │   │   ├── media.scss
-│   │   │   │   └── mixins.scss
-│   │   │   ├── fonts.scss
-│   │   │   ├── globals.scss
-│   │   │   ├── utils.scss
-│   │   │   ├── variables.scss
-│   │   │   └── index.scss
+│   │   │   ├── helpers/  # SCSS-Variablen, Mixins & Funktionen (generieren keinen direkten CSS-Output)
+│   │   │   │   ├── constants.scss  # Basis-Konstanten (z.B. Viewport-Breiten)
+│   │   │   │   ├── functions.scss  # Mathematische SCSS-Logik 
+│   │   │   │   ├── media.scss      # Media Query Mixins (Breakpoints) & Touch-sichere Hover-States
+│   │   │   │   └── mixins.scss     # Wiederverwendbare Layout-Bausteine
+│   │   │   ├── fonts.scss          # Lokale @font-face Einbindungen
+│   │   │   ├── globals.scss        # HTML/Body-Resets und Basis-Typografie-Regeln
+│   │   │   ├── utils.scss          # Globale CSS-Utility-Klassen
+│   │   │   ├── variables.scss      # Globale CSS Custom Properties
+│   │   │   └── index.scss          # Entry-Point: Importiert Normalisierung, bündelt SCSS-Module
 │   │   └── main.jsx            # App-Entry-Point
 │   ├── App.jsx                 # Routing-Konfiguration
 │   ├── index.html
@@ -281,7 +282,7 @@ GET  /genres                      # Alle Genre-Kategorien
 POST /support                     # Support-Anfrage erstellen
 ```
 
-#### Geschützte Endpunkte (erfordern JWT)
+### Geschützte Endpunkte (erfordern JWT)
 ```http
 POST   /addreview/:tmdb_id        # Bewertung hinzufügen
 POST   /watchlist/:tmdb_id        # Film/Serie zur Merkliste
@@ -570,32 +571,55 @@ Personalisierte Empfehlungen:
 
 ---
 
-## UI-Design
-### Design-System
-**Farben** (variables.scss):
-Primär: Graustufen von
-![Akzentfarben](https://img.shields.io/badge/--colour--black--06-%230F0F0F-darkgrey.svg)
-bis
-![Akzentfarben](https://img.shields.io/badge/--colour--gray--99-%230F0F0F-darkgrey.svg)
+## UI-Design & Design-System
 
+Das Frontend nutzt ein maßgeschneidertes, modulares SCSS-Design-System, das auf Fluid Design, Wiederverwendbarkeit und Barrierefreiheit (Accessibility) ausgelegt ist. Die Architektur basiert auf globalen CSS-Variablen kombiniert mit leistungsstarken SCSS-Mixins und -Funktionen.
 
+### Farbpalette (variables.scss):   
+Das Projekt verwendet ein systematisches Naming für Farbpaletten, das in variables.scss definiert ist:  
+Primärfarben:
+Primärfarben:
+- Hintergrund: `--colour-black-08` <span style="background-color:#141414;color:#fff;padding:2px 6px;border-radius:6px;">#141414</span>  bis  `--colour-black-15` <span style="background-color:#262626;color:#fff;padding:2px 6px;border-radius:6px;">#262626</span>  für Cards/Elemente.
+
+- Text: `--colour-white` <span style="background-color:#FFFFFF;color:#000;padding:2px 6px;border-radius:6px;border:1px solid #888;">#FFFFFF</span> für Headings, `--colour-grey-60` <span style="background-color:#999999;color:#000;padding:2px 6px;border-radius:6px;">#999999</span> für Body-Text.
+  
 Akzentfarben: 
-![Akzentfarben](https://img.shields.io/badge/--colour--red--45-%23E50000-red.svg) , 
-![Akzentfarben](https://img.shields.io/badge/--colour--red--50-%23FF0000-red.svg)
+- Rot-Skala: `--colour-red-45` <span style="background-color:#E50000;color:#fff;padding:2px 6px;border-radius:6px;">#E50000</span> bis `--colour-red-99` <span style="background-color:#FFFAFA;color:#000;padding:2px 6px;border-radius:6px;border:1px solid #888;">#FFFAFA</span>  für Hover-States, Buttons und Highlights.
+  
+Statusfarben: 
+Erfolg/Validierung: `--colour-green` <span style="background-color:#3cad40;color:#fff;padding:2px 6px;border-radius:6px;">#3cad40</span>, `--colour-green-22` <span style="background-color:#116714;color:#fff;padding:2px 6px;border-radius:6px;border:1px solid #0b4d0f;">#116714</span>.
 
-Erfolg: 
-![Erfolg](https://img.shields.io/badge/--colour--green-%233cad40-green.svg) ,
-![Erfolg](https://img.shields.io/badge/--colour--green--22-%23116714-darkgreen.svg)
+### Typografie:     
+Die Applikation nutzt Fluid Typography, berechnet durch die mathematische SCSS-Funktion clamp(). Dadurch skalieren Schriftgrößen und Abstände stufenlos zwischen den Viewports, ohne dass harte Breakpoints nötig sind.
+ - Schriftart: Manrope (Weights: 400, 500, 600, 700)
 
-**Typografie**:
-- Font: Manrope (400, 500, 600, 700)
-- Fluid Typography: fluid(max, min) für responsive Schriftgrößen
-- Breakpoints: 1440px (laptop), 1023px (tablet), 767px (mobile)
+ - Fluid Headings:
+  * h1: Skaliert von 58px (Desktop) bis 28px (Mobile)
+  * h2: Skaliert von 48px bis 24px
+  * h3: Skaliert von 38px bis 20px
 
-**Accessibility**:
+- Body Text: Skaliert fließend zwischen 18px und 14px.
+
+### Responsive Breakpoints & Media Queries:
+
+| Breakpoint       | SCSS‑Variable | Mixins (Beispiele)        |
+|------------------|--------------|----------------------------|
+| Desktop / Laptop | > 1440px     | @include laptop-above      |
+| Tablet           | <= 1023px    | @include tablet            |
+| Mobile           | <= 767px     | @include mobile, @include mobile-above |
+| Mobile Small     | <= 480px     | @include mobile-s          |
+
+
+## SCSS Utilities & Mixins:
+Die Ordnerstruktur (styles/helpers/) stellt wichtige Werkzeuge bereit, um sauberen und DRY (Don't Repeat Yourself) Code zu schreiben:
+  - @include hover: Ein intelligentes Hover-Mixin, das erkennt, ob das Gerät eine Maus unterstützt (any-hover: hover). Auf Touch-Geräten (Smartphones) fällt es automatisch auf einen :active-State zurück, um "steckengebliebene" Hover-Effekte zu vermeiden.
+  - Positionierung: Hilfs-Mixins wie @include flex-center, @include abs-center (Absolute Centering) reduzieren Boilerplate-Code.
+  - Visibility-Klassen: Hilfsklassen wie .hidden-tablet, .visible-mobile erlauben schnelles Ein- und Ausblenden von Elementen im DOM.
+
+### Accessibility:
 - Keyboard-Navigation (Tab, Arrow-Keys)
-- ARIA-Labels & Roles
-- Focus-States (@include focus-visible)
+- .visually-hidden: Ein Mixin/Klasse, um Elemente (wie Label) visuell zu verstecken, aber für Screenreader weiterhin vorlesbar zu machen.
+- Focus Management: Globale Anpassung der Focus-States (:focus-visible) mit Outline-Offset (2px dashed var(--colour-white)), um Tastaturnutzern eine klare Navigation zu ermöglichen.
 
 ---
 
