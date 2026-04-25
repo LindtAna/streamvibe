@@ -1,13 +1,14 @@
 # StreamVibe Go
 
-https://img.shields.io/badge/React-19.1.1-blue.svg
-https://img.shields.io/badge/React_Router-7.13.2-blue.svg
-https://img.shields.io/badge/Axios-1.14.0-purple.svg
-https://img.shields.io/badge/gin--gonic/gin-v1.12.0-green.svg
-https://img.shields.io/badge/golang--jwt-v5.3.1-orange.svg
-https://img.shields.io/badge/MongoDB-mongo--driver_v2.5.0-green.svg
-https://img.shields.io/badge/argon2id-secure-blue.svg
-https://img.shields.io/badge/TMDB-API-red.svg
+![React](https://img.shields.io/badge/React-19.1.1-blue.svg)
+![React Router](https://img.shields.io/badge/React_Router-7.13.2-blue.svg)
+![Axios](https://img.shields.io/badge/Axios-1.14.0-purple.svg)
+![gin-gonic/gin](https://img.shields.io/badge/gin--gonic/gin-v1.12.0-green.svg)
+![golang-jwt](https://img.shields.io/badge/golang--jwt-v5.3.1-orange.svg)
+![MongoDB](https://img.shields.io/badge/MongoDB-mongo--driver_v2.5.0-green.svg)
+![argon2id](https://img.shields.io/badge/argon2id-secure-blue.svg)
+![TMDB API](https://img.shields.io/badge/TMDB-API-red.svg)
+
 
 Web-Plattform zum Entdecken und Verwalten von Filmen und Serien mit personalisierten Empfehlungen, Suchfunktion, Merkliste und Bewertungsmöglichkeit, realisiert mit einem Go-Backend and React-Frontend.
 
@@ -201,10 +202,10 @@ streamvibe/
     ├── go.mod
     ├── go.sum
     └── main.go                 # Server-Entry-Point
+ ```
 
-    ```
 
-    ##  Umgebungsvariablen
+##  Umgebungsvariablen
 
 ### Backend (`/server/streamvibemoviesserver/.env`)
 ```env
@@ -395,31 +396,31 @@ GET    /recommendedseries         # Personalisierte Serien-Empfehlungen
                                 │
 ┌───────────────────────────────▼───────────────────────────────────┐
 │                  Backend (Go + Gin Framework)                     │
-│  ┌─────────────┐    ┌─────────────────┐    ┌─────────────┐       │
-│  │   Routes    │    │   Controllers   │    │ Middleware  │       │
-│  │             │    │                 │    │             │       │
-│  │ Unprotected:│--->│ user_controller │    │- AuthMiddle-│       │
-│  │ - /register │    │  - RegisterUser │    │  ware (JWT) │       │
-│  │ - /login    │    │  - LoginUser    │    │             │       │
-│  │ - /logout   │    │  - LogoutHandler│    │             │       │
-│  │ - /refresh  │    │  - RefreshToken │    │             │       │
-│  │             │    │                 │    │             │       │
-│  │ - /movie/:id│    │ tmdb_movie_ctrl │    │             │       │
-│  │ - /serie/:id│    │  - GetMovieTMDB │    │             │       │
-│  │ - /db-movie │    │  - GetSerieTMDB │    │             │       │
-│  │ - /search   │    │                 │    │             │       │
-│  │ - /home-... │    │ movie_controller│    │             │       │
-│  │ - /support  │    │  - GetMovies    │    │             │       │
-│  │             │    │  - GetMovie     │    │             │       │
-│  │ Protected:  │    │                 │    │             │       │
-│  │ - /addreview│    │ search_ctrl     │    │             │       │
-│  │ - /watchlist│    │  - SearchTMDB   │    │             │       │
-│  │ - /recommen-│    │                 │    │             │       │
-│  │   dedmovies │    │ watchlist_ctrl  │    │             │       │
-│  │             │    │  - AddToWatch   │    │             │       │
-│  │             │    │  - RemoveFrom   │    │             │       │
-│  │             │    │  - GetWatchlist │    │             │       │
-│  └─────────────┘    └─────────────────┘    └─────────────┘       │
+│  ┌─────────────┐    ┌─────────────────┐    ┌─────────────┐        │
+│  │   Routes    │    │   Controllers   │    │ Middleware  │        │
+│  │             │    │                 │    │             │        │
+│  │ Unprotected:│--->│ user_controller │    │- AuthMiddle-│        │
+│  │ - /register │    │  - RegisterUser │    │  ware (JWT) │        │
+│  │ - /login    │    │  - LoginUser    │    │             │        │
+│  │ - /logout   │    │  - LogoutHandler│    │             │        │
+│  │ - /refresh  │    │  - RefreshToken │    │             │        │
+│  │             │    │                 │    │             │        │
+│  │ - /movie/:id│    │ tmdb_movie_ctrl │    │             │        │
+│  │ - /serie/:id│    │  - GetMovieTMDB │    │             │        │
+│  │ - /db-movie │    │  - GetSerieTMDB │    │             │        │
+│  │ - /search   │    │                 │    │             │        │
+│  │ - /home-... │    │ movie_controller│    │             │        │
+│  │ - /support  │    │  - GetMovies    │    │             │        │
+│  │             │    │  - GetMovie     │    │             │        │
+│  │ Protected:  │    │                 │    │             │        │
+│  │ - /addreview│    │ search_ctrl     │    │             │        │
+│  │ - /watchlist│    │  - SearchTMDB   │    │             │        │
+│  │ - /recommen-│    │                 │    │             │        │
+│  │   dedmovies │    │ watchlist_ctrl  │    │             │        │
+│  │             │    │  - AddToWatch   │    │             │        │
+│  │             │    │  - RemoveFrom   │    │             │        │
+│  │             │    │  - GetWatchlist │    │             │        │
+│  └─────────────┘    └─────────────────┘    └─────────────┘        │
 │                              │                                    │
 │                              ▼                                    │
 │                    MongoDB Driver (Go)                            │
@@ -430,11 +431,11 @@ GET    /recommendedseries         # Personalisierte Serien-Empfehlungen
 │                      MongoDB Database                             │
 │                                                                   │
 │  Collections:                                                     │
-│  - users (Benutzer, JWT-Tokens, Watchlist, Genres)               │
-│  - movies (DB-Filme: Poster, Trailer, Regie, Drehbuch)           │
-│  - user_reviews (Bewertungen von Usern)                          │
-│  - support_anfrage (Support-Anfragen)                            │
-│  - rankings (AI-Review-Klassifikation, optional)                 │
+│  - users (Benutzer, JWT-Tokens, Watchlist, Genres)                │
+│  - movies (DB-Filme: Poster, Trailer, Regie, Drehbuch)            │
+│  - user_reviews (Bewertungen von Usern)                           │
+│  - support_anfrage (Support-Anfragen)                             │
+│  - rankings (AI-Review-Klassifikation, optional)                  │
 └───────────────────────────────────────────────────────────────────┘
 
 External Services:
@@ -447,31 +448,31 @@ External Services:
 
 Authentication Flow:
 ┌───────────────────────────────────────────────────────────────────┐
-│  1. User Login → Backend generiert Access Token + Refresh Token  │
-│  2. Tokens als HttpOnly Cookies gespeichert                      │
-│  3. axiosPrivate Interceptor: Auto-Refresh bei 401               │
-│  4. AuthContext speichert User-State (localStorage + State)      │
+│  1. User Login → Backend generiert Access Token + Refresh Token   │
+│  2. Tokens als HttpOnly Cookies gespeichert                       │
+│  3. axiosPrivate Interceptor: Auto-Refresh bei 401                │
+│  4. AuthContext speichert User-State (localStorage + State)       │
 └───────────────────────────────────────────────────────────────────┘
 
 Data Flow Beispiel (Film-Details abrufen):
 ┌────────────────────────────────────────────────────────────────────┐
-│ 1. User navigiert zu /movie/:tmdbId                               │
-│ 2. MovieDetailsTMDB.jsx ruft apiService.getMovieById(tmdbId)      │
-│ 3. axiosConfig sendet GET /movie/:tmdbId an Backend               │
-│ 4. Backend-Controller GetMovieTMDB:                               │
-│    - Ruft TMDB API für Filmdaten ab                               │
-│    - Holt User-Reviews aus MongoDB                                │
-│    - Konvertiert zu MovieDetailsResponse                          │
-│ 5. Frontend zeigt Film-Banner + Details + Reviews                 │
+│ 1. User navigiert zu /movie/:tmdbId                                │
+│ 2. MovieDetailsTMDB.jsx ruft apiService.getMovieById(tmdbId)       │
+│ 3. axiosConfig sendet GET /movie/:tmdbId an Backend                │
+│ 4. Backend-Controller GetMovieTMDB:                                │
+│    - Ruft TMDB API für Filmdaten ab                                │
+│    - Holt User-Reviews aus MongoDB                                 │
+│    - Konvertiert zu MovieDetailsResponse                           │
+│ 5. Frontend zeigt Film-Banner + Details + Reviews                  │
 └────────────────────────────────────────────────────────────────────┘
 
 Personalisierte Empfehlungen:
 ┌────────────────────────────────────────────────────────────────────┐
-│ 1. User hat favourite_genres bei Registrierung gewählt            │
-│ 2. Backend mappt Genre-Namen zu TMDB-Genre-IDs                    │
-│ 3. Für jedes Genre: 2× top-rated + 2× popular (aktuell)           │
-│ 4. Duplikate entfernen → Empfehlungen zurückgeben                 │
-│ 5. Frontend zeigt "Filmempfehlungen" Sektion                      │
+│ 1. User hat favourite_genres bei Registrierung gewählt             │
+│ 2. Backend mappt Genre-Namen zu TMDB-Genre-IDs                     │
+│ 3. Für jedes Genre: 2× top-rated + 2× popular (aktuell)            │
+│ 4. Duplikate entfernen → Empfehlungen zurückgeben                  │
+│ 5. Frontend zeigt "Filmempfehlungen" Sektion                       │
 └────────────────────────────────────────────────────────────────────┘
 ```
 ### Backend (Go)
@@ -575,12 +576,18 @@ Personalisierte Empfehlungen:
 ## UI-Design
 ### Design-System
 **Farben** (variables.scss):
-![Primär](https://img.shields.io/badge/Primär-Graustufen_--colour--black--06_bis_--colour--grey--99-lightgrey.svg)
+Primär: Graustufen von
+![Akzentfarben](https://img.shields.io/badge/--colour--black--06-%230F0F0F-darkgrey.svg)
+bis
+![Akzentfarben](https://img.shields.io/badge/--colour-grey-99-%23FCFCFD-lightgrey.svg)
 
-![Akzentfarben](https://img.shields.io/badge/--colour--red--45-%23E50000-red.svg)
+
+Akzentfarben: 
+![Akzentfarben](https://img.shields.io/badge/--colour--red--45-%23E50000-red.svg) , 
 ![Akzentfarben](https://img.shields.io/badge/--colour--red--50-%23FF0000-red.svg)
 
-![Erfolg](https://img.shields.io/badge/--colour--green-%233cad40-green.svg)
+Erfolg: 
+![Erfolg](https://img.shields.io/badge/--colour--green-%233cad40-green.svg) ,
 ![Erfolg](https://img.shields.io/badge/--colour--green--22-%23116714-darkgreen.svg)
 
 **Typografie**:
