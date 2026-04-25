@@ -25,6 +25,5 @@ dist-ssr
 
 
 .notes
-.env
 .env.development
 .env.production
