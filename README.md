@@ -261,6 +261,7 @@ GET /search?q=<query>&page=<n>   # Multi-Search
 ```
 
 #### Datenbank-Filme (Redaktions-Tipps)
+
 ```http
 GET  /db-movies                   # Alle DB-Filme
 GET  /db-movie/:db_id             # Einzelner DB-Film
@@ -291,88 +292,74 @@ GET    /recommendedseries         # Personalisierte Serien-Empfehlungen
 ```
 ---
 
-## Datenbank-Schema
+## Datenbank-Schema (Models)
+Die Datenbank basiert auf MongoDB. Die Datenstrukturen sind in Go wie folgt definiert:
 
-### Collections
-#### Benutzer(user_model)
+### Benutzer (User)
+Repräsentiert die registrierten Nutzer der Plattform.
 ```go
-{
-  _id: ObjectId,
-  user_id: string,              // Hex-String von ObjectId
-  user_name: string,
-  email: string,
-  password: string,             // bcrypt-Hash
-  role: "USER" | "ADMIN",
-  created_at: Date,
-  updated_at: Date,
-  token: string,                // JWT Access Token
-  refresh_token: string,        // JWT Refresh Token
-  favourite_genres: [
-    { genre_id: int, genre_name: string }
-  ],
-  watchlist: [string]           // Array von TMDB-IDs
+type User struct {
+    ID              bson.ObjectID `bson:"_id,omitempty"`
+    UserName        string        `bson:"user_name"`
+    Email           string        `bson:"email"`
+    Password        string        `bson:"password"` // bcrypt-Hash
+    Role            string        `bson:"role"`     // "ADMIN" oder "USER"
+    FavouriteGenres []Genre       `bson:"favourite_genres"`
+    Watchlist       []string      `bson:"watchlist"` // IDs von TMDB
+    Token           string        `bson:"token"`
+    RefreshToken    string        `bson:"refresh_token"`
 }
 ```
-#### Filme(movie_model) - Redaktions-Tipps
+### Redaktions-Filme (Movie)
+Interne Filmdatenbank für redaktionelle Empfehlungen.
 ```go
-{
-  db_id: string,
-  title: string,
-  poster_path: string,          // URL
-  youtube_id: string,
-  release_date: string,
-  original_language: string,
-  director: { name: string, profile_path: string },
-  screenwriter: { name: string, profile_path: string },
-  genre: [{ genre_id: int, genre_name: string }],
-  overview: string,
-  admin_review: string
+type Movie struct {
+    DbID             string        `bson:"db_id"`
+    Title            string        `bson:"title"`
+    PosterPath       string        `bson:"poster_path"`
+    YouTubeID        string        `bson:"youtube_id"`
+    Director         *PersonInfoDB `bson:"director"`
+    Screenwriter     *PersonInfoDB `bson:"screenwriter"`
+    Genre            []Genre       `bson:"genre"`
+    AdminReview      string        `bson:"admin_review"`
 }
 ```
-#### Bewertungen(UserReview)
+### Benutzerbewertungen (UserReview)
+Speichert die Bewertungen der Nutzer.
 ```go
-{
-  _id: ObjectId,
-  review_id: ObjectId,
-  user_id: string,
-  user_name: string,
-  country: string,
-  rating: int,                  // 1-5
-  text: string,
-  created_at: Date,
-  movie_id: string,             // TMDB-ID (optional)
-  serie_id: string              // TMDB-ID (optional)
+type UserReview struct {
+    ReviewID  bson.ObjectID `bson:"review_id"`
+    UserID    string        `bson:"user_id"`
+    UserName  string        `bson:"user_name"`
+    Rating    int           `bson:"rating"` // 1-5
+    Text      string        `bson:"text"`
+    CreatedAt time.Time     `bson:"created_at"`
 }
 ```
-#### Genres(Genre)
+### Genres(Genre)
 ```go
-{
-  genre_id: int,
-  genre_name: string
+type Genre struct {
+	GenreID   int    `bson:"genre_id"`
+	GenreName string `bson:"genre_name"`
 }
 ```
-#### Support Anfrage(support_model)
+### Support Anfrage(SupportRequest)
 ```go
-{
-  _id: ObjectId,
-  first_name: string,
-  last_name: string,
-  email: string,
-  phone: string,
-  message: string,
-  created_at: Date
+type SupportRequest struct {
+	ID        bson.ObjectID `bson:"_id,omitempty"`
+	FirstName string        `bson:"first_name"`
+	LastName  string        `bson:"last_name"`
+	Email     string        `bson:"email"`
+	Phone     string        `bson:"phone,omitempty"`
+	Message   string        `bson:"message"`
+	CreatedAt time.Time     `bson:"created_at"`
 }
 ```
-#### Rankings (für KI-Review-Analyse)
+### Rankings (für KI-Review-Analyse)
 ```go
-{
-  _id: ObjectId,
-  first_name: string,
-  last_name: string,
-  email: string,
-  phone: string,
-  message: string,
-  created_at: Date
+type Ranking struct {
+	RankingValue int    `bson:"ranking_value"`
+	RankingName  string `bson:"ranking_name"`
 }
 ```
 ---
@@ -589,7 +576,7 @@ Personalisierte Empfehlungen:
 Primär: Graustufen von
 ![Akzentfarben](https://img.shields.io/badge/--colour--black--06-%230F0F0F-darkgrey.svg)
 bis
-![Akzentfarben](https://img.shields.io/badge/--colour-grey-99-%23FCFCFD-lightgrey.svg)
+![Akzentfarben](https://img.shields.io/badge/--colour--gray--99-%230F0F0F-darkgrey.svg)
 
 
 Akzentfarben: 
