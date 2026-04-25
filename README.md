@@ -249,36 +249,46 @@ VITE_API_BASE_URL=http://localhost:8080
 ### Öffentliche Endpunkte
 
 #### Filme & Serien (TMDB)
-GET  /movie/:tmdb_id              # Film-Details
-GET  /serie/:tmdb_id              # Serien-Details
-GET  /home-collections            # Homepage Film-Sammlungen
-GET  /home-collections-series     # Homepage Serien-Sammlungen
-GET  /movies-page-collections     # Film-Seite nach Genres
-GET  /series-page-collections     # Serien-Seite nach Genres
-GET  /search?q=<query>&page=<n>   # Multi-Search
+
+```http
+GET /movie/:tmdb_id              # Film-Details
+GET /serie/:tmdb_id              # Serien-Details
+GET /home-collections            # Homepage Film-Sammlungen
+GET /home-collections-series     # Homepage Serien-Sammlungen
+GET /movies-page-collections     # Film-Seite nach Genres
+GET /series-page-collections     # Serien-Seite nach Genres
+GET /search?q=<query>&page=<n>   # Multi-Search
+```
 
 #### Datenbank-Filme (Redaktions-Tipps)
+```http
 GET  /db-movies                   # Alle DB-Filme
 GET  /db-movie/:db_id             # Einzelner DB-Film
+```
 
 #### Authentifizierung
+```http
 POST /register                    # Benutzerregistrierung
 POST /login                       # Login (setzt JWT-Cookies)
 POST /logout                      # Logout (löscht Cookies)
 POST /refresh                     # Token-Refresh
+```
 
 #### Sonstiges
+```http
 GET  /genres                      # Alle Genre-Kategorien
 POST /support                     # Support-Anfrage erstellen
+```
 
 #### Geschützte Endpunkte (erfordern JWT)
+```http
 POST   /addreview/:tmdb_id        # Bewertung hinzufügen
 POST   /watchlist/:tmdb_id        # Film/Serie zur Merkliste
 DELETE /watchlist/:tmdb_id        # Aus Merkliste entfernen
 GET    /watchlist                 # Merkliste abrufen
 GET    /recommendedmovies         # Personalisierte Film-Empfehlungen
 GET    /recommendedseries         # Personalisierte Serien-Empfehlungen
-
+```
 ---
 
 ## Datenbank-Schema
