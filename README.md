@@ -100,7 +100,9 @@ streamvibe/
 │   ├── public/
 │   │   └── favicons/           # App-Icons verschiedener Größen
 │   ├── src/
-│   │   ├── api/                # Axios-Konfiguration & API-Services
+│   │   ├── api/                 # API-Konfiguration & Endpunkte
+│   │   │    ├── api.js          # apiService: Zentralisierte API-Methoden(Movies, Collections)
+│   │   │    └── axiosConfig.js  # Axios-Instanz mit baseURL und Credentials-Support
 │   │   ├── app/
 │   │   │   ├── components/     # Wiederverwendbare UI-Komponenten
 │   │   │   │   ├── Badge/
@@ -148,10 +150,10 @@ streamvibe/
 │   │   │   └── (Bilder)        # Banner & andere Assets
 │   │   ├── context/            # React Context (AuthProvider)
 │   │   ├── hooks/              # Custom Hooks
-│   │   │   ├── useAuth.jsx
-│   │   │   ├── useAxiosPrivate.jsx
-│   │   │   ├── useFetch.js
-│   │   │   └── useSearchCache.js
+│   │   │   ├── useAuth.js          # Zugriff auf den AuthContext (User-Daten & Token)
+│   │   │   ├── useAxiosPrivate.js  # Automatischer Token-Refresh via Interceptors
+│   │   │   ├── useFetch.js         # Datenabfragen mit Loading- und Error-State Handling
+│   │   │   └── useSearchCache.js   # Caching für Suchergebnisse und Scroll-Position
 │   │   ├── styles/             # Globale Styles & Helpers
 │   │   │   ├── helpers/  # SCSS-Variablen, Mixins & Funktionen (generieren keinen direkten CSS-Output)
 │   │   │   │   ├── constants.scss  # Basis-Konstanten (z.B. Viewport-Breiten)
@@ -247,10 +249,30 @@ VITE_API_BASE_URL=http://localhost:8080
 
 ##  API-Dokumentation
 
-### Öffentliche Endpunkte
+### Infrastruktur & Sicherheit
+Die Kommunikation mit dem Backend erfolgt über eine zentralisierte Architektur, die Sicherheit и Performance optimiert.
 
-#### Filme & Serien (TMDB)
+#### Kommunikation & Authentifizierung
+- **Zentraler Service:** Alle Anfragen werden über den `apiService` (`api/api.js`) abgewickelt, der auf einer vorkonfigurierten Axios-Instanz basiert.
+- **Sicherheits-Interceptors:** Der Hook `useAxiosPrivate` implementiert automatisches Token-Management:
+  - Erkennt `401 Unauthorized` Fehler bei abgelaufenen Access-Tokens.
+  - Pausiert ausgehende Anfragen in einer `failedQueue`.
+  - Führt einen `/refresh` Call durch.
+  - Wiederholt alle wartenden Anfragen automatisch nach erfolgreichem Refresh.
+  - **Fallback:** Bei ungültigem Refresh-Token wird der User automatisch ausgeloggt (`auth` wird zurückgesetzt).
+- **Credentials:** Alle Anfragen werden mit `withCredentials: true` gesendet, um das sichere Handling von HTTP-only Cookies zu gewährleisten.
 
+#### Caching-Strategie
+Um die Netzwerklast zu reduzieren, wird Caching-System via `useSearchCache`genutzt:
+- **Persistence:** Speicherung im `sessionStorage` (Daten bleiben beim Tab-Wechsel/Refresh erhalten).
+- **TTL (Time-To-Live):** Cache-Einträge sind **10 Minuten** gültig.
+- **UX-Optimierung:** Neben den Daten wird die **Scroll-Position** gespeichert(z. B. beim Zurückkehren von einer Detailseite zur Ergebnisliste).
+
+### Endpunkte (Beispiele)
+
+#### Öffentliche Endpunkte
+
+Filme & Serien (TMDB)
 ```http
 GET /movie/:tmdb_id              # Film-Details
 GET /serie/:tmdb_id              # Serien-Details
@@ -261,14 +283,13 @@ GET /series-page-collections     # Serien-Seite nach Genres
 GET /search?q=<query>&page=<n>   # Multi-Search
 ```
 
-#### Datenbank-Filme (Redaktions-Tipps)
-
+Datenbank-Filme (Redaktions-Tipps)
 ```http
 GET  /db-movies                   # Alle DB-Filme
 GET  /db-movie/:db_id             # Einzelner DB-Film
 ```
 
-#### Authentifizierung
+Authentifizierung
 ```http
 POST /register                    # Benutzerregistrierung
 POST /login                       # Login (setzt JWT-Cookies)
@@ -276,13 +297,14 @@ POST /logout                      # Logout (löscht Cookies)
 POST /refresh                     # Token-Refresh
 ```
 
-#### Sonstiges
+Sonstiges
 ```http
 GET  /genres                      # Alle Genre-Kategorien
 POST /support                     # Support-Anfrage erstellen
 ```
 
-### Geschützte Endpunkte (erfordern JWT)
+#### Geschützte Endpunkte (erfordern JWT)
+
 ```http
 POST   /addreview/:tmdb_id        # Bewertung hinzufügen
 POST   /watchlist/:tmdb_id        # Film/Serie zur Merkliste
@@ -576,17 +598,16 @@ Personalisierte Empfehlungen:
 Das Frontend nutzt ein maßgeschneidertes, modulares SCSS-Design-System, das auf Fluid Design, Wiederverwendbarkeit und Barrierefreiheit (Accessibility) ausgelegt ist. Die Architektur basiert auf globalen CSS-Variablen kombiniert mit leistungsstarken SCSS-Mixins und -Funktionen.
 
 ### Farbpalette (variables.scss):   
-Das Projekt verwendet ein systematisches Naming für Farbpaletten, das in variables.scss definiert ist:  
+Das Projekt verwendet ein systematisches Naming für Farbpaletten, das in variables.scss definiert ist:   
 Primärfarben:
-Primärfarben:
-- Hintergrund: `--colour-black-08` <span style="background-color:#141414;color:#fff;padding:2px 6px;border-radius:6px;">#141414</span>  bis  `--colour-black-15` <span style="background-color:#262626;color:#fff;padding:2px 6px;border-radius:6px;">#262626</span>  für Cards/Elemente.
+- Hintergrund: `--colour-black-08` <span style="background-color:#141414;color:#fff;padding:2px 6px;border-radius:6px;">#141414</span> bis `--colour-black-15` <span style="background-color:#262626;color:#fff;padding:2px 6px;border-radius:6px;">#262626</span> für Cards/Elemente.
 
-- Text: `--colour-white` <span style="background-color:#FFFFFF;color:#000;padding:2px 6px;border-radius:6px;border:1px solid #888;">#FFFFFF</span> für Headings, `--colour-grey-60` <span style="background-color:#999999;color:#000;padding:2px 6px;border-radius:6px;">#999999</span> für Body-Text.
+- Text:  `--colour-white` <span style="background-color:#FFFFFF;color:#000;padding:2px 6px;border-radius:6px;border:1px solid #888;">#FFFFFF</span> für Headings, `--colour-grey-60` <span style="background-color:#999999;color:#000;padding:2px 6px;border-radius:6px;">#999999</span> für Body-Text.
   
 Akzentfarben: 
-- Rot-Skala: `--colour-red-45` <span style="background-color:#E50000;color:#fff;padding:2px 6px;border-radius:6px;">#E50000</span> bis `--colour-red-99` <span style="background-color:#FFFAFA;color:#000;padding:2px 6px;border-radius:6px;border:1px solid #888;">#FFFAFA</span>  für Hover-States, Buttons und Highlights.
+- Rot-Skala: `--colour-red-45` <span style="background-color:#E50000;color:#fff;padding:2px 6px;border-radius:6px;">#E50000</span> bis `--colour-red-99` <span style="background-color:#FFFAFA;color:#000;padding:2px 6px;border-radius:6px;border:1px solid #ccc;">#FFFAFA</span> für Hover-States, Buttons und Highlights.
   
-Statusfarben: 
+Statusfarben:    
 Erfolg/Validierung: `--colour-green` <span style="background-color:#3cad40;color:#fff;padding:2px 6px;border-radius:6px;">#3cad40</span>, `--colour-green-22` <span style="background-color:#116714;color:#fff;padding:2px 6px;border-radius:6px;border:1px solid #0b4d0f;">#116714</span>.
 
 ### Typografie:     
