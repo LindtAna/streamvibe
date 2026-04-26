@@ -80,7 +80,7 @@ Das Projekt kombiniert ein Go-Backend (Gin Framework) mit einem React-Frontend u
 | Gin | - | Go Web Framework |
 | MongoDB | mongo-driver v2.5.0 | Datenbank |
 | JWT | golang-jwt/jwt v5.3.1 | Authentifizierung |
-| bcrypt | golang.org/x/crypto | Passwort‑Hashing |
+| Argon2id | golang.org/x/crypto | Passwort‑Hashing |
 | CORS | gin-contrib/cors 1.7.6 | Cross‑Origin‑Konfiguration |
 | godotenv | 1.5.1 | Umgebungsvariablen |
 | validator | v10.30.1 | Validierung |
@@ -201,6 +201,9 @@ streamvibe/
     │   ├── tmdb_serie_util.go
     │   ├── tmdb_util.go
     │   └── token_util.go
+    ├── legacy/                 # Veraltete / nicht mehr verwendete Implementierungen
+    │   └── controllers/
+    │       └── user_controller_bcrypt.go
     ├── .env.example
     ├── go.mod
     ├── go.sum
@@ -307,8 +310,8 @@ POST /support                     # Support-Anfrage erstellen
 
 ```http
 POST   /addreview/:tmdb_id        # Bewertung hinzufügen
-POST   /watchlist/:tmdb_id        # Film/Serie zur Merkliste
-DELETE /watchlist/:tmdb_id        # Aus Merkliste entfernen
+POST   /watchlist/:type/:tmdb_id        # Film/Serie zur Merkliste
+DELETE /watchlist/:type/:tmdb_id        # Aus Merkliste entfernen
 GET    /watchlist                 # Merkliste abrufen
 GET    /recommendedmovies         # Personalisierte Film-Empfehlungen
 GET    /recommendedseries         # Personalisierte Serien-Empfehlungen
@@ -553,7 +556,12 @@ Personalisierte Empfehlungen:
 ### Sicherheitsmaßnahmen
 
 #### Authentifizierung & Schutz
-- **Passwort-Hashing:** bcrypt mit Default-Cost
+- **Passwort-Hashing:** Argon2id mit OWASP-konformen Parametern
+  - **Time:** 3 Iterationen
+  - **Memory:** 64 MB
+  - **Parallelism:** 4 Threads
+  - **Key Length:** 32 Bytes
+  - **Salt:** 16 Bytes (kryptographisch sicher)
 - **Protected Routes:** Middleware prüft JWT vor geschützten Endpunkten
 
 #### Sicherheit im Request-Flow
@@ -586,9 +594,9 @@ Personalisierte Empfehlungen:
 
 ### Umgebungsspezifische Konfiguration
 
-#### ![ENV=production](https://img.shields.io/badge/ENV-production-blue) aktiviert
-- ![SameSite=None](https://img.shields.io/badge/SameSite-None-blue) Cookies  
-- ![Secure](https://img.shields.io/badge/Secure-HTTPS-blue)‑Flag für HTTPS  
+#### `ENV=production` aktiviert
+- `SameSite=None` Cookies  
+- `Secure HttpOnly`‑Flag für HTTPS  
 - Strikte CORS‑Origins
 
 ---
