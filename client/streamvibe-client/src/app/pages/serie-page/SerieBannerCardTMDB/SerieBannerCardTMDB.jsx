@@ -28,7 +28,7 @@ const SerieBannerCardTMDB = ({ serie, titleId, TitleTag = 'h2' }) => {
     if (auth && auth.watchlist && serie) {
       // TMDB ID 
       const serieIdStr = String(serie.id)
-      setIsSaved(auth.watchlist.includes(serieIdStr))
+      setIsSaved(auth.watchlist.includes(`serie_${serieIdStr}`))
     }
   }, [auth, serie])
 
@@ -53,18 +53,19 @@ const SerieBannerCardTMDB = ({ serie, titleId, TitleTag = 'h2' }) => {
     setIsLoading(true)
     try {
       const serieIdStr = String(serie.id)
+      const savedItem = `serie_${serieIdStr}`
       
       if (isSaved) {
-        await axiosPrivate.delete(`/watchlist/${serieIdStr}`)
+       await axiosPrivate.delete(`/watchlist/serie/${serieIdStr}`)
         setIsSaved(false)
         
-        const updatedWatchlist = auth.watchlist.filter(id => id !== serieIdStr)
+        const updatedWatchlist = auth.watchlist.filter(id => id !== savedItem)
         setAuth({ ...auth, watchlist: updatedWatchlist })
       } else {
-        await axiosPrivate.post(`/watchlist/${serieIdStr}`)
+        await axiosPrivate.post(`/watchlist/serie/${serieIdStr}`)
         setIsSaved(true)
         
-        const updatedWatchlist = [...(auth.watchlist || []), serieIdStr]
+        const updatedWatchlist = [...(auth.watchlist || []), savedItem]
         setAuth({ ...auth, watchlist: updatedWatchlist })
       }
     } catch (error) {
