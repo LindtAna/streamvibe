@@ -17,8 +17,8 @@ func SetupProtectedRoutes(router *gin.Engine, client *mongo.Client) {
 
 	protected.POST("/addreview/:tmdb_id", controller.UserReviewUpdateTMDB(client))
 
-	protected.POST("/watchlist/:tmdb_id", controller.AddToWatchList(client))
-	protected.DELETE("/watchlist/:tmdb_id", controller.RemoveFromWatchlist(client))
+	protected.POST("/watchlist/:type/:tmdb_id", controller.AddToWatchList(client))
+	protected.DELETE("/watchlist/:type/:tmdb_id", controller.RemoveFromWatchlist(client))
 	protected.GET("/watchlist", controller.GetWatchlist(client))
 
 	protected.GET("/recommendedmovies", controller.GetRecommendedMoviesTMDB(client))
