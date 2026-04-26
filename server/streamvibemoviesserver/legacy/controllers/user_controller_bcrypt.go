@@ -1,15 +1,10 @@
-// //////// Password hashing uses Argon2 (replacing legacy bcrypt implementation) ////////////
-package controllers
+package legacycontrollers
 
 import (
 	"context"
-	"crypto/rand"
-	"crypto/subtle"
-	"encoding/base64"
 	"fmt"
 	"net/http"
 	"os"
-	"strings"
 	"time"
 
 	"github.com/LindtAna/streamvibe/server/streamvibemoviesserver/database"
@@ -19,81 +14,20 @@ import (
 	"github.com/go-playground/validator/v10"
 	"go.mongodb.org/mongo-driver/v2/bson"
 	"go.mongodb.org/mongo-driver/v2/mongo"
-	"go.mongodb.org/mongo-driver/v2/mongo/options"
-	"golang.org/x/crypto/argon2"
+	"golang.org/x/crypto/bcrypt"
 )
 
-// Argon2id-Parameter (OWASP-Empfehlungen)
-const (
-	argon2Time    = 3         // Anzahl der Iterationen
-	argon2Memory  = 64 * 1024 // Speicher in KiB (64 MB)
-	argon2Threads = 4         // Anzahl paralleler Threads
-	argon2KeyLen  = 32        // Länge des erzeugten Keys (32 Bytes)
-	saltLength    = 16        // Länge des Salts (16 Bytes)
-)
-
-// verschlüsselt ein Text-Passwort mithilfe des Argon2id-Algorithmus
-func HashPassword(password string) (string, error) {
-	// Zufälliges Salt generieren
-	salt := make([]byte, saltLength)
-	if _, err := rand.Read(salt); err != nil {
+// Text-Passwort mithilfe des bcrypt-Algorithmus verschlüsselt
+func HashPasswordBcrypt(password string) (string, error) {
+	HashPassword, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+	if err != nil {
 		return "", err
 	}
-
-	// Argon2id-Hash generieren
-	hash := argon2.IDKey([]byte(password), salt, argon2Time, argon2Memory, argon2Threads, argon2KeyLen)
-
-	// Salt und Hash im Format: $argon2id$v=19$m=65536,t=3,p=4$<salt>$<hash> kodieren
-	// Base64-Kodierung für Salt und Hash
-	b64Salt := base64.RawStdEncoding.EncodeToString(salt)
-	b64Hash := base64.RawStdEncoding.EncodeToString(hash)
-
-	// Format: $argon2id$v=19$m=memory,t=time,p=threads$salt$hash
-	encodedHash := fmt.Sprintf("$argon2id$v=%d$m=%d,t=%d,p=%d$%s$%s",
-		argon2.Version, argon2Memory, argon2Time, argon2Threads, b64Salt, b64Hash)
-
-	return encodedHash, nil
-}
-
-// vergleicht ein Klartext-Passwort mit einem gespeicherten Argon2id-Hash
-func ComparePasswordAndHash(password, encodedHash string) (bool, error) {
-	// Kodierte Hash-Teile extrahieren
-	parts := strings.Split(encodedHash, "$")
-	if len(parts) != 6 {
-		return false, fmt.Errorf("invalid hash format")
-	}
-
-	// Parameter extrahieren
-	var version int
-	var memory, time, threads uint32
-	_, err := fmt.Sscanf(parts[3], "m=%d,t=%d,p=%d", &memory, &time, &threads)
-	if err != nil {
-		return false, err
-	}
-	_, err = fmt.Sscanf(parts[2], "v=%d", &version)
-	if err != nil {
-		return false, err
-	}
-
-	// Salt und Hash dekodieren
-	salt, err := base64.RawStdEncoding.DecodeString(parts[4])
-	if err != nil {
-		return false, err
-	}
-	decodedHash, err := base64.RawStdEncoding.DecodeString(parts[5])
-	if err != nil {
-		return false, err
-	}
-
-	// Hash des eingegebenen Passworts mit denselben Parametern berechnen
-	passwordHash := argon2.IDKey([]byte(password), salt, time, memory, uint8(threads), uint32(len(decodedHash)))
-
-	// Constant-time-Vergleich (Schutz vor Timing-Attacken)
-	return subtle.ConstantTimeCompare(passwordHash, decodedHash) == 1, nil
+	return string(HashPassword), nil
 }
 
 // erstellt einen neuen Benutzer in der Datenbank
-func RegisterUser(client *mongo.Client) gin.HandlerFunc {
+func RegisterUserBcrypt(client *mongo.Client) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var user models.User
 
@@ -112,7 +46,7 @@ func RegisterUser(client *mongo.Client) gin.HandlerFunc {
 		}
 
 		// Verschlüsselt das Passwort vor dem Speichern in der Datenbank
-		hashedPassword, err := HashPassword(user.Password)
+		hashedPassword, err := HashPasswordBcrypt(user.Password)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Unable to hash password"})
 			return
@@ -141,7 +75,7 @@ func RegisterUser(client *mongo.Client) gin.HandlerFunc {
 		user.UpdatedAt = time.Now()
 		user.Password = hashedPassword
 
-		// Benutzer in die Datenbank einfügen
+		// Benutzer in die Datenbank eingwfügt
 		result, err := userCollection.InsertOne(ctx, user)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create user"})
@@ -154,7 +88,7 @@ func RegisterUser(client *mongo.Client) gin.HandlerFunc {
 }
 
 // authentifiziert den Benutzer und setzt JWT-Cookies
-func LoginUser(client *mongo.Client) gin.HandlerFunc {
+func LoginUserBcrypt(client *mongo.Client) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var userLogin models.UserLogin
 		//liest die Anmeldedaten aus dem Request-Body
@@ -175,9 +109,9 @@ func LoginUser(client *mongo.Client) gin.HandlerFunc {
 			return
 		}
 
-		// Vergleicht das eingegebene Passwort mit dem gespeicherten Argon2id-Hash
-		match, err := ComparePasswordAndHash(userLogin.Password, foundUser.Password)
-		if err != nil || !match {
+		// Vergleicht das eingegebene Passwort mit dem gespeicherten Hash
+		err = bcrypt.CompareHashAndPassword([]byte(foundUser.Password), []byte(userLogin.Password))
+		if err != nil {
 			c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid email or password"})
 			return
 		}
@@ -239,8 +173,8 @@ func LoginUser(client *mongo.Client) gin.HandlerFunc {
 	}
 }
 
-// LogoutHandler meldet den Benutzer ab, indem die Token-Cookies und DB-Einträge gelöscht werden
-func LogoutHandler(client *mongo.Client) gin.HandlerFunc {
+// meldet den Benutzer ab, indem die Token-Cookies und DB-inträge gelöscht werden
+func LogoutHandlerBcrypt(client *mongo.Client) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var UserLogout struct {
 			UserId string `json:"user_id"`
@@ -293,8 +227,8 @@ func LogoutHandler(client *mongo.Client) gin.HandlerFunc {
 	}
 }
 
-// RefreshTokenHandler erstellt neue Tokens, wenn das Access-Token abgelaufen ist
-func RefreshTokenHandler(client *mongo.Client) gin.HandlerFunc {
+// erstellt neue Tokens, wenn das Access-Token abgelaufen ist
+func RefreshTokenHandlerBcrypt(client *mongo.Client) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var ctx, cancel = context.WithTimeout(c, 100*time.Second)
 		defer cancel()
@@ -362,55 +296,4 @@ func RefreshTokenHandler(client *mongo.Client) gin.HandlerFunc {
 
 		c.JSON(http.StatusOK, gin.H{"message": "Tokens refreshed"})
 	}
-}
-
-// GetUsersFavouriteGenres ruft die bevorzugten Filmgenres eines Benutzers ab
-func GetUsersFavouriteGenres(userId string, c *gin.Context, client *mongo.Client) ([]string, error) {
-
-	var ctx, cancel = context.WithTimeout(c, 100*time.Second)
-	defer cancel()
-
-	// Filtert nach der Benutzer-ID
-	filter := bson.D{{Key: "user_id", Value: userId}} //bson.D is a slice(dynamic wrapper over an array) that stores fields strictly in the specified order
-
-	// Projection schränkt die zurückgegebenen Felder ein, um Bandbreite zu sparen
-	projection := bson.M{
-		"favourite_genres.genre_name": 1,
-		"_id":                         0,
-	}
-
-	opts := options.FindOne().SetProjection(projection)
-	var result bson.M
-
-	var userCollection *mongo.Collection = database.OpenCollection("users", client)
-	err := userCollection.FindOne(ctx, filter, opts).Decode(&result)
-
-	if err != nil {
-		if err == mongo.ErrNoDocuments {
-			return []string{}, nil
-		}
-		return nil, err
-	}
-
-	// Extrahiert das Array mit den Lieblingsgenres
-	favGenresArray, ok := result["favourite_genres"].(bson.A) //bson.A = slice([]interface{}), which stores array elements from MongoDB
-	if !ok {
-		return []string{}, nil
-	}
-	var genreNames []string
-
-	// Iteriert durch die BSON-Struktur, um die reinen Genrenamen als Strings zu erhalten
-	for _, item := range favGenresArray {
-		if genreMap, ok := item.(bson.D); ok {
-			for _, elem := range genreMap {
-				if elem.Key == "genre_name" {
-					if name, ok := elem.Value.(string); ok {
-						genreNames = append(genreNames, name)
-					}
-				}
-			}
-		}
-	}
-
-	return genreNames, nil
 }
