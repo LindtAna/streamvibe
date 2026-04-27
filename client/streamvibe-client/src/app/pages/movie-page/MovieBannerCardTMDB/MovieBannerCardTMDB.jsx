@@ -14,6 +14,7 @@ import deleteIcon from '../../../../assets/icons/delete.svg'
 import likeIcon from '../../../../assets/icons/like.svg'
 import volumeIcon from '../../../../assets/icons/volume.svg'
 import muteIcon from '../../../../assets/icons/mute.svg'
+import NoPosterIcon from '../../../../assets/icons/no-poster-reel.svg'
 
 const MovieBannerCardTMDB = ({ movie, titleId, TitleTag = 'h2' }) => {
   const { auth, setAuth } = useAuth()
@@ -76,14 +77,14 @@ const MovieBannerCardTMDB = ({ movie, titleId, TitleTag = 'h2' }) => {
   }
 
   // Backdrop oder Poster als Hintergrund
-  const backgroundImage = movie.backdrop_path || movie.poster_path
+  const backgroundImage = movie.backdrop_path || movie.poster_path || null
 
   return (
     <div className="movie-banner-card container">
       {/* Blurred background poster */}
       <div
         className="movie-banner-card__background"
-        style={{ backgroundImage: `url(${backgroundImage})` }}
+        style={backgroundImage  ? { backgroundImage: `url(${backgroundImage})` } : undefined}
         aria-hidden="true"
       />
 
@@ -94,12 +95,18 @@ const MovieBannerCardTMDB = ({ movie, titleId, TitleTag = 'h2' }) => {
       <div className="movie-banner-card__content container">
         {/* Left side - poster */}
         <div className="movie-banner-card__left">
-          <img
-            className="movie-banner-card__poster"
-            src={movie.poster_path}
-            alt={movie.title}
-            loading="eager"
-          />
+          {movie.poster_path ? (
+  <img
+    className="movie-banner-card__poster"
+    src={movie.poster_path}
+    alt={movie.title}
+    loading="eager"
+  />
+) : (
+  <div className="movie-banner-card__poster movie-banner-card__poster--fallback">
+    <img src={NoPosterIcon} alt="No poster available" />
+  </div>
+)}
         </div>
 
         {/* Right side - Movie info */}

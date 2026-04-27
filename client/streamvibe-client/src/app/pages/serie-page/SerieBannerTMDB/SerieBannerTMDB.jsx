@@ -32,7 +32,7 @@ const SerieBannerTMDB = ({ tmdbId }) => {
   }, [tmdbId])
 
   if (loading) {
-    return <div className="container">Loading...</div>
+    return <div className="container">Vorspann läuft...</div>
   }
 
   if (error) {
@@ -40,7 +40,7 @@ const SerieBannerTMDB = ({ tmdbId }) => {
   }
 
   if (!serie) {
-    return <div className="container">No serie found</div>
+    return <div className="container">Popcorn ist fertig, Serie leider nicht</div>
   }
 
   return <SerieBannerCardTMDB serie={serie} />

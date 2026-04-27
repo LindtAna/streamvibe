@@ -14,6 +14,7 @@ import deleteIcon from '../../../../assets/icons/delete.svg'
 import likeIcon from '../../../../assets/icons/like.svg'
 import volumeIcon from '../../../../assets/icons/volume.svg'
 import muteIcon from '../../../../assets/icons/mute.svg'
+import NoPosterIcon from '../../../../assets/icons/no-poster-serial.svg'
 
 const SerieBannerCardTMDB = ({ serie, titleId, TitleTag = 'h2' }) => {
   const { auth, setAuth } = useAuth()
@@ -54,17 +55,17 @@ const SerieBannerCardTMDB = ({ serie, titleId, TitleTag = 'h2' }) => {
     try {
       const serieIdStr = String(serie.id)
       const savedItem = `serie_${serieIdStr}`
-      
+
       if (isSaved) {
-       await axiosPrivate.delete(`/watchlist/serie/${serieIdStr}`)
+        await axiosPrivate.delete(`/watchlist/serie/${serieIdStr}`)
         setIsSaved(false)
-        
+
         const updatedWatchlist = auth.watchlist.filter(id => id !== savedItem)
         setAuth({ ...auth, watchlist: updatedWatchlist })
       } else {
         await axiosPrivate.post(`/watchlist/serie/${serieIdStr}`)
         setIsSaved(true)
-        
+
         const updatedWatchlist = [...(auth.watchlist || []), savedItem]
         setAuth({ ...auth, watchlist: updatedWatchlist })
       }
@@ -76,14 +77,14 @@ const SerieBannerCardTMDB = ({ serie, titleId, TitleTag = 'h2' }) => {
   }
 
   // Backdrop oder Poster als Hintergrund
-  const backgroundImage = serie.backdrop_path || serie.poster_path
+  const backgroundImage = serie.backdrop_path || serie.poster_path || null
 
   return (
     <div className="serie-banner-card container">
       {/* Blurred background poster */}
       <div
         className="serie-banner-card__background"
-        style={{ backgroundImage: `url(${backgroundImage})` }}
+        style={backgroundImage  ? { backgroundImage: `url(${backgroundImage})` } : undefined}
         aria-hidden="true"
       />
 
@@ -94,12 +95,19 @@ const SerieBannerCardTMDB = ({ serie, titleId, TitleTag = 'h2' }) => {
       <div className="serie-banner-card__content container">
         {/* Left side - poster */}
         <div className="serie-banner-card__left">
-          <img
-            className="serie-banner-card__poster"
-            src={serie.poster_path}
-            alt={serie.title}
-            loading="eager"
-          />
+
+          {serie.poster_path ? (
+            <img
+              className="serie-banner-card__poster"
+              src={serie.poster_path}
+              alt={serie.title}
+              loading="eager"
+            />
+          ) : (
+            <div className="serie-banner-card__poster serie-banner-card__poster--fallback">
+              <img src={NoPosterIcon} alt="No poster available" />
+            </div>
+          )}
         </div>
 
         {/* Right side - Serie info */}

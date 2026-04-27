@@ -58,7 +58,7 @@ const SerieDetailsTMDB = ({ tmdbId, seasons }) => {
   }
 
   if (loading) {
-    return <div className="container">Loading serie details...</div>
+    return <div className="container">Popcorn wird gepoppt...</div>
   }
 
   if (error) {
@@ -66,7 +66,7 @@ const SerieDetailsTMDB = ({ tmdbId, seasons }) => {
   }
 
   if (!serie) {
-    return <div className="container">No serie found</div>
+    return <div className="container">Popcorn ist fertig, Serie leider nicht</div>
   }
 
 

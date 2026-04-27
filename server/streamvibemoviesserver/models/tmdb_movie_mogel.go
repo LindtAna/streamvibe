@@ -89,7 +89,7 @@ type TMDBMovieListResponse struct {
 
 type TMDBMovieItem struct {
 	ID          int     `json:"id"`
-	Title       string  `json:"-"`
+	Title       string  `json:"title"`
 	PosterPath  string  `json:"poster_path"`
 	ReleaseDate string  `json:"release_date"`
 	VoteAverage float64 `json:"vote_average"`
@@ -98,7 +98,7 @@ type TMDBMovieItem struct {
 // MovieCards
 type MovieCollectionItem struct {
 	ID          int     `json:"id"`
-	Title       string  `json:"-"`
+	Title       string  `json:"title"`
 	PosterPath  string  `json:"poster_path"`
 	ReleaseDate string  `json:"release_date"`
 	Rating      float64 `json:"rating"`

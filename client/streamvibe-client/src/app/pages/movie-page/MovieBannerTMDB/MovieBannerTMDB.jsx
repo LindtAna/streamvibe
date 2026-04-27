@@ -32,7 +32,7 @@ const MovieBannerTMDB = ({ tmdbId }) => {
   }, [tmdbId])
 
   if (loading) {
-    return <div className="container">Loading...</div>
+    return <div className="container">Vorspann läuft...</div>
   }
 
   if (error) {
@@ -40,7 +40,7 @@ const MovieBannerTMDB = ({ tmdbId }) => {
   }
 
   if (!movie) {
-    return <div className="container">No movie found</div>
+    return <div className="container">Popcorn ist fertig, Film leider nicht</div>
   }
 
   return <MovieBannerCardTMDB movie={movie} />

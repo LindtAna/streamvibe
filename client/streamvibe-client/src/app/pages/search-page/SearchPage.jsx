@@ -86,7 +86,7 @@ const SearchPage = () => {
 
     return (
         <div className="search-page container">
-            {loading && <div className="search-page__loading">Laden...</div>}
+            {loading && <div className="search-page__loading">Vorspann läuft...</div>}
             {error && <div className="search-page__error">{error}</div>}
             {noResults && (
                 <div className="search-page__empty">

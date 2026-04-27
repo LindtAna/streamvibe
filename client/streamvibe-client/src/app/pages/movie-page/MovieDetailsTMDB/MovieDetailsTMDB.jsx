@@ -58,7 +58,7 @@ const MovieDetailsTMDB = ({ tmdbId, seasons }) => {
   }
 
   if (loading) {
-    return <div className="container">Loading movie details...</div>
+    return <div className="container">Popcorn wird gepoppt...</div>
   }
 
   if (error) {
@@ -66,16 +66,16 @@ const MovieDetailsTMDB = ({ tmdbId, seasons }) => {
   }
 
   if (!movie) {
-    return <div className="container">No movie found</div>
+    return <div className="container">Popcorn ist fertig, Film leider nicht</div>
   }
 
-  // Формат года из даты выхода
+ // Jahresformat ab Veröffentlichungsdatum
   const releaseYear = movie.release_date ? new Date(movie.release_date).getFullYear() : 'N/A'
   
-  // Рейтинг TMDB (округлённый до 1 знака)
+  // TMDB-Bewertung (auf 1 Dezimalstelle gerundet)
   const tmdbRating = movie.rating ? parseFloat(movie.rating.toFixed(1)) : 0
   
-  // Названия жанров
+  // Genrenamen
   const genreNames = movie.genres?.map(g => g.name) || []
   
   // Язык оригинала

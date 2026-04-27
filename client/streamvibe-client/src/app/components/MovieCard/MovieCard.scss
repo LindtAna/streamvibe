@@ -26,6 +26,42 @@
       }
     }
 
+    &__no-poster {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      row-gap: fluid(10, 8);
+      width: 100%;
+      height: fluid(420, 240);
+      padding: fluid(20, 12);
+      background-color: var(--colour-black-08);
+      border: 1px solid var(--colour-black-15);
+      border-radius: inherit;
+      
+      @include laptop {
+        height: fluid-to-laptop(380, 220);
+      }
+    }
+ 
+    &__no-poster-icon {
+      width: fluid(120, 60);
+      height: fluid(120, 60);
+      opacity: 0.5;
+    }
+ 
+    &__no-poster-title {
+      max-width: 100%;
+      color: var(--colour-grey-70);
+      font-size: fluid-to-laptop(26, 14);
+      font-weight: 700;
+      text-align: center;
+      line-height: 1.4;
+      word-wrap: break-word;
+      overflow-wrap: break-word;
+      hyphens: auto;
+    }
+
     &__body{
         display: flex;
         justify-content: space-between;

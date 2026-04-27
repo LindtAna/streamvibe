@@ -47,7 +47,7 @@ const isEmpty = !loading && !error &&
 
   return (
     <div className="container">
-      {loading && <p>Loading...</p>}
+      {loading && <p>Vorspann läuft...</p>}
       {error && <h2 className="h3">{error}</h2>}
       {isEmpty && <h2 className="h4">Wir zaubern Dir die Filme gleich herbei!</h2>}
     

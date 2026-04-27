@@ -30,7 +30,7 @@ const MovieBanner = ({ dbId }) => {
   }, [dbId])
 
   if (loading) {
-    return <div className="container">Loading...</div>
+    return <div className="container">Vorspann läuft...</div>
   }
 
   if (error) {

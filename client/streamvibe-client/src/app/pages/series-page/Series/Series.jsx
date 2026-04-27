@@ -40,7 +40,7 @@ const Series = ({ showRecommendations = false }) => {
 
   return (
     <div className="container">
-      {loading && <p>Loading...</p>}
+      {loading && <p>Vorspann läuft...</p>}
       {error && <h2 className="h3">{error}</h2>}
       {isEmpty && <h2 className="h4">Wir zaubern Dir die Serien gleich herbei!n.</h2>}
     
