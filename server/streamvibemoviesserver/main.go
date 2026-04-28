@@ -78,6 +78,7 @@ func main() {
 	// Registriert die öffentlichen und geschützten API-Routen
 	routes.SetupUnprotectedRoutes(router, client)
 	routes.SetupProtectedRoutes(router, client)
+	routes.SetupAdminRoutes(router, client)
 
 	// Startet den HTTP-Server auf Port 8080
 	if err := router.Run(":8080"); err != nil {

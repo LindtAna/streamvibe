@@ -27,7 +27,7 @@ func CreateSupportRequest(client *mongo.Client) gin.HandlerFunc {
 			return
 		}
 
-		var ctx, cancel = context.WithTimeout(context.Background(), 100*time.Second)
+		var ctx, cancel = context.WithTimeout(context.Background(), 10*time.Second)
 		defer cancel()
 
 		supportRequest.CreatedAt = time.Now()

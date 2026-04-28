@@ -71,7 +71,7 @@ func AdminReviewUpdate(client *mongo.Client) gin.HandlerFunc {
 				},
 			},
 		}
-		var ctx, cancel = context.WithTimeout(c, 100*time.Second)
+		var ctx, cancel = context.WithTimeout(c, 10*time.Second)
 		defer cancel()
 
 		var movieCollection *mongo.Collection = database.OpenCollection("movies", client)
@@ -157,7 +157,7 @@ func GetReviewRanking(admin_review string, client *mongo.Client, c *gin.Context)
 func GetRankings(client *mongo.Client, c *gin.Context) ([]models.Ranking, error) {
 	var rankings []models.Ranking
 
-	var ctx, cancel = context.WithTimeout(c, 100*time.Second)
+	var ctx, cancel = context.WithTimeout(c, 10*time.Second)
 	defer cancel()
 
 	var rankingCollection *mongo.Collection = database.OpenCollection("rankings", client)

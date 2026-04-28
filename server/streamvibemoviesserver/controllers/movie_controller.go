@@ -20,7 +20,7 @@ var validate = validator.New()
 func GetMovies(client *mongo.Client) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// Kontext mit Timeout zur Vermeidung von hängenden Datenbankanfragen
-		ctx, cancel := context.WithTimeout(c, 100*time.Second)
+		ctx, cancel := context.WithTimeout(c, 10*time.Second)
 		defer cancel()
 
 		var movieCollection *mongo.Collection = database.OpenCollection("movies", client)
@@ -46,7 +46,7 @@ func GetMovies(client *mongo.Client) gin.HandlerFunc {
 // liefert einen einzelnen Film basierend auf der db_id zurück
 func GetMovie(client *mongo.Client) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		ctx, cancel := context.WithTimeout(c, 100*time.Second)
+		ctx, cancel := context.WithTimeout(c, 10*time.Second)
 		defer cancel()
 
 		// Auslesen der ID aus den URL-Parametern
@@ -70,41 +70,10 @@ func GetMovie(client *mongo.Client) gin.HandlerFunc {
 	}
 }
 
-// fügt einen neuen Film zur Datenbank hinzu (Admin-Funktion)
-func AddMovie(client *mongo.Client) gin.HandlerFunc {
-	return func(c *gin.Context) {
-		ctx, cancel := context.WithTimeout(c, 100*time.Second)
-		defer cancel()
-
-		var movie models.Movie
-		// Bindet den JSON-Body an die Movie-Struktur
-		if err := c.ShouldBindJSON(&movie); err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid input"})
-			return
-		}
-		// Validierung der Pflichtfelder und Formate
-		if err := validate.Struct(movie); err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"error": "Validation failed", "details": err.Error()})
-			return
-		}
-
-		var movieCollection *mongo.Collection = database.OpenCollection("movies", client)
-
-		// Einfügen des neuen Datensatzes
-		result, err := movieCollection.InsertOne(ctx, movie)
-		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to add movie"})
-			return
-		}
-
-		c.JSON(http.StatusCreated, result)
-	}
-}
-
 // GetGenres ruft alle verfügbaren Filmgenres aus der Datenbank ab
 func GetGenres(client *mongo.Client) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		var ctx, cancel = context.WithTimeout(c, 100*time.Second)
+		var ctx, cancel = context.WithTimeout(c, 10*time.Second)
 		defer cancel()
 
 		var genreCollection *mongo.Collection = database.OpenCollection("genres", client)

@@ -230,7 +230,7 @@ func LogoutHandlerBcrypt(client *mongo.Client) gin.HandlerFunc {
 // erstellt neue Tokens, wenn das Access-Token abgelaufen ist
 func RefreshTokenHandlerBcrypt(client *mongo.Client) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		var ctx, cancel = context.WithTimeout(c, 100*time.Second)
+		var ctx, cancel = context.WithTimeout(c, 10*time.Second)
 		defer cancel()
 
 		refreshToken, err := c.Cookie("refresh_token")

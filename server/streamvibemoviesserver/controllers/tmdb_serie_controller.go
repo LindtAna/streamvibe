@@ -21,7 +21,7 @@ var validateTMDBSerie = validator.New()
 // ruft Filmdetails von TMDB ab und kombiniert sie mit User-Reviews
 func GetSerieTMDB(client *mongo.Client) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		ctx, cancel := context.WithTimeout(c, 100*time.Second)
+		ctx, cancel := context.WithTimeout(c, 10*time.Second)
 		defer cancel()
 
 		serieID := c.Param("tmdb_id")
@@ -201,7 +201,7 @@ func UserReviewSerieUpdateTMDB(client *mongo.Client) gin.HandlerFunc {
 			return
 		}
 
-		var ctx, cancel = context.WithTimeout(context.Background(), 100*time.Second)
+		var ctx, cancel = context.WithTimeout(context.Background(), 10*time.Second)
 		defer cancel()
 
 		var userCollection *mongo.Collection = database.OpenCollection("users", client)
