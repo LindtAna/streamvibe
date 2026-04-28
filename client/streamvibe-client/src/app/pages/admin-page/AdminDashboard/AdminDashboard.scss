@@ -1,0 +1,116 @@
+@use '../../../../styles/helpers' as *;
+
+.admin-dashboard {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background-color: var(--colour-black-06);
+
+  &__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: fluid(20, 12) fluid(40, 16);
+    background-color: var(--colour-black-08);
+    border-bottom: var(--border);
+  }
+
+  &__header-title {
+    font-size: fluid-to-laptop(24, 18);
+    font-weight: 700;
+    color: var(--colour-white);
+
+    @include mobile {
+      display: none;
+    }
+  }
+
+  &__header-actions {
+    display: flex;
+    align-items: center;
+    gap: fluid(20, 12);
+  }
+
+  &__welcome {
+    font-size: fluid-to-laptop(22, 14);
+    color: var(--colour-white);
+
+    @include mobile-s {
+      display: none;
+    }
+  }
+
+  &__username {
+    color: var(--colour-white);
+    font-weight: 600;
+  }
+
+
+  &__content {
+    display: flex;
+    flex: 1;
+  }
+
+  &__sidebar {
+    width: fluid(280, 80);
+    background-color: var(--colour-black-08);
+    border: var(--border);
+    padding: fluid(24, 16);
+
+    @include mobile {
+      width: fluid(80, 60);
+    }
+  }
+
+  &__nav {
+    display: flex;
+    flex-direction: column;
+    gap: fluid(20, 12);
+  }
+
+  &__nav-link {
+    display: flex;
+    align-items: center;
+    padding: fluid(16, 12) fluid(24, 12);
+    color: var(--colour-grey-70);
+    font-size: fluid-to-laptop(16, 14);
+    font-weight: 500;
+    transition: all var(--transition-duration);
+    border: var(--border);
+    border-radius: var(--border-radius-s);
+
+    @include hover {
+      background-color: var(--colour-green);
+      color: var(--colour-white);
+    }
+
+    &--active {
+      background-color: var(--colour-black-10);
+      color: var(--colour-green);
+      border-right-color: var(--colour-green-22);
+    }
+
+    @include mobile {
+      justify-content: center;
+    }
+  }
+
+  &__nav-icon {
+    width: fluid(28, 24);
+    height: fluid(28, 24);
+    flex-shrink: 0;
+  }
+
+  &__nav-label {
+    @include mobile {
+      display: none;
+    }
+  }
+
+  &__main {
+    flex: 1;
+    padding: fluid(40, 20);
+    overflow-y: auto;
+    max-height: calc(100vh - #{fluid(80, 60)});
+  }
+}

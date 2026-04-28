@@ -1,0 +1,58 @@
+@use "../../../../styles/helpers" as *;
+
+.add-movie {
+  max-width: 1200px;
+
+  &__title {
+    margin-bottom: fluid(32, 24);
+    color: var(--colour-white);
+  }
+
+  &__form {
+    background-color: var(--colour-black-08);
+    border: var(--border);
+    border-radius: var(--border-radius-l);
+    padding: fluid(40, 24);
+
+    @include laptop {
+      border-radius: var(--border-radius-m);
+    }
+  }
+
+  &__form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: fluid(24, 16);
+
+    @include tablet {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  &__form-cell {
+    --field-row-gap: #{fluid-to-laptop(10, 8)};
+
+    &--wide {
+      grid-column: 1 / -1;
+    }
+  }
+
+  &__form-actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: fluid(32, 24);
+    gap: fluid(16, 12);
+
+    @include mobile {
+      flex-direction: column;
+    }
+  }
+}
+
+.add-movie-submit-button {
+  background-color: var(--colour-green);
+
+  @include hover {
+    background-color: var(--colour-green-22);
+  }
+}

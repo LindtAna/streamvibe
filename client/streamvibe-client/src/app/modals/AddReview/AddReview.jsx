@@ -32,12 +32,13 @@ import RatingView from '../../components/RatingView'
     text: ''
   })
 
-  // Verwalten des modalen Fensters
+  // Steuerung des nativen <dialog> Elements und Body-Scroll-Lock
   useEffect(() => {
     const dialog = dialogRef.current
     if (!dialog) return
  
     dialog.open = isOpen
+    // Verhindert das Scrollen des Hintergrunds, wenn das Modal offen ist
     document.documentElement.classList.toggle('is-lock', isOpen)
  
     return () => {
@@ -45,7 +46,7 @@ import RatingView from '../../components/RatingView'
     }
   }, [isOpen])
 
-  // Schließen mit Escape
+  // Barrierefreiheit: Schließen des Modals bei Druck auf die Escape-Taste
   useEffect(() => {
     if (!isOpen) return
  
@@ -59,7 +60,7 @@ import RatingView from '../../components/RatingView'
     return () => document.removeEventListener('keydown', handleKeyDown)
   }, [isOpen])
 
-  // success-meldung automatisch ausblenden
+  //Erfolgsmeldung automatisch ausblenden
   useEffect(() => {
     if (success) {
       const timer = setTimeout(() => setSuccess(null), 2000)
@@ -67,7 +68,7 @@ import RatingView from '../../components/RatingView'
     }
   }, [success])
 
-
+//Schließen und Zurücksetzen des Formulars
   const closeModal = useCallback(() => {
     onClose()
     setFormData({
@@ -80,12 +81,14 @@ import RatingView from '../../components/RatingView'
     openButtonRef.current?.focus()
   }, [])
 
+  // Schließen des Modals bei Klick auf das Backdrop (außerhalb des Inhalts)
    const handleDialogClick = useCallback((e) => {
     if (e.target === dialogRef.current) {
       closeModal()
     }
   }, [closeModal])
  
+
   const handleChange = (field) => (e) => {
     setFormData((prev) => ({
       ...prev,
@@ -100,6 +103,7 @@ import RatingView from '../../components/RatingView'
     }))
   }
  
+  // Client-seitige Validierung der Pflichtfelder
   const handleSubmit = async (e) => {
     e.preventDefault()
     setError(null)
@@ -122,8 +126,7 @@ import RatingView from '../../components/RatingView'
  
     setLoading(true)
  
-    try {
-      // const response = await axiosPrivate.post(`/addreview/${imdbId}`, {
+    try { // POST-Request an den Endpunkt für Filmbewertungen
         const response = await axiosPrivate.post(`/addreview/${tmdbId}`, {
         country: formData.country.trim(),
         rating: Number(formData.rating),
@@ -147,7 +150,6 @@ import RatingView from '../../components/RatingView'
       if (err.response?.status === 401) {
         setError('Sitzung abgelaufen. Bitte melde dich erneut an.')
         setTimeout(() => {
-          // navigate('/login', { state: { from: { pathname: `/movie/${imdbId}` } } })
           navigate('/login', { state: { from: { pathname: `/movie/${tmdbId}` } } })
         }, 2000)
       } else {

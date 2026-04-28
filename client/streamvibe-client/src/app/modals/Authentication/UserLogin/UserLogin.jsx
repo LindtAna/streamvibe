@@ -134,6 +134,9 @@ const UserLogin = ({ onClose }) => {
         navigate(from, { replace: true })
       }, 1000)
 
+      if (response.data.role === 'ADMIN') {
+        navigate('/admin', { replace: true });
+      }
     } catch (err) {
       setError('Login fehlgeschlagen. Bitte überprüfe deine Anmeldedaten.')
       console.error('Login error:', err)
@@ -238,7 +241,7 @@ const UserLogin = ({ onClose }) => {
 
 
   return (
-    <form className="user-login__form" onSubmit={handleSubmit} noValidate>
+    <form className="user-login user-login__form" onSubmit={handleSubmit} noValidate>
       <h1 className="user-login__title h5" id={titleId}>
         {mode === "login" ? "Anmelden" : "Account erstellen"}
       </h1>
