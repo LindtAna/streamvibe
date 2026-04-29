@@ -26,6 +26,7 @@ Web-Plattform zum Entdecken und Verwalten von Filmen und Serien mit personalisie
 - [Architektur](#architektur)
 - [Sicherheit & Authentifizierung](#sicherheit--authentifizierung)
 - [Deployment](#deployment)
+- [Hinweis zur Performance](#hinweis-zur-performance)
 - [UI-Design](#ui-design--design-system)
 - [Roadmap](#roadmap)
 
@@ -36,7 +37,10 @@ Web-Plattform zum Entdecken und Verwalten von Filmen und Serien mit personalisie
 **StreamVibe Go**  ist eine moderne Web-Plattform zum Entdecken, Durchsuchen und Verwalten von Filmen und Serien. Die Anwendung bietet personalisierte Empfehlungen basierend auf Nutzervorlieben, eine umfassende Suchfunktion sowie eine Merkliste zur Verwaltung interessanter Inhalte.
 Das Projekt kombiniert ein Go-Backend (Gin Framework) mit einem React-Frontend und nutzt die TMDB-API als primäre Datenquelle. Die Architektur ist auf Skalierbarkeit, Performance und Benutzerfreundlichkeit ausgelegt.
 
-**Live Demo:**  [https://streamvibe-go.vercel.app](https://streamvibe-go.vercel.app)
+**Live Demo:**  [https://streamvibe-go.vercel.app](https://streamvibe-go.vercel.app)        
+Hinweis: Erste Ladezeit kann verzögert sein → siehe Abschnitt „Hinweis zur Performance“
+
+ **Admin-Dashboard Live Demo:** [https://streamvibe-go.vercel.app/admin](https://streamvibe-go.vercel.app/admin)
 
 ---
 
@@ -52,10 +56,13 @@ Das Projekt kombiniert ein Go-Backend (Gin Framework) mit einem React-Frontend u
 - **Trailer-Integration** – YouTube-Video-Player für Film-/Serien-Trailer
 - **Responsive Design** – Optimiert für Desktop, Tablet und Mobile
 
-### **Admin-Funktionen (Optional)**
+### **Admin-Funktionen**
 
-- **KI-gestützte Review-Analyse** – Automatische Sentiment-Klassifizierung via OpenAI
-- **Verwaltung redaktioneller Inhalte**
+- **Admin Dashboard** – Zentrale Verwaltungsoberfläche mit rollenbasiertem Zugriff
+- **Film-Verwaltung** – Hinzufügen von redaktionellen Filmen zur Datenbank
+- **Support-System** – Bearbeitung und Beantwortung von Nutzer-Anfragen via E-Mail
+- **KI-gestützte Review-Analyse (Optional)** – Automatische Sentiment-Klassifizierung via OpenAI
+
 
 
 ## Technologie-Stack
@@ -84,6 +91,7 @@ Das Projekt kombiniert ein Go-Backend (Gin Framework) mit einem React-Frontend u
 | CORS | gin-contrib/cors 1.7.6 | Cross‑Origin‑Konfiguration |
 | godotenv | 1.5.1 | Umgebungsvariablen |
 | validator | v10.30.1 | Validierung |
+| gomail | v2 | SMTP E-Mail-Versand |
 
 ### Externe APIs
 
@@ -100,9 +108,9 @@ streamvibe/
 │   ├── public/
 │   │   └── favicons/           # App-Icons verschiedener Größen
 │   ├── src/
-│   │   ├── api/                 # API-Konfiguration & Endpunkte
-│   │   │    ├── api.js          # apiService: Zentralisierte API-Methoden(Movies, Collections)
-│   │   │    └── axiosConfig.js  # Axios-Instanz mit baseURL und Credentials-Support
+│   │   ├─ api/             # API-Konfiguration & Endpunkte
+│   │   │  ├── api.js          # apiService: Zentralisierte API-Methoden(Movies, Collections)
+│   │   │  └── axiosConfig.js  # Axios-Instanz mit baseURL und Credentials-Support
 │   │   ├── app/
 │   │   │   ├── components/     # Wiederverwendbare UI-Komponenten
 │   │   │   │   ├── Badge/
@@ -131,9 +139,15 @@ streamvibe/
 │   │   │   │   └── Section/
 │   │   │   ├── modals/         # Dialog-Komponenten
 │   │   │   │   ├── AddReview/
-│   │   │   │   └── Authentication/
-│   │   │   │       └── UserLogin/
+│   │   │   │   ├── Authentication/
+│   │   │   │   │   └── UserLogin/
+│   │   │   │   └── SupportResponse/
 │   │   │   ├── pages/          # Seitenkomponenten
+│   │   │   │   ├── admin-page/
+│   │   │   │   │   ├── AddMovie/
+│   │   │   │   │   ├── AdminDashboard/
+│   │   │   │   │   ├── RequireAdmin.jsx
+│   │   │   │   │   └── SupportRequests/
 │   │   │   │   ├── home/
 │   │   │   │   ├── movie-page/
 │   │   │   │   ├── movies-page/
@@ -173,6 +187,7 @@ streamvibe/
 │
 └── server/streamvibemoviesserver/
     ├── controllers/            # Request-Handler
+    │   ├── admin_controller.go
     │   ├── admin_openai_review_optional_controller.go
     │   ├── movie_controller.go
     │   ├── search_controller.go
@@ -184,15 +199,18 @@ streamvibe/
     ├── database/               # DB-Verbindung
     │   └── database_connection.go
     ├── middleware/             # Middleware (Auth)
+    │   ├── admin_middleware.go
     │   └── auth_middleware.go
     ├── models/                 # Datenmodelle
-    │   ├── movie_model.go
+    │   ├── admin_model.go
+    │   ├── user_model.go
     │   ├── search_model.go
-    │   ├── support_model.go
+    │   ├── movie_model.go
     │   ├── tmdb_movie_model.go
     │   ├── tmdb_serie_model.go
-    │   └── user_model.go
+    │   └── support_model.go
     ├── routes/                 # Route-Definitionen
+    │   ├── admin_routes.go
     │   ├── protected_routes.go
     │   └── unprotected_routes.go
     ├── utils/                  # Hilfsfunktionen
@@ -229,6 +247,12 @@ TMDB_API_KEY=<bearer_token>
 # OpenAI (optional)
 OPENAI_API_KEY=<api_key>
 BASE_PROMPT_TEMPLATE=Return a response using one of these words: {rankings}...
+
+# SMTP E-Mail-Konfiguration (Admin Support-System)
+SMTP_HOST=smtp.example.com
+SMTP_PORT=587
+SMTP_USER=noreply@streamvibe-go.vercel.app
+SMTP_PASSWORD=<smtp_password>
 
 # Server-Konfiguration
 ENV=production
@@ -316,27 +340,36 @@ GET    /watchlist                 # Merkliste abrufen
 GET    /recommendedmovies         # Personalisierte Film-Empfehlungen
 GET    /recommendedseries         # Personalisierte Serien-Empfehlungen
 ```
+
+#### Admin-Endpunkte (erfordern JWT + Admin-Rolle)
+ 
+```http
+POST   /admin/addmovie            # Film zur Datenbank hinzufügen
+GET    /admin/support-requests    # Alle Support-Anfragen abrufen
+POST   /admin/support-response    # Support-Antwort per E-Mail senden
+DELETE /admin/support-request/:id # Support-Anfrage löschen
+```
 ---
 
 ## Datenbank-Schema (Models)
 Die Datenbank basiert auf MongoDB. Die Datenstrukturen sind in Go wie folgt definiert:
 
-### Benutzer (User)
+#### Benutzer (User)
 Repräsentiert die registrierten Nutzer der Plattform.
 ```go
 type User struct {
     ID              bson.ObjectID `bson:"_id,omitempty"`
     UserName        string        `bson:"user_name"`
     Email           string        `bson:"email"`
-    Password        string        `bson:"password"` // bcrypt-Hash
-    Role            string        `bson:"role"`     // "ADMIN" oder "USER"
+    Password        string        `bson:"password"` // Argon2id-Hash
+    Role            string        `bson:"role"`     // "USER"
     FavouriteGenres []Genre       `bson:"favourite_genres"`
     Watchlist       []string      `bson:"watchlist"` // IDs von TMDB
     Token           string        `bson:"token"`
     RefreshToken    string        `bson:"refresh_token"`
 }
 ```
-### Redaktions-Filme (Movie)
+#### Redaktions-Filme (Movie)
 Interne Filmdatenbank für redaktionelle Empfehlungen.
 ```go
 type Movie struct {
@@ -350,7 +383,7 @@ type Movie struct {
     AdminReview      string        `bson:"admin_review"`
 }
 ```
-### Benutzerbewertungen (UserReview)
+#### Benutzerbewertungen (UserReview)
 Speichert die Bewertungen der Nutzer.
 ```go
 type UserReview struct {
@@ -362,14 +395,14 @@ type UserReview struct {
     CreatedAt time.Time     `bson:"created_at"`
 }
 ```
-### Genres(Genre)
+#### Genres(Genre)
 ```go
 type Genre struct {
 	GenreID   int    `bson:"genre_id"`
 	GenreName string `bson:"genre_name"`
 }
 ```
-### Support Anfrage(SupportRequest)
+#### Support Anfrage(SupportRequest)
 ```go
 type SupportRequest struct {
 	ID        bson.ObjectID `bson:"_id,omitempty"`
@@ -381,11 +414,23 @@ type SupportRequest struct {
 	CreatedAt time.Time     `bson:"created_at"`
 }
 ```
-### Rankings (für KI-Review-Analyse)
+#### Support Antwort (SupportResponse)
 ```go
-type Ranking struct {
-	RankingValue int    `bson:"ranking_value"`
-	RankingName  string `bson:"ranking_name"`
+type SupportResponse struct {
+	SupportRequestID bson.ObjectID `bson:"support_request_id"`
+	AdminID          bson.ObjectID `bson:"admin_id"`
+	Response         string        `bson:"response"`
+	SentAt           time.Time     `bson:"sent_at"`
+}
+```
+#### Administrator (Admin)
+```go
+type Admin struct {
+	ID         bson.ObjectID `bson:"_id,omitempty"`
+	AdminID    string        `bson:"admin_id"`
+	AdminName  string        `bson:"admin_name"`
+	AdminEmail string        `bson:"admin_email"`
+	Password   string        `bson:"password"` // Argon2id-Hash
 }
 ```
 ---
@@ -394,90 +439,125 @@ type Ranking struct {
 
 ### System-Architektur
 ```
-┌───────────────────────────────────────────────────────────────────┐
-│                   Frontend (React + Vite)                         │
-│  ┌──────────────┐  ┌──────────────┐  ┌──────────────────┐         │
-│  │   Pages      │  │  Components  │  │     Context      │         │
-│  │              │  │              │  │   (Global State) │         │
-│  │ - HomePage   │  │ - Header     │  │                  │         │
-│  │ - Movies     │  │ - Hero       │  │ - AuthProvider   │         │
-│  │ - Series     │  │ - Collections│  │   (User/Auth)    │         │
-│  │ - MoviePage  │  │ - MovieCard  │  │                  │         │
-│  │ - SeriePage  │  │ - SerieCard  │  │                  │         │
-│  │ - SavedPage  │  │ - Slider     │  │                  │         │
-│  │ - SearchPage │  │ - Button     │  │                  │         │
-│  │ - Support    │  │ - SearchBar  │  │                  │         │
-│  │              │  │ - VideoPlayer│  │                  │         │
-│  └──────────────┘  └──────────────┘  └──────────────────┘         │
-│                              │                                    │
-│                              ▼                                    │
-│                    Axios HTTP Client                              │
-│                    (axiosConfig / axiosPrivate)                   │
-└───────────────────────────────┼───────────────────────────────────┘
-                                │
-                                │ REST API Calls + JWT Auth
-                                │
-┌───────────────────────────────▼───────────────────────────────────┐
-│                  Backend (Go + Gin Framework)                     │
-│  ┌─────────────┐    ┌─────────────────┐    ┌─────────────┐        │
-│  │   Routes    │    │   Controllers   │    │ Middleware  │        │
-│  │             │    │                 │    │             │        │
-│  │ Unprotected:│--->│ user_controller │    │- AuthMiddle-│        │
-│  │ - /register │    │  - RegisterUser │    │  ware (JWT) │        │
-│  │ - /login    │    │  - LoginUser    │    │             │        │
-│  │ - /logout   │    │  - LogoutHandler│    │             │        │
-│  │ - /refresh  │    │  - RefreshToken │    │             │        │
-│  │             │    │                 │    │             │        │
-│  │ - /movie/:id│    │ tmdb_movie_ctrl │    │             │        │
-│  │ - /serie/:id│    │  - GetMovieTMDB │    │             │        │
-│  │ - /db-movie │    │  - GetSerieTMDB │    │             │        │
-│  │ - /search   │    │                 │    │             │        │
-│  │ - /home-... │    │ movie_controller│    │             │        │
-│  │ - /support  │    │  - GetMovies    │    │             │        │
-│  │             │    │  - GetMovie     │    │             │        │
-│  │ Protected:  │    │                 │    │             │        │
-│  │ - /addreview│    │ search_ctrl     │    │             │        │
-│  │ - /watchlist│    │  - SearchTMDB   │    │             │        │
-│  │ - /recommen-│    │                 │    │             │        │
-│  │   dedmovies │    │ watchlist_ctrl  │    │             │        │
-│  │             │    │  - AddToWatch   │    │             │        │
-│  │             │    │  - RemoveFrom   │    │             │        │
-│  │             │    │  - GetWatchlist │    │             │        │
-│  └─────────────┘    └─────────────────┘    └─────────────┘        │
-│                              │                                    │
-│                              ▼                                    │
-│                    MongoDB Driver (Go)                            │
-└───────────────────────────────┼───────────────────────────────────┘
-                                │
-                                ▼
-┌───────────────────────────────────────────────────────────────────┐
-│                      MongoDB Database                             │
-│                                                                   │
-│  Collections:                                                     │
-│  - users (Benutzer, JWT-Tokens, Watchlist, Genres)                │
-│  - movies (DB-Filme: Poster, Trailer, Regie, Drehbuch)            │
-│  - user_reviews (Bewertungen von Usern)                           │
-│  - support_anfrage (Support-Anfragen)                             │
-│  - rankings (AI-Review-Klassifikation, optional)                  │
-└───────────────────────────────────────────────────────────────────┘
+┌────────────────────────────────────────────────────────────────────────────┐
+│                   Frontend (React + Vite)                                  │
+│  ┌──────────────┐         ┌──────────────┐         ┌──────────────────┐    │
+│  │   Pages      │         │  Components  │         │     Context      │    │
+│  │              │         │              │         │   (Global State) │    │
+│  │ - HomePage   │         │ - Header     │         │                  │    │
+│  │ - Movies     │         │ - Hero       │         │ - AuthProvider   │    │
+│  │ - Series     │         │ - Collections│         │   (User/Auth)    │    │
+│  │ - MoviePage  │         │ - MovieCard  │         │                  │    │
+│  │ - SeriePage  │         │ - SerieCard  │         │                  │    │
+│  │ - SavedPage  │         │ - Slider     │         │                  │    │
+│  │ - SearchPage │         │ - Button     │         │                  │    │
+│  │ - Support    │         │ - SearchBar  │         │                  │    │
+│  │              │         │ - VideoPlayer│         │                  │    │
+│  └──────────────┘         └──────────────┘         └──────────────────┘    │
+│                                  │                                         │
+│                                  ▼                                         │
+│                          Axios HTTP Client                                 │
+│                    (axiosConfig / axiosPrivate)                            │
+└──────────────────────────────────┼─────────────────────────────────────────┘
+                                   │
+                                   │ REST API Calls + JWT Auth
+                                   │
+┌───────────────────────────────── ▼ ────────────────────────────────────────┐
+│                     Backend (Go + Gin Framework)                           │
+│  ┌─────────────────────┐      ┌────────────────────┐  ┌──────────────────┐ │
+│  │       Routes        │      │   Controllers      │  │    Middleware    │ │
+│  │                     │      │                    │  │                  │ │
+│  │ Unprotected:        │────▸ │ user_controller    │  │- AuthMiddleware  │ │
+│  │ - /register         │      │  - RegisterUser    │  │      (JWT)       │ │
+│  │ - /login            │      │  - LoginUser       │  │                  │ │
+│  │ - /logout           │      │  - LogoutHandler   │  │                  │ │
+│  │ - /refresh          │      │  - RefreshToken    │  │                  │ │
+│  │                     │      │                    │  │                  │ │
+│  │ - /movie/:id        │      │ tmdb_movie_ctrl    │  │                  │ │
+│  │ - /serie/:id        │      │  - GetMovieTMDB    │  │                  │ │
+│  │ - /db-movie/:db_id  │      │  - GetSerieTMDB    │  │                  │ │
+│  │ - /search           │      │                    │  │                  │ │
+│  │ - /home-collections │      │ movie_controller   │  │                  │ │
+│  │ - /support          │      │  - GetMovies       │  │                  │ │
+│  │                     │      │  - GetMovie        │  │                  │ │
+│  │ Protected:          │      │                    │  │                  │ │
+│  │ - /addreview        │      │ search_controller  │  │                  │ │
+│  │ - /watchlist        │      │  - SearchTMDB      │  │                  │ │
+│  │ - /recommendedmovies│      │                    │  │                  │ │
+│  │                     │      │ watchlist_ctrl     │  │                  │ │
+│  │                     │      │  - AddToWatchlist  │  │                  │ │
+│  │                     │      │  - RemoveFromWtchl │  │                  │ │
+│  │                     │      │  - GetWatchlist    │  │                  │ │
+│  │                     │      │                    │  │                  │ │
+│  │  Admin:             │      │ admin_controller   │  │-AdminMiddleware  │ │
+│  │ - /admin            │      │ - AddMovie         │  │                  │ │
+│  │ - /addmovie         │      │ - GetAllSupportReq │  │                  │ │
+│  │ - ./support-requests│      │ - SendSupportResp  │  │                  │ │
+│  │ - ./support-response│      │ - DeleteSupportResp│  │                  │ │
+│  └─────────────────────┘      └────────────────────┘  └──────────────────┘ │
+│                                         │                                  │
+│                                         ▼                                  │
+│                                MongoDB Driver (Go)                         │
+└─────────────────────────────────────────┼──────────────────────────────────┘
+                                          │
+                                          ▼
+┌────────────────────────────────────────────────────────────────────────────┐
+│                      MongoDB Database                                      │
+│                                                                            │
+│  Collections:                                                              │
+│  - users (Benutzer, JWT-Tokens, Watchlist, Genres)                         │
+│  - movies (DB-Filme: Poster, Trailer, Regie, Drehbuch)                     │
+│  - user_reviews (Bewertungen von Usern)                                    │
+│  - support_anfrage (Support-Anfragen)                                      │
+│  - support_responses (Admin-Antworten auf Support-Anfragen)                │
+│  - rankings (AI-Review-Klassifikation, optional)                           │
+└────────────────────────────────────────────────────────────────────────────┘
 
 External Services:
-┌─────────────────┐    ┌─────────────────┐    ┌──────────────┐
-│   TMDB API      │    │  YouTube Embed  │    │  OpenAI API  │
-│  (Filme/Serien, │    │   (Trailer)     │    │ (AI-Review,  │
-│   Metadaten,    │    │                 │    │  optional)   │
-│   Bilder)       │    │                 │    │              │
-└─────────────────┘    └─────────────────┘    └──────────────┘
+┌─────────────────┐            ┌─────────────────┐            ┌──────────────┐
+│   TMDB API      │            │  YouTube Embed  │            │  OpenAI API  │
+│  (Filme/Serien, │            │   (Trailer)     │            │ (AI-Review,  │
+│   Metadaten,    │            │                 │            │  optional)   │
+│   Bilder)       │            │                 │            │              │
+└─────────────────┘            └─────────────────┘            └──────────────┘
+```
 
-Authentication Flow:
+#### Authentication Flow:
+```
 ┌───────────────────────────────────────────────────────────────────┐
 │  1. User Login → Backend generiert Access Token + Refresh Token   │
 │  2. Tokens als HttpOnly Cookies gespeichert                       │
 │  3. axiosPrivate Interceptor: Auto-Refresh bei 401                │
 │  4. AuthContext speichert User-State (localStorage + State)       │
 └───────────────────────────────────────────────────────────────────┘
+```
+#### Film-Verwaltung Workflow(Admin):
+```
+┌───────────────────────────────────────────────────────────────────┐
+│  1. Administrator füllt Formular aus (/admin)                     │
+│  2. Frontend sendet POST-Request an /admin/addmovie               │
+│  3.  Backend validiert Eingaben (go-playground/validator)         │
+│  4. Film wird in MongoDB gespeichert                              │
+│  5. Bestätigung an Frontend                                       │
+└───────────────────────────────────────────────────────────────────┘
+```
+#### Support-System(SupportRequests)(Admin) Workflow
+```
+┌────────────────────────────────────────────────────────────────────┐
+│ 1. Admin öffnet Support-Anfragen (/admin/support-requests)         │
+│ 2. Frontend ruft GET /admin/support-requests ab                    │
+│ 3. Admin klickt "Antworten" → SupportResponse Modal öffnet sich    │
+│ 4. Admin verfasst Antwort → POST /admin/support-response           │
+│ 5. Backend sendet HTML-E-Mail via SMTP                             │
+│ 6. Antwort wird in DB gespeichert                                  │
+│ 5. Modal schließt sich                                             │
+└────────────────────────────────────────────────────────────────────┘
+```
 
-Data Flow Beispiel (Film-Details abrufen):
+#### Data Flow Beispiel 
+Film-Details abrufen:
+
+```
 ┌────────────────────────────────────────────────────────────────────┐
 │ 1. User navigiert zu /movie/:tmdbId                                │
 │ 2. MovieDetailsTMDB.jsx ruft apiService.getMovieById(tmdbId)       │
@@ -488,8 +568,9 @@ Data Flow Beispiel (Film-Details abrufen):
 │    - Konvertiert zu MovieDetailsResponse                           │
 │ 5. Frontend zeigt Film-Banner + Details + Reviews                  │
 └────────────────────────────────────────────────────────────────────┘
-
+```
 Personalisierte Empfehlungen:
+```
 ┌────────────────────────────────────────────────────────────────────┐
 │ 1. User hat favourite_genres bei Registrierung gewählt             │
 │ 2. Backend mappt Genre-Namen zu TMDB-Genre-IDs                     │
@@ -498,6 +579,7 @@ Personalisierte Empfehlungen:
 │ 5. Frontend zeigt "Filmempfehlungen" Sektion                       │
 └────────────────────────────────────────────────────────────────────┘
 ```
+
 ### Backend (Go)
 
 #### Schichtenmodell
@@ -513,7 +595,7 @@ Personalisierte Empfehlungen:
 
 1. **RESTful API-Design**
 2. **JWT-basierte Authentifizierung** via HTTP-Only Cookies
-3. **Parallele API-Anfragen** mit Goroutines & WaitGroups
+3. **Parallele API-Anfragen** mit Goroutines & WaitGroups, um die Latenz zu reduzieren
 4. **Context-basierte Timeouts** für DB-Operationen
 
 
@@ -564,10 +646,25 @@ Personalisierte Empfehlungen:
   - **Salt:** 16 Bytes (kryptographisch sicher)
 - **Protected Routes:** Middleware prüft JWT vor geschützten Endpunkten
 
+- Rollenbasierte Zugriffskontrolle
+    - **Frontend:** `RequireAdmin` Component prüft `auth.role === "ADMIN"`
+    - **Backend:** Middleware-Chain für Admin-Routen:
+  ```go
+  admin.Use(
+    middleware.AuthMiddleware(),    // Prüft JWT
+    middleware.AdminMiddleware(),   // Prüft Role
+  )
+  ```
+
 #### Sicherheit im Request-Flow
 - **CORS-Konfiguration:** Explizite Whitelist für erlaubte Origins
 - **SameSite-Cookies:** Lax (dev) / None (prod mit HTTPS)
 - **Input-Validierung:** go-playground/validator auf Server-Seite
+
+#### E-Mail-Sicherheit
+- **XSS-Schutz:** Alle Benutzereingaben werden mit `html.EscapeString()` escaped
+- **SMTP über TLS:** Sichere Verbindung zum E-Mail-Server (Port 587)
+- **Template-Validierung:** HTML-Templates mit festen Strukturen
 
 
 ### Datenschutz (DSGVO-Konform)
@@ -583,7 +680,7 @@ Personalisierte Empfehlungen:
 ### Empfohlene Infrastruktur
 
 #### Backend
-- Cloud VM (z.B. AWS EC2, DigitalOcean Droplet)
+- Cloud VM (z.B. AWS EC2, Render)
 
 #### Frontend
 - CDN-Hosting (Vercel, Netlify, Cloudflare Pages)
@@ -598,6 +695,18 @@ Personalisierte Empfehlungen:
 - `SameSite=None` Cookies  
 - `Secure HttpOnly`‑Flag für HTTPS  
 - Strikte CORS‑Origins
+
+---
+
+### Hinweis zur Performance (Free Tier)
+
+Das Backend ist auf [https://render.com](https://render.com)  (Free Tier) gehostet. 
+Inaktive Services werden automatisch heruntergefahren.
+Die erste Anfrage kann daher bis zu ~15–20 Sekunden dauern (Cold Start).  
+Nachfolgende Requests sind deutlich schneller.
+Dieses Verhalten ist infrastrukturell bedingt und spiegelt **nicht** die tatsächliche Laufzeit-Performance der Anwendung wider.
+
+In einer Produktionsumgebung würde dies z. B. durch Always-on-Instanzen oder eine Caching-Schicht vermieden werden.
 
 ---
 
@@ -648,14 +757,16 @@ Die Ordnerstruktur (styles/helpers/) stellt wichtige Werkzeuge bereit, um sauber
 ### Accessibility:
 - Keyboard-Navigation (Tab, Arrow-Keys)
 - .visually-hidden: Ein Mixin/Klasse, um Elemente (wie Label) visuell zu verstecken, aber für Screenreader weiterhin vorlesbar zu machen.
+- **ARIA Labels:** Semantische HTML-Struktur
 - Focus Management: Globale Anpassung der Focus-States (:focus-visible) mit Outline-Offset (2px dashed var(--colour-white)), um Tastaturnutzern eine klare Navigation zu ermöglichen.
+- **Escape-Key:** Modal schließt sich bei ESC-Taste
 
 ---
 
 ##  Roadmap
 ### Geplante Features
 
-- Admin-Dashboard
+- ~~Administrator Dashboard~~
 - Erweiterte Filter (Jahr, Rating, Sprache)
 - Dark/Light Mode
 
