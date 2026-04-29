@@ -7,15 +7,14 @@ import getIdFromTitle from '../getIdFromTitle'
 const Field = ({
   className,
   id,
-  label,
-  // undefined (default) | 'email' | 'textarea'
+  label, // undefined (default) | 'email' | 'textarea'
   type,
   placeholder,
   isRequired,
   inputMode,
-  // renderBefore — Slot für Select (Ländercode vor dem Eingabefeld)
-  renderBefore,
+  renderBefore, // renderBefore — Slot für Select (Ländercode vor dem Eingabefeld)
   error,
+  size = 'default', // 'default' | 'small'
   // Die restlichen Eigenschaften werden an das Eingabefeld/Textfeld übergeben.
   ...rest
 }) => {
@@ -24,7 +23,8 @@ const Field = ({
   const hasError = error !== undefined ? Boolean(error) : false
 
   return (
-    <div className={classNames(className, 'field')}>
+    <div className={classNames(className, 'field',
+    {'field--small': size === 'small' })}>
       <label className="field__label" htmlFor={fieldId}>
         {label}{' '}
         {isRequired && (

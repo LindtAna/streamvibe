@@ -61,7 +61,7 @@ function App() {
 
               <Route path="/stream/:yt_id" element={<Videoplayer />} />
 
-              <Route path="/login" element={<UserLogin />} />
+              <Route path="/login" element={<UserLogin isPage={true} />} />
               <Route path="/support" element={<SupportPage />} />
 
               {/* Protected */}

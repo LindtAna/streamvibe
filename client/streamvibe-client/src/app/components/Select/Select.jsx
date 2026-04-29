@@ -17,9 +17,9 @@ const Select = ({
   // Array<{ value: string, isSelected?: boolean }>
   options = [],
   buttonClassName,
-  onChange,
-  // 'auto' | 'up' | 'down' -- Öffnungsrichtung
+  onChange, // 'auto' | 'up' | 'down' -- Öffnungsrichtung
   forceDirection = 'auto',
+  wideWidth = false,
 }) => {
   const reactId = useId()
   const baseId = idProp ?? (label ? getIdFromTitle(label) : reactId)
@@ -150,7 +150,9 @@ const Select = ({
   }
 
   return (
-    <div className="select" ref={rootRef} onKeyDown={handleKeyDown}>
+    <div className={classNames('select', { 'select--wide-width': wideWidth })} 
+    ref={rootRef} 
+    onKeyDown={handleKeyDown}>
    
       <label
         className={classNames('select__label', {

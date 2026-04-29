@@ -83,7 +83,7 @@ const SupportRequests = () => {
 
   return (
     <div className="support-requests">
-      <h1 className="support-requests__title h3">Support-Anfragen</h1>
+      <h1 className="support-requests__title h4">Support-Anfragen</h1>
 
       {success && <div className="alert alert-success">{success}</div>}
       {error && <div className="alert alert-danger">{error}</div>}

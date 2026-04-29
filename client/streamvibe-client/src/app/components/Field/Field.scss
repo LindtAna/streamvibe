@@ -1,8 +1,18 @@
 .field {
+    --field-row-gap: #{fluid-to-laptop(16, 12)};
+    --field-control-height: #{fluid-to-laptop(67, 53)};
+    --field-body-margin-bottom: 0px;
+
+    &--small {
+        --field-row-gap: #{fluid-to-laptop(5, 3)};
+        --field-control-height: #{fluid-to-laptop(45, 38)};
+        --field-body-margin-bottom: #{fluid(20, 15)};
+    }
+
     display: flex;
     flex-direction: column;
     align-items: start;
-    row-gap: var(--field-row-gap, fluid-to-laptop(16, 12));
+    row-gap: var(--field-row-gap);
 
 
     &__label {
@@ -24,7 +34,7 @@
 
     &__control {
         width: 100%;
-        height: var(--field-control-height, fluid-to-laptop(67, 53));
+        height: var(--field-control-height);
         padding-inline: fluid-to-laptop(20, 16);
         color: var(--colour-white);
         background-color: var(--colour-black-08);

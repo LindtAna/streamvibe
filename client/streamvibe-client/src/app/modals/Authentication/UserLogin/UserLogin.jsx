@@ -13,7 +13,7 @@ import Select from '../../../components/Select'
 import Tags from '../../../components/Tags'
 
 
-const UserLogin = ({ onClose }) => {
+const UserLogin = ({ onClose, isPage }) => {
   const titleId = 'user-login-title'
 
   const { setAuth } = useAuth()
@@ -241,7 +241,7 @@ const UserLogin = ({ onClose }) => {
 
 
   return (
-    <form className="user-login user-login__form" onSubmit={handleSubmit} noValidate>
+    <form className={`user-login user-login__form ${isPage ? 'user-login__form--page' : ''}`} onSubmit={handleSubmit} noValidate>
       <h1 className="user-login__title h5" id={titleId}>
         {mode === "login" ? "Anmelden" : "Account erstellen"}
       </h1>
@@ -272,6 +272,7 @@ const UserLogin = ({ onClose }) => {
       {mode === 'login' && (
         <>
           <Field
+          size="small"
             className="user-login__form-cell"
             label="Email"
             type="email"
@@ -282,6 +283,7 @@ const UserLogin = ({ onClose }) => {
           />
 
           <Field
+          size="small"
             className="user-login__form-cell"
             label="Passwort"
             type="password"
@@ -319,6 +321,7 @@ const UserLogin = ({ onClose }) => {
       {mode === 'register' && (
         <>
           <Field
+          size="small"
             className="user-login__form-cell"
             label="Benutzername"
             placeholder="Erika Musterfrau"
@@ -328,6 +331,7 @@ const UserLogin = ({ onClose }) => {
           />
 
           <Field
+          size="small"
             className="user-login__form-cell"
             label="Email"
             type="email"
@@ -338,6 +342,7 @@ const UserLogin = ({ onClose }) => {
           />
 
           <Field
+          size="small"
             className="user-login__form-cell"
             label="Passwort (7 characters minimum)"
             type="password"
@@ -348,6 +353,7 @@ const UserLogin = ({ onClose }) => {
           />
 
           <Field
+          size="small"
             className="user-login__form-cell"
             label="Passwort bestätigen"
             type="password"
@@ -365,6 +371,7 @@ const UserLogin = ({ onClose }) => {
               options={genresOptions}
               onChange={handleGenreSelect}
               forceDirection="up"
+              wideWidth={true}
             />
 
             <div
