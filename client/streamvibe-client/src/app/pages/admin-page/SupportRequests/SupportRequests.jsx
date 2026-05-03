@@ -57,6 +57,31 @@ const SupportRequests = () => {
     fetchSupportRequests()
   }
 
+   // Löschen einer Support-Anfrage
+const handleDeleteRequest = async (requestId) => {
+    // Блокируем удаление для демо-админа
+    if (isDemoMode) {
+      setError('Demo-Modus: Löschen von Support-Anfragen ist nicht erlaubt.')
+      setTimeout(() => setError(null), 3000)
+      return
+    }
+
+    // Bestätigung vor dem Löschen
+    if (!window.confirm('Möchten Sie diese Support-Anfrage wirklich löschen?')) {
+      return
+    }
+
+    try {
+      await axiosPrivate.delete(`/admin/support-request/${requestId}`)
+      setSuccess('Support-Anfrage erfolgreich gelöscht!')
+      // Aktualisiere die Liste nach erfolgreichem Löschen
+      fetchSupportRequests()
+    } catch (err) {
+      console.error('Error deleting support request:', err)
+      setError('Fehler beim Löschen der Support-Anfrage.')
+    }
+  }
+
 
   //Formatierung von Zeitstempeln in lokales Format
   const formatDate = (dateString) => {
@@ -111,6 +136,13 @@ const SupportRequests = () => {
                   mode="black-08"
                   label="Antworten"
                   onClick={() => handleOpenModal(request)}
+                />
+
+                <Button
+                  className="support-request-card__reply-button"
+                  mode="black-08"
+                  label="Löschen"
+                  onClick={() => handleDeleteRequest(request._id)}
                 />
               </div>
 

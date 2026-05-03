@@ -1,6 +1,6 @@
 import './AdminDashboard.scss'
 
-import { NavLink, Outlet } from 'react-router-dom'
+import { NavLink, Outlet, useLocation } from 'react-router-dom'
 import { useState } from 'react'
 
 import useAuth from '../../../../hooks/useAuth'
@@ -15,7 +15,9 @@ const SIDEBAR_LINKS = [
 const AdminDashboard = () => {
   const { auth, setAuth } = useAuth()
   const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const location = useLocation()
 
+  const isDemoAdmin = auth?.email === 'admin-demo@streamvibe.app';
 
   const handleLogout = () => {
     setAuth(null)
@@ -28,9 +30,19 @@ const AdminDashboard = () => {
       <header className="admin-dashboard__header">
         <h1 className="admin-layout__header-title h5">Administrator Dashboard</h1>
 
+        {isDemoAdmin && (
+            <div style={{ color: '#FF3333', margin: '0 20px', fontWeight: 'bold' }}>
+              {location.pathname === '/admin/support-requests' 
+                ? '⚠︎ Demo-Modus: Sie sehen nur die Test-Support-Anfragen und können nicht darauf antworten oder sie löschen.'
+                : '⚠︎ Demo-Modus: das Eingeben einer Beschreibung ist möglich, jedoch können keine Filme hinzugefügt werden.'}
+            </div>
+        )}
+
         <div className="admin-dashboard__header-actions">
           <p className="admin-dashboard__welcome h5">
-            Hallo, <span className="admin-dashboard__username">{auth?.user_name || 'Boss'}</span>!
+            Hallo, <span className="admin-dashboard__username">
+              {isDemoAdmin ? 'Demo-Admin' : (auth?.user_name || 'Boss')} 
+            </span>!
           </p>
           <Button
             className="admin-dashboard__logout-button"

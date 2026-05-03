@@ -19,10 +19,22 @@ const UserLogin = ({ onClose, isPage }) => {
   const { setAuth } = useAuth()
   const [mode, setMode] = useState("login")
 
+  const location = useLocation()
+  const navigate = useNavigate()
+
+  const from = location.state?.from?.pathname || "/"
+  const isDemoRedirect = isPage && from === '/admin';
+
+  const [favouriteGenres, setFavouriteGenres] = useState([])
+
+  const [error, setError] = useState(null)
+  const [success, setSuccess] = useState(null)
+  const [loading, setLoading] = useState(false)
+
   const [formData, setFormData] = useState({
     user_name: '',
-    email: '',
-    password: '',
+    email: isDemoRedirect ? 'admin-demo@streamvibe.app' : '',
+    password: isDemoRedirect ? 'Qwerty@7654321' : '',
     confirmPassword: '',
     agreement: false,
   })
@@ -41,16 +53,18 @@ const UserLogin = ({ onClose, isPage }) => {
 
   ]
 
-  const [favouriteGenres, setFavouriteGenres] = useState([])
+  ///Setzt Demodaten beim isDemoRedirect
+   useEffect(() => {
+    if (isDemoRedirect) {
+      setFormData(prev => ({
+        ...prev,
+        email: 'admin-demo@streamvibe.app',
+        password: 'Qwerty@7654321'
+      }))
+    }
+  }, [isDemoRedirect])
 
-  const [error, setError] = useState(null)
-  const [success, setSuccess] = useState(null)
-  const [loading, setLoading] = useState(false)
-  const navigate = useNavigate()
-  const location = useLocation()
-
-  const from = location.state?.from?.pathname || "/"
-
+  
   useEffect(() => {
     if (success) {
       const timer = setTimeout(() => setSuccess(null), 1500)

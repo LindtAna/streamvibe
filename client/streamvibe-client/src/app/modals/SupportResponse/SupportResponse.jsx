@@ -3,13 +3,17 @@ import './SupportResponse.scss'
 import { useState, useEffect, useRef, useCallback } from 'react'
 
 import useAxiosPrivate from '../../../hooks/useAxiosPrivate'
+import useAuth from '../../../hooks/useAuth'
 
 import Field from '../../components/Field'
 import Button from '../../components/Button'
 
 const SupportResponseModal = ({ isOpen, onClose, supportRequest, onResponseSent }) => {
   const titleId = 'support-response-title'
+
+  const { auth } = useAuth()
   const axiosPrivate = useAxiosPrivate()
+  const isDemoAdmin = auth?.email === 'admin-demo@streamvibe.app'
 
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
@@ -81,6 +85,7 @@ const SupportResponseModal = ({ isOpen, onClose, supportRequest, onResponseSent 
   
   const handleSubmit = async (e) => {
     e.preventDefault()
+    if (isDemoAdmin) return
     setError(null)
     setSuccess(null)
 // Einfache Validierung der Eingabelänge

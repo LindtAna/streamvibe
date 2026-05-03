@@ -3,6 +3,7 @@ import './AddMovie.scss'
 import { useState } from 'react'
 
 import useAxiosPrivate from '../../../../hooks/useAxiosPrivate'
+import useAuth from '../../../../hooks/useAuth'
 
 import Field from '../../../components/Field'
 import Button from '../../../components/Button'
@@ -25,14 +26,18 @@ const INITIAL_FORM_DATA = {
 }
 
 const AddMovie = () => {
+    const { auth } = useAuth()
     const axiosPrivate = useAxiosPrivate()
-    const [loading, setLoading] = useState(false)
 
+    const isDemoAdmin = auth?.email === 'admin-demo@streamvibe.app'
+
+    const [loading, setLoading] = useState(false)
     const [error, setError] = useState(null)
     const [success, setSuccess] = useState(null)
 
     const [formData, setFormData] = useState(INITIAL_FORM_DATA)
     const resetForm = () => setFormData(INITIAL_FORM_DATA)
+
 
     const handleChange = (field) => (e) => {
         setFormData((prev) => ({
@@ -43,6 +48,7 @@ const AddMovie = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault()
+        if (isDemoAdmin) return
         setLoading(true)
 
         try {
