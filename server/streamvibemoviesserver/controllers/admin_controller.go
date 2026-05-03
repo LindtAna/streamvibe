@@ -65,8 +65,20 @@ func GetAllSupportRequests(client *mongo.Client) gin.HandlerFunc {
 		supportCollection := database.OpenCollection("support_anfrage", client)
 		var supportRequests []models.SupportRequest
 
-		// Sortier-Optionen: Die neuesten Anfragen werden zuerst angezeigt
-		opts := options.Find().SetSort(bson.D{{Key: "created_at", Value: -1}})
+		// Sortier-Optionen
+		opts := options.Find()
+
+		email, exists := c.Get("email")
+		isDemoAdmin := exists && email == "admin-demo@streamvibe.app"
+
+		if isDemoAdmin {
+			// Demo-Modus: Sortierung nach Erstellungsdatum in aufsteigender Reihenfolge (ältestes zuerst) + Limit 3
+			opts.SetSort(bson.D{{Key: "created_at", Value: 1}})
+			opts.SetLimit(3)
+		} else {
+			// Regulärer Administrator: Neueste Anfragen zuerst
+			opts.SetSort(bson.D{{Key: "created_at", Value: -1}})
+		}
 
 		// Führt die Abfrage in der Datenbank aus
 		cursor, err := supportCollection.Find(ctx, bson.M{}, opts)
@@ -237,6 +249,17 @@ func sendEmail(recipientEmail, firstName, lastName, responseText string) error {
 // entfernt eine Support-Anfrage aus der DB
 func DeleteSupportRequest(client *mongo.Client) gin.HandlerFunc {
 	return func(c *gin.Context) {
+
+		email, exists := c.Get("email")
+		isDemoAdmin := exists && email == "admin-demo@streamvibe.app"
+
+		if isDemoAdmin {
+			c.JSON(http.StatusForbidden, gin.H{
+				"error": "Demo-Modus: Löschen von Support-Anfragen ist nicht erlaubt",
+			})
+			return
+		}
+
 		// ID aus der URL-Parameter (/support/:id)
 		requestID := c.Param("id")
 

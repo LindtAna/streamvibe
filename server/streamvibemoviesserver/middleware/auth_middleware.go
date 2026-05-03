@@ -31,6 +31,7 @@ func AuthMiddleware() gin.HandlerFunc {
 		}
 		c.Set("userId", claims.UserId) //Saving user data
 		c.Set("role", claims.Role)
+		c.Set("email", claims.Email)
 
 		c.Next() //middleware is finished, execute the next middleware/handler
 	}
