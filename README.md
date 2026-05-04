@@ -34,7 +34,6 @@ Web-Plattform zum Entdecken und Verwalten von Filmen und Serien mit personalisie
 ---
 
 ##  Über das Projekt  
-[Zurück 🡡](#inhaltsverzeichnis)
 
 **StreamVibe Go**  ist eine moderne Web-Plattform zum Entdecken, Durchsuchen und Verwalten von Filmen und Serien. Die Anwendung bietet personalisierte Empfehlungen basierend auf Nutzervorlieben, eine umfassende Suchfunktion sowie eine Merkliste zur Verwaltung interessanter Inhalte.
 Das Projekt kombiniert ein Go-Backend (Gin Framework) mit einem React-Frontend und nutzt die TMDB-API als primäre Datenquelle. Die Architektur ist auf Skalierbarkeit, Performance und Benutzerfreundlichkeit ausgelegt.
@@ -145,7 +144,8 @@ streamvibe/
 │   │   │   │   │   ├── Header/
 │   │   │   │   │   ├── Logo/
 │   │   │   │   │   └── SearchBar/
-│   │   │   │   └── Section/
+│   │   │   │   ├── Section/
+│   │   │   │   └── Footer/
 │   │   │   ├── modals/         # Dialog-Komponenten
 │   │   │   │   ├── AddReview/
 │   │   │   │   ├── Authentication/
