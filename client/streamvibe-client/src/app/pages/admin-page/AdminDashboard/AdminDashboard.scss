@@ -7,12 +7,19 @@
   background-color: var(--colour-black-06);
 
   &__header {
-    display: flex;
+    display: grid;
+    grid-template-columns: auto 1fr auto;
     align-items: center;
-    justify-content: space-between;
+    gap: fluid(20, 12);
     padding: fluid(20, 12) fluid(40, 16);
     background-color: var(--colour-black-08);
     border-bottom: var(--border);
+
+    @include tablet {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+    }
   }
 
   &__header-title {
@@ -20,8 +27,34 @@
     font-weight: 700;
     color: var(--colour-white);
 
+    @include tablet {
+      font-size: fluid(18, 14);
+    }
+
     @include mobile {
-      display: none;
+      flex: 1 1 100%;
+      text-align: center;
+    }
+  }
+
+  &__demo-warning {
+    color: var(--colour-red-60);
+    font-weight: 700;
+    text-align: center;
+    grid-column: 2;
+    justify-self: center;
+    max-width: fluid(600, 300);
+    margin: 0 fluid(15, 8);
+
+    @include tablet {
+      flex: 1 1 100%;
+      order: -1;
+      margin: 0 0 fluid(16, 12) 0;
+      max-width: none;
+    }
+
+    @include mobile {
+      margin: 0;
     }
   }
 
@@ -29,14 +62,24 @@
     display: flex;
     align-items: center;
     gap: fluid(20, 12);
+
+    @include tablet {
+      display: contents;
+    }
+
+    @include mobile {
+      display: flex;
+      flex: 1 1 100%;
+      justify-content: space-between;
+    }
   }
 
   &__welcome {
     font-size: fluid-to-laptop(22, 14);
     color: var(--colour-white);
 
-    @include mobile-s {
-      display: none;
+    @include tablet {
+      font-size: fluid(16, 12);
     }
   }
 
@@ -44,7 +87,6 @@
     color: var(--colour-white);
     font-weight: 600;
   }
-
 
   &__content {
     display: flex;
@@ -58,14 +100,19 @@
     padding: fluid(24, 16);
 
     @include mobile {
-      width: fluid(80, 60);
+      width: fluid(70, 60);
+      padding: fluid(16, 12);
     }
   }
 
   &__nav {
     display: flex;
     flex-direction: column;
-    gap: fluid(20, 12);
+    gap: fluid(15, 8);
+
+     @include mobile {
+    align-items: center;
+  }
   }
 
   &__nav-link {
@@ -79,6 +126,14 @@
     border: var(--border);
     border-radius: var(--border-radius-s);
 
+    @include mobile {
+      @include square(40px);
+      padding: 0;
+      @include flex-center;
+
+      border-radius: 12px;
+    }
+
     @include hover {
       background-color: var(--colour-green);
       color: var(--colour-white);
@@ -89,27 +144,28 @@
       color: var(--colour-green);
       border-right-color: var(--colour-green-22);
     }
-
-    @include mobile {
-      justify-content: center;
-    }
   }
 
   &__nav-icon {
-    width: fluid(28, 24);
-    height: fluid(28, 24);
-    flex-shrink: 0;
+    display: none;
+
+    @include mobile {
+      display: flex;
+      @include square(35px);
+    }
   }
 
   &__nav-label {
+    display: block;
+
     @include mobile {
-      display: none;
+      @include visually-hidden;
     }
   }
 
   &__main {
     flex: 1;
-    padding: fluid(40, 20);
+    padding: fluid(40, 8);
     overflow-y: auto;
     max-height: calc(100vh - #{fluid(80, 60)});
   }
