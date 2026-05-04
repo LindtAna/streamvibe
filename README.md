@@ -26,7 +26,7 @@ Web-Plattform zum Entdecken und Verwalten von Filmen und Serien mit personalisie
 - [Architektur](#architektur)
 - [Sicherheit & Authentifizierung](#sicherheit--authentifizierung)
 - [Deployment](#deployment)
-- [Hinweis zur Performance](#hinweis-zur-performance)
+- [Hinweis zur Performance](#hinweis-zur-performance-free-tier)
 - [UI-Design](#ui-design--design-system)
 - [Roadmap](#roadmap)
 
@@ -698,7 +698,7 @@ Personalisierte Empfehlungen:
 
 ---
 
-### Hinweis zur Performance (Free Tier)
+## Hinweis zur Performance (Free Tier)
 
 Das Backend ist auf [https://render.com](https://render.com)  (Free Tier) gehostet. 
 Inaktive Services werden automatisch heruntergefahren.
