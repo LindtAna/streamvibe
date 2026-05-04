@@ -10,6 +10,7 @@ import RequiredAuth from "./src/app/RequiredAuth";
 
 import Header from "./src/app/layouts/Header/Header";
 import Layout from "./src/app/Layout";
+import Footer from "./src/app/layouts/Footer"; 
 
 import UserLogin from "./src/app/modals/Authentication/UserLogin";
 
@@ -80,6 +81,7 @@ function App() {
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </main>
+        <Footer />
       </Router>
     </AuthProvider>
   );

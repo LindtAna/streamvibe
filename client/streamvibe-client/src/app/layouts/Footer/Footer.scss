@@ -1,0 +1,48 @@
+@use '../../../styles/helpers/' as *;
+
+.footer {
+  width: 100%;
+  background-color: var(--colour-black-06);
+  border-block: var(--border-width-l) solid var(--colour-black-12);
+  padding-block: fluid(15, 8);
+
+  &__inner {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-inline: #{fluid(60, 15)};
+
+    @include mobile {
+      flex-direction: column;
+      text-align: center;
+      gap: 8px;
+    }
+  }
+
+  &__text {
+    @include fluid-text(14, 12);
+    color: var(--colour-grey-75);
+    margin: 0;
+    line-height: 1.5;
+
+    &--tmdb {
+      max-width: 600px;
+
+      @include tablet {
+        max-width: 400px;
+      }
+
+      @include mobile {
+        max-width: 100%;
+      }
+    }
+
+    &--copyright {
+      white-space: nowrap;
+
+      @include mobile {
+        white-space: normal;
+      }
+    }
+  }
+}
