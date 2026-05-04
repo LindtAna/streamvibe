@@ -33,7 +33,9 @@ Web-Plattform zum Entdecken und Verwalten von Filmen und Serien mit personalisie
 
 ---
 
-##  Über das Projekt
+##  Über das Projekt  
+[Zurück 🡡](#inhaltsverzeichnis)
+
 **StreamVibe Go**  ist eine moderne Web-Plattform zum Entdecken, Durchsuchen und Verwalten von Filmen und Serien. Die Anwendung bietet personalisierte Empfehlungen basierend auf Nutzervorlieben, eine umfassende Suchfunktion sowie eine Merkliste zur Verwaltung interessanter Inhalte.
 Das Projekt kombiniert ein Go-Backend (Gin Framework) mit einem React-Frontend und nutzt die TMDB-API als primäre Datenquelle. Die Architektur ist auf Skalierbarkeit, Performance und Benutzerfreundlichkeit ausgelegt.
 
@@ -44,7 +46,9 @@ Hinweis: Erste Ladezeit kann verzögert sein → siehe Abschnitt „Hinweis zur 
 
 ---
 
-##  Features
+##  Features  
+[Zurück 🡡](#inhaltsverzeichnis)
+
 
 ### **Kernfunktionen**
 
@@ -63,9 +67,11 @@ Hinweis: Erste Ladezeit kann verzögert sein → siehe Abschnitt „Hinweis zur 
 - **Support-System** – Bearbeitung und Beantwortung von Nutzer-Anfragen via E-Mail
 - **KI-gestützte Review-Analyse (Optional)** – Automatische Sentiment-Klassifizierung via OpenAI
 
+---
 
+## Technologie-Stack  
+[Zurück 🡡](#inhaltsverzeichnis)
 
-## Technologie-Stack
 
 ### Frontend
 
@@ -100,8 +106,11 @@ Hinweis: Erste Ladezeit kann verzögert sein → siehe Abschnitt „Hinweis zur 
 | TMDB API | Haupt‑Datenquelle für Film‑/Serieninformationen |
 | OpenAI API (optional) | KI‑gestützte Review‑Analyse |
 
+---
 
-##  Repository-Struktur
+##  Repository-Struktur   
+[Zurück 🡡](#inhaltsverzeichnis)
+
 ```
 streamvibe/
 ├── client/streamvibe-client/
@@ -228,8 +237,9 @@ streamvibe/
     └── main.go                 # Server-Entry-Point
  ```
 
-
-##  Umgebungsvariablen
+---
+##  Umgebungsvariablen  
+[Zurück 🡡](#inhaltsverzeichnis)
 
 ### Backend (`/server/streamvibemoviesserver/.env`)
 ```env
@@ -274,7 +284,8 @@ VITE_API_BASE_URL=http://localhost:8080
 ```
 ---
 
-##  API-Dokumentation
+##  API-Dokumentation  
+[Zurück 🡡](#inhaltsverzeichnis)
 
 ### Infrastruktur & Sicherheit
 Die Kommunikation mit dem Backend erfolgt über eine zentralisierte Architektur, die Sicherheit и Performance optimiert.
@@ -352,6 +363,7 @@ DELETE /admin/support-request/:id # Support-Anfrage löschen
 ---
 
 ## Datenbank-Schema (Models)
+[Zurück 🡡](#inhaltsverzeichnis)
 Die Datenbank basiert auf MongoDB. Die Datenstrukturen sind in Go wie folgt definiert:
 
 #### Benutzer (User)
@@ -435,7 +447,8 @@ type Admin struct {
 ```
 ---
 
-##  Architektur
+##  Architektur  
+[Zurück 🡡](#inhaltsverzeichnis)
 
 ### System-Architektur
 ```
@@ -619,7 +632,8 @@ Personalisierte Empfehlungen:
 
 ---
 
-##  Sicherheit & Authentifizierung
+##  Sicherheit & Authentifizierung  
+[Zurück 🡡](#inhaltsverzeichnis)
 ### JWT-Flow
 
 #### Login
@@ -676,7 +690,8 @@ Personalisierte Empfehlungen:
 
 ---
 
-## Deployment
+## Deployment  
+[Zurück 🡡](#inhaltsverzeichnis)
 ### Empfohlene Infrastruktur
 
 #### Backend
@@ -698,7 +713,8 @@ Personalisierte Empfehlungen:
 
 ---
 
-## Hinweis zur Performance (Free Tier)
+## Hinweis zur Performance (Free Tier)  
+[Zurück 🡡](#inhaltsverzeichnis)
 
 Das Backend ist auf [https://render.com](https://render.com)  (Free Tier) gehostet. 
 Inaktive Services werden automatisch heruntergefahren.
@@ -710,7 +726,8 @@ In einer Produktionsumgebung würde dies z. B. durch Always-on-Instanzen oder ei
 
 ---
 
-## UI-Design & Design-System
+## UI-Design & Design-System  
+[Zurück 🡡](#inhaltsverzeichnis)
 
 Das Frontend nutzt ein maßgeschneidertes, modulares SCSS-Design-System, das auf Fluid Design, Wiederverwendbarkeit und Barrierefreiheit (Accessibility) ausgelegt ist. Die Architektur basiert auf globalen CSS-Variablen kombiniert mit leistungsstarken SCSS-Mixins und -Funktionen.
 
@@ -748,7 +765,7 @@ Die Applikation nutzt Fluid Typography, berechnet durch die mathematische SCSS-F
 | Mobile Small     | <= 480px     | @include mobile-s          |
 
 
-## SCSS Utilities & Mixins:
+### SCSS Utilities & Mixins:
 Die Ordnerstruktur (styles/helpers/) stellt wichtige Werkzeuge bereit, um sauberen und DRY (Don't Repeat Yourself) Code zu schreiben:
   - @include hover: Ein intelligentes Hover-Mixin, das erkennt, ob das Gerät eine Maus unterstützt (any-hover: hover). Auf Touch-Geräten (Smartphones) fällt es automatisch auf einen :active-State zurück, um "steckengebliebene" Hover-Effekte zu vermeiden.
   - Positionierung: Hilfs-Mixins wie @include flex-center, @include abs-center (Absolute Centering) reduzieren Boilerplate-Code.
@@ -763,7 +780,8 @@ Die Ordnerstruktur (styles/helpers/) stellt wichtige Werkzeuge bereit, um sauber
 
 ---
 
-##  Roadmap
+##  Roadmap  
+[Zurück 🡡](#inhaltsverzeichnis)
 ### Geplante Features
 
 - ~~Administrator Dashboard~~
